@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atelier Global | Princess Prom Dress Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo">✨ Atelier Global</div>
+    <div class="countdown-badge">
+      Prom Night Countdown: <span id="event-timer">45 Days Left</span>
+    </div>
+    <nav class="nav-links">
+      <button class="nav-btn active" onclick="switchTab('customizer')">1. Design Studio</button>
+      <button class="nav-btn" onclick="switchTab('production')">2. Live Tracker & Escrow</button>
+      <button class="nav-btn" onclick="switchTab('chat')">3. Designer Chat</button>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <section id="customizer-tab" class="tab-content active">
+      <div class="grid-2col">
+        
+        <div class="card preview-card">
+          <div class="badge-sparkle">✨ Royal Princess Visualizer</div>
+          <div class="dress-canvas" id="dress-canvas">
+            <div class="gown-base" id="gown-base"></div>
+            <div class="beading-layer" id="beading-layer"></div>
+            <div class="silhouete-overlay">👗 Custom A-Line Silhouette</div>
+          </div>
+          <div class="preview-footer">
+            <p><strong>Selected Fabric:</strong> <span id="lbl-fabric">Silk Satin</span></p>
+            <p><strong>Beading Style:</strong> <span id="lbl-beading">Heavy Crystal & Sequin</span></p>
+          </div>
+        </div>
+
+        <div class="card controls-card">
+          <h2>Co-Create Your Dream Prom Gown</h2>
+          <p class="subtitle">Customize every detail within your target budget.</p>
+
+          <form id="dress-form">
+            <div class="form-group">
+              <label for="fabric">Select Fabric & Texture</label>
+              <select id="fabric" onchange="updateCustomizer()">
+                <option value="Silk Satin" data-price="220">Silk Satin ($220)</option>
+                <option value="Glitter Tulle" data-price="190">Glitter Tulle ($190)</option>
+                <option value="Velvet Royal" data-price="250">Velvet Royal ($250)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="beading">Beading & Embellishment Extravagance</label>
+              <select id="beading" onchange="updateCustomizer()">
+                <option value="Heavy Crystal & Sequin" data-price="180">Heavy Crystal & Rhinestone Corset (+$180)</option>
+                <option value="Medium Pearl Accent" data-price="120">Medium Pearl & Sparkle Accent (+$120)</option>
+                <option value="Minimal Shimmer" data-price="70">Minimal Sparkle Dust (+$70)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Gown Color Palette</label>
+              <div class="color-swatches">
+                <button type="button" class="swatch active" style="background:#4a1525;" onclick="setColor('#4a1525', 'Royal Emerald/Burgundy')"></button>
+                <button type="button" class="swatch" style="background:#1d2a44;" onclick="setColor('#1d2a44', 'Midnight Navy')"></button>
+                <button type="button" class="swatch" style="background:#e0a96d;" onclick="setColor('#e0a96d', 'Rose Gold Sparkle')"></button>
+                <button type="button" class="swatch" style="background:#d4af37;" onclick="setColor('#d4af37', 'Imperial Gold')"></button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="sizing">Fit & Sizing Method</label>
+              <select id="sizing">
+                <option value="3d-scan">AI 3D Smartphone Scan (30 Secs, 100% Fit Guarantee)</option>
+                <option value="local-tailor">Local Partner Tailor Measurement Visit</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="prom-date">Guaranteed Delivery Slot Needed By</label>
+              <input type="date" id="prom-date" value="2026-05-15" />
+            </div>
+
+            <div class="price-box">
+              <div class="price-row">
+                <span>Base Production & Material:</span>
+                <span id="price-fabric">$220</span>
+              </div>
+              <div class="price-row">
+                <span>Hand-Beading & Craftsmanship:</span>
+                <span id="price-beading">$180</span>
+              </div>
+              <div class="price-row">
+                <span>Escrow & Local Fit Protection:</span>
+                <span id="price-protection">$40</span>
+              </div>
+              <hr />
+              <div class="price-row total">
+                <span>Total Guaranteed Price:</span>
+                <span id="price-total">$440</span>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="submitOrder()">Lock Design & Reserve Tailor Slot</button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="production-tab" class="tab-content">
+      <div class="card">
+        <h2>Live Artisan Progress & Stage-Gate Escrow Tracker</h2>
+        <p class="subtitle">Your money is held safely in escrow. Funds are only unlocked when you approve each step!</p>
+
+        <div class="stepper">
+          <div class="step completed">
+            <div class="step-circle">1</div>
+            <div class="step-label">Design & 3D Scan Approved</div>
+          </div>
+          <div class="step active">
+            <div class="step-circle">2</div>
+            <div class="step-label">Fabric & Beading Inspection</div>
+          </div>
+          <div class="step">
+            <div class="step-circle">3</div>
+            <div class="step-label">Corset & Bodice Construction</div>
+          </div>
+          <div class="step">
+            <div class="step-circle">4</div>
+            <div class="step-label">Final QA Hub & Video Inspection</div>
+          </div>
+        </div>
+
+        <div class="stage-card">
+          <h3>Current Stage: Hand-Beading Placement Inspection</h3>
+          <p>Master Artisan <strong>Elena (Vietnam Atelier #14)</strong> has uploaded photo updates of your custom bodice beading.</p>
+          
+          <div class="inspection-preview">
+            <div class="mock-photo">📷 [High-Res Inspection Photo: Crystal Bodice Detail]</div>
+          </div>
+
+          <div class="action-bar">
+            <button class="btn btn-success" onclick="approveMilestone()">✓ Approve Stage & Release 25% Escrow</button>
+            <button class="btn btn-warning" onclick="requestRevision()">⚠️ Request Change / Update Designer</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="chat-tab" class="tab-content">
+      <div class="card chat-card">
+        <h2>Direct Communication with Lead Artisan</h2>
+        <p class="subtitle">Real-Time Auto-Translated Chat with Tailor Studio</p>
+
+        <div class="chat-box" id="chat-box">
+          <div class="msg msg-artisan">
+            <strong>Atelier Elena:</strong> Hello! I am laying out the crystal beads on your dress bodice today. Please review the stage photo and let me know if you want more shimmer near the neckline!
+          </div>
+        </div>
+
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Type your design updates or questions..." />
+          <button class="btn btn-primary" onclick="sendMessage()">Send Update</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,15 +1,15 @@
 /**
- * Atelier Global - Prom Dress Customizer & Escrow Tracker Logic
- * Includes complete UI validation, fallbacks, and error handling.
+ * Atelier Global - Comprehensive Customizer, Clearance, Checkout, Camera QA & Tracker
  */
 
-// Global State Safeguards
 const AppState = {
   isStageApproved: false,
-  minimumLeadDays: 14
+  minimumLeadDays: 14,
+  selectedDressName: "Custom Prom Dress",
+  selectedTotalPrice: 440,
+  webcamStream: null
 };
 
-// UI Error Banner Helper
 function showError(message) {
   const banner = document.getElementById('error-banner');
   const msgSpan = document.getElementById('error-message');
@@ -21,12 +21,9 @@ function showError(message) {
 
 function hideError() {
   const banner = document.getElementById('error-banner');
-  if (banner) {
-    banner.classList.add('hidden');
-  }
+  if (banner) banner.classList.add('hidden');
 }
 
-// Defensive Tab Navigation
 function switchTab(tabName) {
   try {
     const tabs = document.querySelectorAll('.tab-content');
@@ -45,264 +42,189 @@ function switchTab(tabName) {
       showError(`Unable to switch to tab: ${tabName}`);
     }
   } catch (err) {
-    console.error("Tab switching error:", err);
-    showError("An unexpected error occurred while switching tabs.");
+    console.error("Tab error:", err);
+    showError("Error switching view tabs.");
   }
 }
 
-// Live Customizer & Dynamic Pricing Logic with Defensive Fallbacks
+// Live Customizer
 function updateCustomizer() {
   hideError();
   try {
     const fabricSelect = document.getElementById('fabric');
     const beadingSelect = document.getElementById('beading');
 
-    if (!fabricSelect || !beadingSelect) {
-      throw new Error("Required customization controls missing.");
-    }
+    if (!fabricSelect || !beadingSelect) return;
 
     const selectedFabricOpt = fabricSelect.options[fabricSelect.selectedIndex];
     const selectedBeadingOpt = beadingSelect.options[beadingSelect.selectedIndex];
 
-    // Safe Numerical Parsing with Fallbacks
     const fabricPrice = parseFloat(selectedFabricOpt?.getAttribute('data-price')) || 220;
     const beadingPrice = parseFloat(selectedBeadingOpt?.getAttribute('data-price')) || 180;
     const protectionFee = 40;
 
-    const totalPrice = fabricPrice + beadingPrice + protectionFee;
+    AppState.selectedTotalPrice = fabricPrice + beadingPrice + protectionFee;
+    AppState.selectedDressName = `Custom ${selectedFabricOpt.value} Prom Dress`;
 
-    // Safe Label Updates
-    const lblFabric = document.getElementById('lbl-fabric');
-    const lblBeading = document.getElementById('lbl-beading');
-    if (lblFabric) lblFabric.innerText = selectedFabricOpt?.value || 'Silk Satin';
-    if (lblBeading) lblBeading.innerText = selectedBeadingOpt?.value || 'Heavy Crystal';
+    document.getElementById('lbl-fabric').innerText = selectedFabricOpt?.value || 'Silk Satin';
+    document.getElementById('lbl-beading').innerText = selectedBeadingOpt?.value || 'Heavy Crystal';
 
-    // Safe Price Display Updates
-    document.getElementById('price-fabric').innerText = `$${fabricPrice.toFixed(0)}`;
-    document.getElementById('price-beading').innerText = `$${beadingPrice.toFixed(0)}`;
-    document.getElementById('price-total').innerText = `$${totalPrice.toFixed(0)}`;
+    document.getElementById('price-fabric').innerText = `$${fabricPrice}`;
+    document.getElementById('price-beading').innerText = `$${beadingPrice}`;
+    document.getElementById('price-total').innerText = `$${AppState.selectedTotalPrice}`;
 
-    // Adjust Beading Visualizer Layer Safely
-    const beadingLayer = document.getElementById('beading-layer');
-    if (beadingLayer && selectedBeadingOpt) {
-      const value = selectedBeadingOpt.value;
-      if (value.includes('Heavy')) {
-        beadingLayer.style.opacity = '0.9';
-        beadingLayer.style.backgroundSize = '10px 10px';
-      } else if (value.includes('Medium')) {
-        beadingLayer.style.opacity = '0.6';
-        beadingLayer.style.backgroundSize = '18px 18px';
-      } else {
-        beadingLayer.style.opacity = '0.3';
-        beadingLayer.style.backgroundSize = '24px 24px';
-      }
-    }
+    // Update Summary
+    document.getElementById('summary-item-name').innerText = AppState.selectedDressName;
+    document.getElementById('summary-total').innerText = `$${AppState.selectedTotalPrice}`;
   } catch (err) {
-    console.error("Customizer update error:", err);
-    showError("Could not update dress preview or total price.");
+    showError("Could not update customizer pricing.");
   }
 }
 
-// Color Swatch Selection
-function setColor(swatchBtn, hexCode, colorName) {
-  try {
-    const gownBase = document.getElementById('gown-base');
-    if (gownBase) {
-      gownBase.style.backgroundColor = hexCode;
-    }
-
-    const swatches = document.querySelectorAll('.swatch');
-    swatches.forEach(s => s.classList.remove('active'));
-    if (swatchBtn) {
-      swatchBtn.classList.add('active');
-    }
-  } catch (err) {
-    console.error("Color swatch error:", err);
-  }
+function setColor(swatchBtn, hexCode) {
+  const gownBase = document.getElementById('gown-base');
+  if (gownBase) gownBase.style.backgroundColor = hexCode;
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  if (swatchBtn) swatchBtn.classList.add('active');
 }
 
-// Date Lead-Time Validation
-function validatePromDate() {
-  const dateInput = document.getElementById('prom-date');
-  const dateHint = document.getElementById('date-hint');
-  hideError();
+// Clearance Action
+function buyClearance(gownName, price) {
+  AppState.selectedDressName = gownName;
+  AppState.selectedTotalPrice = price;
 
-  if (!dateInput || !dateInput.value) {
-    if (dateHint) {
-      dateHint.innerText = "Please select a valid prom date.";
-      dateHint.classList.add('error');
-    }
-    dateInput.classList.add('input-error');
-    return false;
-  }
+  document.getElementById('summary-item-name').innerText = gownName;
+  document.getElementById('summary-total').innerText = `$${price}`;
 
-  const selectedDate = new Date(dateInput.value);
-  const today = new Date();
-  
-  // Calculate difference in days
-  const diffTime = selectedDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (isNaN(diffDays) || diffDays < AppState.minimumLeadDays) {
-    if (dateHint) {
-      dateHint.innerText = `Error: Custom artisan dresses require at least ${AppState.minimumLeadDays} days lead time.`;
-      dateHint.classList.add('error');
-    }
-    dateInput.classList.add('input-error');
-    showError(`Selected date is too close! We require at least ${AppState.minimumLeadDays} days for tailoring.`);
-    return false;
-  }
-
-  // Clear Error State
-  dateInput.classList.remove('input-error');
-  if (dateHint) {
-    dateHint.innerText = `Great! ${diffDays} days allows optimal tailor scheduling.`;
-    dateHint.classList.remove('error');
-  }
-  return true;
+  alert(`✨ Selected: ${gownName} ($${price}). Redirecting to checkout...`);
+  switchTab('checkout');
 }
 
-// Order Submission Validation
-function submitOrder() {
-  hideError();
+function proceedToCheckout() {
+  updateCustomizer();
+  switchTab('checkout');
+}
 
-  if (!validatePromDate()) {
-    showError("Please correct your event date before proceeding.");
+function confirmPaymentAndOrder() {
+  const name = document.getElementById('chk-name').value.trim();
+  const address = document.getElementById('chk-address').value.trim();
+
+  if (!name || !address) {
+    showError("Please provide your name and shipping address for escrow protection.");
     return;
   }
 
-  const form = document.getElementById('dress-form');
-  if (form && !form.checkValidity()) {
-    showError("Please fill out all required customizer selections.");
-    return;
-  }
-
-  alert("✨ Design Reserved! Your 3D measurement scan invitation link has been sent to your phone. Transitioning to your Live Escrow Tracker...");
+  alert(`🔒 Payment Authorized! $${AppState.selectedTotalPrice} is now securely locked in Escrow. Your artisan team has been notified.`);
   switchTab('production');
 }
 
-// Milestone Approval Guard
-function approveMilestone() {
+// Live Camera Functionality for Steps 2 & 3
+async function startCamera() {
   hideError();
+  const video = document.getElementById('webcam-video');
+  const placeholder = document.getElementById('camera-placeholder');
 
+  try {
+    AppState.webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    video.srcObject = AppState.webcamStream;
+    video.classList.remove('hidden');
+    if (placeholder) placeholder.classList.add('hidden');
+  } catch (err) {
+    console.error("Camera access error:", err);
+    showError("Unable to access camera. Please allow camera permissions or upload a photo file instead.");
+  }
+}
+
+function takeSnapshot() {
+  const video = document.getElementById('webcam-video');
+  const canvas = document.getElementById('snapshot-canvas');
+
+  if (!AppState.webcamStream || video.classList.contains('hidden')) {
+    showError("Please start the live camera first before taking a snapshot.");
+    return;
+  }
+
+  const context = canvas.getContext('2d');
+  canvas.width = video.videoWidth || 320;
+  canvas.height = video.videoHeight || 240;
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  video.classList.add('hidden');
+  canvas.classList.remove('hidden');
+
+  alert("📷 Snapshot captured! Submitted to artisan for Stage 2/3 fit verification.");
+}
+
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    alert(`📁 File "${file.name}" uploaded successfully for designer review!`);
+  }
+}
+
+// Escrow Milestone & Shipment Progress
+function approveMilestone() {
   if (AppState.isStageApproved) {
-    showError("This milestone has already been approved.");
+    showError("This stage is already approved.");
     return;
   }
 
   AppState.isStageApproved = true;
+  document.getElementById('btn-approve').disabled = true;
+  document.getElementById('btn-revision').disabled = true;
 
-  const btnApprove = document.getElementById('btn-approve');
-  const btnRevision = document.getElementById('btn-revision');
   const statusMsg = document.getElementById('stage-status-msg');
-  const step2 = document.getElementById('step-2');
-  const step3 = document.getElementById('step-3');
+  statusMsg.innerText = "✓ Stage 2 Approved! 25% Escrow Released. Order moved to Express Shipment Track.";
+  statusMsg.className = "status-msg success";
 
-  if (btnApprove) btnApprove.disabled = true;
-  if (btnRevision) btnRevision.disabled = true;
+  document.getElementById('step-2').classList.remove('active');
+  document.getElementById('step-2').classList.add('completed');
+  document.getElementById('step-3').classList.add('completed');
+  document.getElementById('step-4').classList.add('active');
 
-  if (statusMsg) {
-    statusMsg.innerText = "✓ Stage 2 Approved! 25% Escrow Released to Master Artisan Elena. Initializing Stage 3.";
-    statusMsg.className = "status-msg success";
-  }
-
-  if (step2) {
-    step2.classList.remove('active');
-    step2.classList.add('completed');
-  }
-  if (step3) {
-    step3.classList.add('active');
-  }
-
-  alert("✓ Success: Milestone approved! 25% payment unlocked in escrow.");
+  // Advance Shipment Tracker Bar to 75%
+  document.getElementById('shipment-progress').style.width = '75%';
+  alert("✓ Success: Stage approved! Shipment progress updated.");
 }
 
-// Revision Request Guard
 function requestRevision() {
-  hideError();
-
-  if (AppState.isStageApproved) {
-    showError("Cannot request revisions for an already approved milestone.");
-    return;
+  const feedback = prompt("Specify change for your designer:");
+  if (feedback && feedback.trim() !== "") {
+    switchTab('chat');
+    appendChatMessage("User (Design Change Request)", feedback.trim(), "msg-user");
   }
-
-  const feedback = prompt("Specify desired modification for your designer (e.g., 'Add more crystals along the lower neckline'):");
-  
-  if (feedback === null) {
-    // User cancelled prompt
-    return;
-  }
-
-  if (feedback.trim() === "") {
-    showError("Revision request cannot be empty. Please specify what you would like changed.");
-    return;
-  }
-
-  switchTab('chat');
-  appendChatMessage("User (Design Change Request)", feedback.trim(), "msg-user");
-
-  setTimeout(() => {
-    appendChatMessage("Atelier Elena", "Thank you for the update! I will adjust the crystal pattern on the bodice and upload a revised photo tomorrow.", "msg-artisan");
-  }, 1200);
 }
 
-// Chat Input Handlers
+// Chat Handlers
 function handleChatKeyPress(event) {
-  if (event.key === 'Enter') {
-    sendMessage();
-  }
+  if (event.key === 'Enter') sendMessage();
 }
 
 function sendMessage() {
-  hideError();
   const input = document.getElementById('chat-input');
-  
   if (!input) return;
-
   const text = input.value.trim();
-  if (text === "") {
-    showError("Cannot send an empty chat message.");
-    return;
-  }
+  if (text === "") return;
 
   appendChatMessage("You", text, "msg-user");
   input.value = "";
   
-  // Simulated Automated Designer Reply
   setTimeout(() => {
     appendChatMessage("Atelier Elena", "Got your note! Working on perfecting this for your prom date.", "msg-artisan");
-  }, 1500);
+  }, 1200);
 }
 
 function appendChatMessage(sender, text, msgClass) {
   const chatBox = document.getElementById('chat-box');
   if (!chatBox) return;
-
   const msgDiv = document.createElement('div');
   msgDiv.className = `msg ${msgClass}`;
-  
-  // Sanitize text to prevent script injection
   const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
   msgDiv.innerHTML = `<strong>${sender}:</strong> ${safeText}`;
-  
   chatBox.appendChild(msgDiv);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Initialize System Defaults & Set Default Dates Safely
 window.onload = function() {
-  try {
-    // Set default date to +30 days from today
-    const promDateInput = document.getElementById('prom-date');
-    if (promDateInput) {
-      const defaultDate = new Date();
-      defaultDate.setDate(defaultDate.getDate() + 30);
-      promDateInput.value = defaultDate.toISOString().split('T')[0];
-    }
-
-    updateCustomizer();
-  } catch (err) {
-    console.error("Initialization error:", err);
-    showError("Initial setup encountered an error.");
-  }
+  updateCustomizer();
 };

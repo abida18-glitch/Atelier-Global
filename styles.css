@@ -1,4 +1,4 @@
-/* Custom Styling for Atelier Global Prom Solution */
+/* Custom Styling for Atelier Global Prom Solution with Error States */
 :root {
   --primary-color: #4a1525;
   --primary-hover: #350f1a;
@@ -9,6 +9,8 @@
   --text-muted: #6b5c56;
   --success-green: #2e7d32;
   --warning-amber: #d84315;
+  --error-red: #c62828;
+  --error-bg: #ffebee;
   --border-color: #e8ded8;
 }
 
@@ -71,6 +73,33 @@ h1, h2, h3 {
 .nav-btn.active, .nav-btn:hover {
   background-color: rgba(255,255,255,0.2);
   color: #ffffff;
+}
+
+/* Global Error Banner */
+.error-banner {
+  background-color: var(--error-red);
+  color: #ffffff;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.error-banner.hidden {
+  display: none;
+}
+
+.close-banner {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 1.1rem;
+  cursor: pointer;
 }
 
 /* Container & Layout */
@@ -178,7 +207,7 @@ h1, h2, h3 {
   font-style: italic;
 }
 
-/* Form Controls */
+/* Form Controls & Validation */
 .form-group {
   margin-bottom: 16px;
 }
@@ -191,6 +220,10 @@ h1, h2, h3 {
   color: var(--text-dark);
 }
 
+.required {
+  color: var(--error-red);
+}
+
 select, input[type="date"], input[type="text"] {
   width: 100%;
   padding: 10px;
@@ -198,6 +231,24 @@ select, input[type="date"], input[type="text"] {
   border-radius: 6px;
   font-family: inherit;
   font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+input.input-error, select.input-error {
+  border-color: var(--error-red);
+  background-color: var(--error-bg);
+}
+
+.field-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.field-hint.error {
+  color: var(--error-red);
+  font-weight: 600;
 }
 
 .color-swatches {
@@ -255,7 +306,12 @@ select, input[type="date"], input[type="text"] {
   font-size: 0.95rem;
   cursor: pointer;
   text-align: center;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-primary {
@@ -263,7 +319,7 @@ select, input[type="date"], input[type="text"] {
   color: #fff;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: var(--primary-hover);
 }
 
@@ -328,6 +384,24 @@ select, input[type="date"], input[type="text"] {
   border: 1px solid #ebd8cb;
   border-radius: 8px;
   padding: 18px;
+}
+
+.status-msg {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.status-msg.success {
+  background-color: #e8f5e9;
+  color: var(--success-green);
+  border: 1px solid #c8e6c9;
+}
+
+.status-msg.hidden {
+  display: none;
 }
 
 .inspection-preview {

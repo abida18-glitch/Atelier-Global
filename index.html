@@ -17,8 +17,10 @@
     </div>
     <nav class="nav-links">
       <button id="nav-btn-customizer" class="nav-btn active" onclick="switchTab('customizer')">1. Design Studio</button>
-      <button id="nav-btn-production" class="nav-btn" onclick="switchTab('production')">2. Live Tracker & Escrow</button>
-      <button id="nav-btn-chat" class="nav-btn" onclick="switchTab('chat')">3. Designer Chat</button>
+      <button id="nav-btn-clearance" class="nav-btn" onclick="switchTab('clearance')">2. Clearance Gowns</button>
+      <button id="nav-btn-checkout" class="nav-btn" onclick="switchTab('checkout')">3. Checkout</button>
+      <button id="nav-btn-production" class="nav-btn" onclick="switchTab('production')">4. Tracker & Escrow</button>
+      <button id="nav-btn-chat" class="nav-btn" onclick="switchTab('chat')">5. Designer Chat</button>
     </nav>
   </header>
 
@@ -49,7 +51,7 @@
           <h2>Co-Create Your Dream Prom Gown</h2>
           <p class="subtitle">Customize every detail within your target budget.</p>
 
-          <form id="dress-form" onsubmit="event.preventDefault(); submitOrder();">
+          <form id="dress-form" onsubmit="event.preventDefault(); proceedToCheckout();">
             
             <div class="form-group">
               <label for="fabric">Select Fabric & Texture <span class="required">*</span></label>
@@ -113,43 +115,155 @@
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="btn-submit-order">Lock Design & Reserve Tailor Slot</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-order">Proceed to Secure Checkout</button>
           </form>
         </div>
 
       </div>
     </section>
 
+    <section id="clearance-tab" class="tab-content">
+      <div class="card">
+        <h2>✨ Ready-to-Ship Princess Clearance</h2>
+        <p class="subtitle">Limited-quantity extravagant sample dresses available at deep discounts!</p>
+        
+        <div class="clearance-grid">
+          <div class="clearance-card">
+            <div class="clearance-tag">50% OFF</div>
+            <div class="clearance-img-placeholder" style="background: linear-gradient(135deg, #4a1525, #70263b);">👗</div>
+            <h3>Sparkly Rose Gold Princess Ballgown</h3>
+            <p class="clearance-size">Size: US 4 / Small • Heavy Sequin Bodice</p>
+            <div class="price-row">
+              <span class="old-price">$450</span>
+              <span class="new-price">$225</span>
+            </div>
+            <button class="btn btn-primary" onclick="buyClearance('Sparkly Rose Gold Princess Ballgown', 225)">Select & Checkout</button>
+          </div>
+
+          <div class="clearance-card">
+            <div class="clearance-tag">40% OFF</div>
+            <div class="clearance-img-placeholder" style="background: linear-gradient(135deg, #1d2a44, #3b5079);">👗</div>
+            <h3>Midnight Crystal Slit Evening Gown</h3>
+            <p class="clearance-size">Size: US 2 / XS • Hand-Beaded Rhinestones</p>
+            <div class="price-row">
+              <span class="old-price">$380</span>
+              <span class="new-price">$228</span>
+            </div>
+            <button class="btn btn-primary" onclick="buyClearance('Midnight Crystal Slit Evening Gown', 228)">Select & Checkout</button>
+          </div>
+
+          <div class="clearance-card">
+            <div class="clearance-tag">60% OFF</div>
+            <div class="clearance-img-placeholder" style="background: linear-gradient(135deg, #d4af37, #f3e5ab);">👗</div>
+            <h3>Imperial Gold Tulle Corset Gown</h3>
+            <p class="clearance-size">Size: US 6 / Medium • Layered Glitter Tulle</p>
+            <div class="price-row">
+              <span class="old-price">$500</span>
+              <span class="new-price">$200</span>
+            </div>
+            <button class="btn btn-primary" onclick="buyClearance('Imperial Gold Tulle Corset Gown', 200)">Select & Checkout</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="checkout-tab" class="tab-content">
+      <div class="card">
+        <h2>🔒 Escrow-Protected Secure Checkout</h2>
+        <p class="subtitle">Your money remains safely locked in escrow until you approve final pre-shipment photos.</p>
+
+        <div class="grid-2col">
+          <div>
+            <h3>Shipping Details</h3>
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="chk-name" placeholder="Princess User" required />
+            </div>
+            <div class="form-group">
+              <label>Shipping Address</label>
+              <input type="text" id="chk-address" placeholder="123 Royalty Way, Suite 4B" required />
+            </div>
+            <div class="form-group">
+              <label>Payment Plan</label>
+              <select id="payment-plan">
+                <option value="full">Pay Full Amount ($440) held in Escrow</option>
+                <option value="split">4 Interest-Free Budget Payments ($110/mo)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <h3>Order Summary</h3>
+            <div class="price-box">
+              <div class="price-row">
+                <span>Selected Item:</span>
+                <span id="summary-item-name">Custom Prom Dress</span>
+              </div>
+              <div class="price-row">
+                <span>Guaranteed Fit Warranty:</span>
+                <span>Included ($0)</span>
+              </div>
+              <div class="price-row">
+                <span>Express Courier Shipping:</span>
+                <span>FREE</span>
+              </div>
+              <hr />
+              <div class="price-row total">
+                <span>Total Amount to Escrow:</span>
+                <span id="summary-total">$440</span>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="confirmPaymentAndOrder()">Complete Order & Start Artisan Process</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="production-tab" class="tab-content">
       <div class="card">
-        <h2>Live Artisan Progress & Stage-Gate Escrow Tracker</h2>
-        <p class="subtitle">Your money is held safely in escrow. Funds are only unlocked when you approve each step!</p>
+        <h2>Live Artisan Progress, Camera Inspection & Shipment Tracker</h2>
+        <p class="subtitle">Funds are only unlocked when you approve each stage or verify photo submissions!</p>
 
         <div class="stepper">
           <div class="step completed" id="step-1">
             <div class="step-circle">1</div>
-            <div class="step-label">Design & 3D Scan Approved</div>
+            <div class="step-label">Design & 3D Scan</div>
           </div>
           <div class="step active" id="step-2">
             <div class="step-circle">2</div>
-            <div class="step-label">Fabric & Beading Inspection</div>
+            <div class="step-label">Beading & Camera QA</div>
           </div>
           <div class="step" id="step-3">
             <div class="step-circle">3</div>
-            <div class="step-label">Corset & Bodice Construction</div>
+            <div class="step-label">Bodice & Live Fitting</div>
           </div>
           <div class="step" id="step-4">
             <div class="step-circle">4</div>
-            <div class="step-label">Final QA Hub & Video Inspection</div>
+            <div class="step-label">Express Shipment</div>
           </div>
         </div>
 
         <div class="stage-card">
-          <h3 id="stage-title">Current Stage: Hand-Beading Placement Inspection</h3>
-          <p id="stage-desc">Master Artisan <strong>Elena (Vietnam Atelier #14)</strong> has uploaded photo updates of your custom bodice beading.</p>
+          <h3 id="stage-title">Current Stage: Beading Inspection & Camera Verification</h3>
+          <p id="stage-desc">Master Artisan <strong>Elena (Vietnam Atelier #14)</strong> has uploaded photo updates. Use the camera below to submit live fitting feedback or snapshot verification!</p>
           
           <div class="inspection-preview">
-            <div class="mock-photo" id="mock-photo">📷 [High-Res Inspection Photo: Crystal Bodice Detail]</div>
+            <div class="mock-photo" id="mock-photo">📷 [Artisan Stage Photo: Crystal Bodice Detail]</div>
+          </div>
+
+          <div class="camera-box" id="camera-section">
+            <h4>📷 Live Fitting Camera & Snapshot Tool (Step 2 & 3)</h4>
+            <div class="camera-viewport">
+              <video id="webcam-video" autoplay playsinline class="hidden"></video>
+              <canvas id="snapshot-canvas" class="hidden"></canvas>
+              <div id="camera-placeholder" class="camera-placeholder">Webcam feed inactive. Click "Start Live Camera" below.</div>
+            </div>
+            <div class="camera-controls">
+              <button class="btn btn-secondary" onclick="startCamera()">Start Live Camera</button>
+              <button class="btn btn-secondary" onclick="takeSnapshot()">Take Photo Snapshot</button>
+              <input type="file" id="file-upload" accept="image/*" onchange="handleFileUpload(event)" style="display:none;" />
+              <button class="btn btn-secondary" onclick="document.getElementById('file-upload').click()">Upload Photo File</button>
+            </div>
           </div>
 
           <div id="stage-status-msg" class="status-msg hidden"></div>
@@ -159,6 +273,20 @@
             <button class="btn btn-warning" id="btn-revision" onclick="requestRevision()">⚠️ Request Change / Update Designer</button>
           </div>
         </div>
+
+        <div class="shipment-box" id="shipment-section">
+          <h3>📦 Express Global Shipment & GPS Delivery Tracker</h3>
+          <p>Tracking Code: <strong>AG-883920-DHL-EXPRESS</strong></p>
+          <div class="shipment-status-bar">
+            <div class="shipment-progress" id="shipment-progress"></div>
+          </div>
+          <div class="shipment-nodes">
+            <span>Vietnam QA Hub (Passed)</span>
+            <span>Customs Clearance</span>
+            <span>Domestic Delivery</span>
+          </div>
+        </div>
+
       </div>
     </section>
 

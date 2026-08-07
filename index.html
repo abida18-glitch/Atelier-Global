@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Atelier Global | Princess Prom Dress Studio</title>
+  <title>Atelier Global | Bespoke Prom & Formal Gown Studio</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,12 +13,14 @@
   <header class="navbar">
     <div class="logo">✨ Atelier Global</div>
     <div class="countdown-badge">
-      Prom Night Countdown: <span id="event-timer">45 Days Left</span>
+      Prom Countdown: <span id="event-timer">45 Days Left</span>
     </div>
     <nav class="nav-links">
       <button id="nav-btn-customizer" class="nav-btn active" onclick="switchTab('customizer')">1. Design Studio</button>
-      <button id="nav-btn-production" class="nav-btn" onclick="switchTab('production')">2. Live Tracker & Escrow</button>
-      <button id="nav-btn-chat" class="nav-btn" onclick="switchTab('chat')">3. Designer Chat</button>
+      <button id="nav-btn-clearance" class="nav-btn" onclick="switchTab('clearance')">2. Clearance Gowns</button>
+      <button id="nav-btn-camera" class="nav-btn" onclick="switchTab('camera')">3. Camera QA & Fitting</button>
+      <button id="nav-btn-checkout" class="nav-btn" onclick="switchTab('checkout')">4. Customer Checkout</button>
+      <button id="nav-btn-tracker" class="nav-btn" onclick="switchTab('tracker')">5. Shipment Tracker & Chat</button>
     </nav>
   </header>
 
@@ -33,44 +35,44 @@
       <div class="grid-2col">
         
         <div class="card preview-card">
-          <div class="badge-sparkle">✨ Royal Princess Visualizer</div>
+          <div class="badge-sparkle">✨ Royal Visualizer</div>
           <div class="dress-canvas" id="dress-canvas">
             <div class="gown-base" id="gown-base"></div>
             <div class="beading-layer" id="beading-layer"></div>
-            <div class="silhouete-overlay">👗 Custom A-Line Silhouette</div>
+            <div class="silhouete-overlay">👗 Bespoke Custom Silhouette</div>
           </div>
           <div class="preview-footer">
-            <p><strong>Selected Fabric:</strong> <span id="lbl-fabric">Silk Satin</span></p>
-            <p><strong>Beading Style:</strong> <span id="lbl-beading">Heavy Crystal & Sequin</span></p>
+            <p><strong>Fabric:</strong> <span id="lbl-fabric">Silk Satin</span></p>
+            <p><strong>Embellishment:</strong> <span id="lbl-beading">Heavy Crystal Corset</span></p>
           </div>
         </div>
 
         <div class="card controls-card">
           <h2>Co-Create Your Dream Prom Gown</h2>
-          <p class="subtitle">Customize every detail within your target budget.</p>
+          <p class="subtitle">Customize every detail with real-time transparent pricing.</p>
 
-          <form id="dress-form" onsubmit="event.preventDefault(); submitOrder();">
+          <form id="dress-form" onsubmit="event.preventDefault(); proceedToCheckout();">
             
             <div class="form-group">
               <label for="fabric">Select Fabric & Texture <span class="required">*</span></label>
               <select id="fabric" onchange="updateCustomizer()" required>
-                <option value="Silk Satin" data-price="220">Silk Satin ($220)</option>
-                <option value="Glitter Tulle" data-price="190">Glitter Tulle ($190)</option>
-                <option value="Velvet Royal" data-price="250">Velvet Royal ($250)</option>
+                <option value="Silk Satin" data-price="220">Silk Satin ($220.00)</option>
+                <option value="Glitter Tulle" data-price="190">Glitter Tulle ($190.00)</option>
+                <option value="Velvet Royal" data-price="250">Velvet Royal ($250.00)</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="beading">Beading & Embellishment Extravagance <span class="required">*</span></label>
+              <label for="beading">Beading & Embellishment <span class="required">*</span></label>
               <select id="beading" onchange="updateCustomizer()" required>
-                <option value="Heavy Crystal & Sequin" data-price="180">Heavy Crystal & Rhinestone Corset (+$180)</option>
-                <option value="Medium Pearl Accent" data-price="120">Medium Pearl & Sparkle Accent (+$120)</option>
-                <option value="Minimal Shimmer" data-price="70">Minimal Sparkle Dust (+$70)</option>
+                <option value="Heavy Crystal Corset" data-price="180">Heavy Crystal Corset (+$180.00)</option>
+                <option value="Medium Pearl Accent" data-price="120">Medium Pearl Accent (+$120.00)</option>
+                <option value="Minimal Sparkle Dust" data-price="70">Minimal Sparkle Dust (+$70.00)</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label>Gown Color Palette</label>
+              <label>Color Palette</label>
               <div class="color-swatches">
                 <button type="button" class="swatch active" style="background:#4a1525;" onclick="setColor(this, '#4a1525', 'Royal Emerald/Burgundy')"></button>
                 <button type="button" class="swatch" style="background:#1d2a44;" onclick="setColor(this, '#1d2a44', 'Midnight Navy')"></button>
@@ -80,103 +82,297 @@
             </div>
 
             <div class="form-group">
-              <label for="sizing">Fit & Sizing Method <span class="required">*</span></label>
+              <label for="sizing">Sizing & Fitting Method <span class="required">*</span></label>
               <select id="sizing" required>
-                <option value="3d-scan">AI 3D Smartphone Scan (30 Secs, 100% Fit Guarantee)</option>
+                <option value="3d-scan">AI 3D Mobile Scan (100% Fit Guarantee)</option>
                 <option value="local-tailor">Local Partner Tailor Measurement Visit</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="prom-date">Prom / Event Date <span class="required">*</span></label>
+              <label for="prom-date">Event Date <span class="required">*</span></label>
               <input type="date" id="prom-date" required onchange="validatePromDate()" />
-              <small class="field-hint" id="date-hint">Requires at least 14 days lead time for custom artisan tailor work.</small>
+              <small class="field-hint" id="date-hint">Requires at least 14 days lead time for custom artisan tailoring.</small>
             </div>
 
             <div class="price-box">
               <div class="price-row">
                 <span>Base Production & Material:</span>
-                <span id="price-fabric">$220</span>
+                <span id="price-fabric">$220.00</span>
               </div>
               <div class="price-row">
-                <span>Hand-Beading & Craftsmanship:</span>
-                <span id="price-beading">$180</span>
+                <span>Hand-Beading Craftsmanship:</span>
+                <span id="price-beading">$180.00</span>
               </div>
               <div class="price-row">
-                <span>Escrow & Local Fit Protection:</span>
-                <span id="price-protection">$40</span>
+                <span>Escrow & Local Tailor Fit Protection:</span>
+                <span id="price-protection">$40.00</span>
+              </div>
+              <div class="price-row">
+                <span>Express Courier Shipping:</span>
+                <span class="text-free">FREE</span>
               </div>
               <hr />
               <div class="price-row total">
                 <span>Total Guaranteed Price:</span>
-                <span id="price-total">$440</span>
+                <span id="price-total">$440.00</span>
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="btn-submit-order">Lock Design & Reserve Tailor Slot</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-order">Proceed to Section 4 Checkout ➔</button>
           </form>
         </div>
 
       </div>
     </section>
 
-    <section id="production-tab" class="tab-content">
+    <section id="clearance-tab" class="tab-content">
       <div class="card">
-        <h2>Live Artisan Progress & Stage-Gate Escrow Tracker</h2>
-        <p class="subtitle">Your money is held safely in escrow. Funds are only unlocked when you approve each step!</p>
-
-        <div class="stepper">
-          <div class="step completed" id="step-1">
-            <div class="step-circle">1</div>
-            <div class="step-label">Design & 3D Scan Approved</div>
-          </div>
-          <div class="step active" id="step-2">
-            <div class="step-circle">2</div>
-            <div class="step-label">Fabric & Beading Inspection</div>
-          </div>
-          <div class="step" id="step-3">
-            <div class="step-circle">3</div>
-            <div class="step-label">Corset & Bodice Construction</div>
-          </div>
-          <div class="step" id="step-4">
-            <div class="step-circle">4</div>
-            <div class="step-label">Final QA Hub & Video Inspection</div>
-          </div>
-        </div>
-
-        <div class="stage-card">
-          <h3 id="stage-title">Current Stage: Hand-Beading Placement Inspection</h3>
-          <p id="stage-desc">Master Artisan <strong>Elena (Vietnam Atelier #14)</strong> has uploaded photo updates of your custom bodice beading.</p>
-          
-          <div class="inspection-preview">
-            <div class="mock-photo" id="mock-photo">📷 [High-Res Inspection Photo: Crystal Bodice Detail]</div>
+        <h2>✨ Section 2: Ready-to-Ship Clearance Gowns</h2>
+        <p class="subtitle">Discontinued sample pieces and overstock available at deep discounts!</p>
+        
+        <div class="clearance-grid">
+          <div class="clearance-card">
+            <div class="clearance-tag">50% OFF</div>
+            <div class="clearance-img-placeholder" style="background: linear-gradient(135deg, #4a1525, #70263b);">👗</div>
+            <h3>Rose Gold Sparkle Ballgown</h3>
+            <p class="clearance-size">Size: US 4 / Small • Heavy Sequin Corset</p>
+            <div class="price-row">
+              <span class="old-price">$450.00</span>
+              <span class="new-price">$225.00</span>
+            </div>
+            <button class="btn btn-primary" onclick="buyClearance('Rose Gold Sparkle Ballgown', 225)">Select & Checkout ➔</button>
           </div>
 
-          <div id="stage-status-msg" class="status-msg hidden"></div>
+          <div class="clearance-card">
+            <div class="clearance-tag">40% OFF</div>
+            <div class="clearance-img-placeholder" style="background: linear-gradient(135deg, #1d2a44, #3b5079);">👗</div>
+            <h3>Midnight Crystal Slit Evening Gown</h3>
+            <p class="clearance-size">Size: US 2 / XS • Hand-Beaded Rhinestones</p>
+            <div class="price-row">
+              <span class="old-price">$380.00</span>
+              <span class="new-price">$228.00</span>
+            </div>
+            <button class="btn btn-primary" onclick="buyClearance('Midnight Crystal Slit Evening Gown', 228)">Select & Checkout ➔</button>
+          </div>
 
-          <div class="action-bar" id="stage-action-bar">
-            <button class="btn btn-success" id="btn-approve" onclick="approveMilestone()">✓ Approve Stage & Release 25% Escrow</button>
-            <button class="btn btn-warning" id="btn-revision" onclick="requestRevision()">⚠️ Request Change / Update Designer</button>
+          <div class="clearance-card">
+            <div class="clearance-tag">60% OFF</div>
+            <div class="clearance-img-placeholder" style="background: linear-gradient(135deg, #d4af37, #f3e5ab);">👗</div>
+            <h3>Imperial Gold Tulle Corset Gown</h3>
+            <p class="clearance-size">Size: US 6 / Medium • Layered Glitter Tulle</p>
+            <div class="price-row">
+              <span class="old-price">$500.00</span>
+              <span class="new-price">$200.00</span>
+            </div>
+            <button class="btn btn-primary" onclick="buyClearance('Imperial Gold Tulle Corset Gown', 200)">Select & Checkout ➔</button>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="chat-tab" class="tab-content">
-      <div class="card chat-card">
-        <h2>Direct Communication with Lead Artisan</h2>
-        <p class="subtitle">Real-Time Auto-Translated Chat with Tailor Studio</p>
+    <section id="camera-tab" class="tab-content">
+      <div class="card">
+        <h2>Section 3: Camera QA & Live Fitting Verification</h2>
+        <p class="subtitle">Use live camera access during Steps 2 & 3 to capture fit photos for your master artisan.</p>
 
-        <div class="chat-box" id="chat-box">
-          <div class="msg msg-artisan">
-            <strong>Atelier Elena:</strong> Hello! I am laying out the crystal beads on your dress bodice today. Please review the stage photo and let me know if you want more shimmer near the neckline!
+        <div class="stepper">
+          <div class="step completed" id="step-1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Design & 3D Scan</div>
+          </div>
+          <div class="step active" id="step-2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Beading & Camera QA</div>
+          </div>
+          <div class="step active" id="step-3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Corset & Fitting</div>
+          </div>
+          <div class="step" id="step-4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Customer Checkout</div>
           </div>
         </div>
 
-        <div class="chat-input-row">
-          <input type="text" id="chat-input" placeholder="Type your design updates or questions..." onkeypress="handleChatKeyPress(event)" />
-          <button class="btn btn-primary" onclick="sendMessage()">Send Update</button>
+        <div class="stage-card">
+          <h3 id="stage-title">Step 2 & 3 Fitting Inspection</h3>
+          <p id="stage-desc">Master Artisan <strong>Elena (Vietnam Atelier #14)</strong> requires live photo verification of corset fit before moving to final assembly.</p>
+          
+          <div class="inspection-preview">
+            <div class="mock-photo" id="mock-photo">📷 [Artisan Sample Photo: Hand-Beaded Bodice]</div>
+          </div>
+
+          <div class="camera-box" id="camera-section">
+            <div class="camera-header">
+              <h4>📷 Customer Camera Access (Steps 2 & 3)</h4>
+              <span class="camera-status-badge" id="camera-status-badge">Camera Inactive</span>
+            </div>
+
+            <div class="camera-viewport">
+              <video id="webcam-video" autoplay playsinline class="hidden"></video>
+              <canvas id="snapshot-canvas" class="hidden"></canvas>
+              <div id="camera-placeholder" class="camera-placeholder">
+                Webcam feed off. Click "Start Live Camera" to capture fit snapshots.
+              </div>
+            </div>
+
+            <div class="camera-controls">
+              <button type="button" class="btn btn-secondary" id="btn-toggle-cam" onclick="toggleCamera()">Start Live Camera</button>
+              <button type="button" class="btn btn-secondary" id="btn-snap" onclick="takeSnapshot()" disabled>Take Snapshot</button>
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('file-upload').click()">Upload File</button>
+              <input type="file" id="file-upload" accept="image/*" onchange="handleFileUpload(event)" style="display:none;" />
+            </div>
+          </div>
+
+          <div id="stage-status-msg" class="status-msg hidden"></div>
+
+          <div class="action-bar" id="stage-action-bar">
+            <button class="btn btn-success" id="btn-approve" onclick="approveMilestone()">✓ Verify Fit & Proceed to Section 4 Checkout</button>
+            <button class="btn btn-warning" id="btn-revision" onclick="requestRevision()">⚠️ Request Change</button>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <section id="checkout-tab" class="tab-content">
+      <div class="card">
+        <h2>🔒 Section 4. Customer Checkout</h2>
+        <p class="subtitle">Your order total is protected by Atelier Escrow until you inspect and approve final pre-shipment photos.</p>
+
+        <form id="checkout-form" onsubmit="event.preventDefault(); processCheckoutPayment();">
+          <div class="grid-2col">
+            
+            <div>
+              <h3>1. Customer Shipping Details</h3>
+              <div class="form-group">
+                <label for="chk-name">Full Customer Name <span class="required">*</span></label>
+                <input type="text" id="chk-name" placeholder="Sophia Martinez" required />
+              </div>
+              <div class="form-group">
+                <label for="chk-email">Email Address <span class="required">*</span></label>
+                <input type="email" id="chk-email" placeholder="sophia@example.com" required />
+              </div>
+              <div class="form-group">
+                <label for="chk-address">Shipping Address <span class="required">*</span></label>
+                <input type="text" id="chk-address" placeholder="742 Evergreen Terrace" required />
+              </div>
+              <div class="grid-2col">
+                <div class="form-group">
+                  <label for="chk-city">City <span class="required">*</span></label>
+                  <input type="text" id="chk-city" placeholder="New York" required />
+                </div>
+                <div class="form-group">
+                  <label for="chk-zip">Zip / Postal Code <span class="required">*</span></label>
+                  <input type="text" id="chk-zip" placeholder="10001" required pattern="^[0-9A-Za-z\s\-]{3,10}$" />
+                </div>
+              </div>
+
+              <h3>2. Escrow Payment Method</h3>
+              <div class="form-group">
+                <label for="payment-plan">Payment Structure <span class="required">*</span></label>
+                <select id="payment-plan" onchange="updatePaymentPlanDisplay()">
+                  <option value="full">Pay Full Amount (100% Held in Escrow)</option>
+                  <option value="installments">4 Interest-Free Installments ($110.00/mo)</option>
+                </select>
+              </div>
+
+              <div class="payment-card-box">
+                <div class="form-group">
+                  <label for="card-num">Card Number <span class="required">*</span></label>
+                  <input type="text" id="card-num" placeholder="4532 •••• •••• 8892" maxlength="19" required />
+                </div>
+                <div class="grid-2col">
+                  <div class="form-group">
+                    <label for="card-exp">Expiry <span class="required">*</span></label>
+                    <input type="text" id="card-exp" placeholder="MM/YY" maxlength="5" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="card-cvv">CVV <span class="required">*</span></label>
+                    <input type="password" id="card-cvv" placeholder="123" maxlength="4" required />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3>3. Section 4 Pricing Breakdown</h3>
+              <div class="price-box">
+                <div class="price-row">
+                  <span>Selected Garment:</span>
+                  <strong id="summary-item-name">Custom Prom Dress</strong>
+                </div>
+                <div class="price-row">
+                  <span>Subtotal:</span>
+                  <span id="summary-subtotal">$400.00</span>
+                </div>
+                <div class="price-row">
+                  <span>Escrow & Local Tailor Protection:</span>
+                  <span id="summary-protection">$40.00</span>
+                </div>
+                <div class="price-row">
+                  <span>Express International Courier:</span>
+                  <span class="text-free">FREE</span>
+                </div>
+                <hr />
+                <div class="price-row total">
+                  <span>Total Amount Held in Escrow:</span>
+                  <span id="summary-total">$440.00</span>
+                </div>
+                <div class="installment-breakdown hidden" id="installment-note">
+                  <span>💡 Payment Plan: 4 payments of <strong id="installment-amount">$110.00</strong></span>
+                </div>
+              </div>
+
+              <div class="trust-badge">
+                🔒 <strong>Atelier Escrow Protection</strong><br />
+                Funds remain locked in escrow until you approve pre-shipment photos. Includes a $50 local alteration credit warranty.
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-checkout-action" id="btn-pay-now">
+                Complete Checkout & Authorize Escrow
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section id="tracker-tab" class="tab-content">
+      <div class="card">
+        <h2>Section 5: Live Shipment GPS Tracker & Tailor Chat</h2>
+        <p class="subtitle">Track real-time express delivery and message your tailor.</p>
+
+        <div class="shipment-box" id="shipment-section">
+          <h3>📦 Express Global Shipment Tracker</h3>
+          <p>Tracking Ref: <strong>AG-883920-DHL-EXPRESS</strong></p>
+          <div class="shipment-status-bar">
+            <div class="shipment-progress" id="shipment-progress"></div>
+          </div>
+          <div class="shipment-nodes">
+            <span>Vietnam QA Hub (Passed)</span>
+            <span>Customs Clearance</span>
+            <span>Domestic Delivery</span>
+          </div>
+        </div>
+
+        <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--border-color);" />
+
+        <div class="chat-card">
+          <h3>💬 Direct Tailor Consultation</h3>
+          <div class="chat-box" id="chat-box">
+            <div class="msg msg-artisan">
+              <strong>Atelier Elena:</strong> Your dress has been packaged and handed over to express delivery! Check the tracker above for live updates.
+            </div>
+          </div>
+
+          <div class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="Type message to tailor..." onkeypress="handleChatKeyPress(event)" />
+            <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+          </div>
+        </div>
+
       </div>
     </section>
 

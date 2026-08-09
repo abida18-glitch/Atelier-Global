@@ -8,9 +8,10 @@
 const state = {
     activeTab: 'doll',
     activeSidebarTab: 'I',
-    dollType: 'petite',
-    skinColor: '#F5D0C5',
-    dollPose: 'runway',
+    avatarType: 'petite',
+    avatarSkinColor: '#F5D0C5',
+    avatarHeight: 1.0,
+    avatarPose: 'runway',
     silhouette: 'a-line',
     neckline: 'sweetheart',
     sleeve: 'sleeveless',
@@ -36,7 +37,147 @@ function showToast(message) {
 }
 
 // ============================================================================
-// 2. THREE.JS 3D CANVAS & ENVIRONMENT ENGINE
+// 2. THREE.JS 3D AVATAR DOLL ENGINE (GAME/ROBLOX STYLE)
+// ============================================================================
+let dollScene, dollCamera, dollRenderer, dollControls;
+let dollAvatarGroup, headMesh, torsoMesh, leftArmMesh, rightArmMesh, leftLegMesh, rightLegMesh;
+let dollMaterial;
+
+function initDollThreeJS() {
+    const container = document.getElementById('doll-canvas-container');
+    if (!container) return;
+
+    dollScene = new THREE.Scene();
+    dollScene.background = new THREE.Color(0xF5F0EB);
+
+    dollCamera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    dollCamera.position.set(0, 1.0, 4.0);
+
+    dollRenderer = new THREE.WebGLRenderer({ antialias: true });
+    dollRenderer.setSize(container.clientWidth, container.clientHeight);
+    dollRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    dollRenderer.shadowMap.enabled = true;
+
+    container.appendChild(dollRenderer.domElement);
+
+    if (THREE.OrbitControls) {
+        dollControls = new THREE.OrbitControls(dollCamera, dollRenderer.domElement);
+        dollControls.enableDamping = true;
+        dollControls.dampingFactor = 0.05;
+        dollControls.minDistance = 1.8;
+        dollControls.maxDistance = 6.0;
+        dollControls.target.set(0, 0.8, 0);
+    }
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    dollScene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    dirLight.position.set(3, 5, 4);
+    dirLight.castShadow = true;
+    dollScene.add(dirLight);
+
+    build3DAvatarDoll();
+
+    const animateDoll = () => {
+        requestAnimationFrame(animateDoll);
+        if (dollControls) dollControls.update();
+
+        if (dollAvatarGroup) {
+            dollAvatarGroup.rotation.y += 0.003;
+        }
+
+        dollRenderer.render(dollScene, dollCamera);
+    };
+    animateDoll();
+
+    window.addEventListener('resize', onDollResize);
+}
+
+function build3DAvatarDoll() {
+    dollAvatarGroup = new THREE.Group();
+    dollAvatarGroup.position.set(0, -0.4, 0);
+
+    dollMaterial = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(state.avatarSkinColor),
+        roughness: 0.4,
+        metalness: 0.05
+    });
+
+    // Head
+    const headGeo = new THREE.SphereGeometry(0.28, 32, 32);
+    headMesh = new THREE.Mesh(headGeo, dollMaterial);
+    headMesh.position.set(0, 1.85, 0);
+    headMesh.castShadow = true;
+    dollAvatarGroup.add(headMesh);
+
+    // Torso
+    const torsoGeo = new THREE.CylinderGeometry(0.22, 0.18, 0.7, 32);
+    torsoMesh = new THREE.Mesh(torsoGeo, dollMaterial);
+    torsoMesh.position.set(0, 1.25, 0);
+    torsoMesh.castShadow = true;
+    dollAvatarGroup.add(torsoMesh);
+
+    // Arms
+    const armGeo = new THREE.CylinderGeometry(0.07, 0.06, 0.6, 16);
+    leftArmMesh = new THREE.Mesh(armGeo, dollMaterial);
+    leftArmMesh.position.set(-0.33, 1.25, 0);
+    leftArmMesh.castShadow = true;
+    dollAvatarGroup.add(leftArmMesh);
+
+    rightArmMesh = new THREE.Mesh(armGeo, dollMaterial);
+    rightArmMesh.position.set(0.33, 1.25, 0);
+    rightArmMesh.castShadow = true;
+    dollAvatarGroup.add(rightArmMesh);
+
+    // Legs
+    const legGeo = new THREE.CylinderGeometry(0.08, 0.07, 0.8, 16);
+    leftLegMesh = new THREE.Mesh(legGeo, dollMaterial);
+    leftLegMesh.position.set(-0.12, 0.45, 0);
+    leftLegMesh.castShadow = true;
+    dollAvatarGroup.add(leftLegMesh);
+
+    rightLegMesh = new THREE.Mesh(legGeo, dollMaterial);
+    rightLegMesh.position.set(0.12, 0.45, 0);
+    rightLegMesh.castShadow = true;
+    dollAvatarGroup.add(rightLegMesh);
+
+    dollScene.add(dollAvatarGroup);
+    updateAvatarProportions();
+}
+
+function updateAvatarProportions() {
+    if (!dollAvatarGroup) return;
+
+    dollMaterial.color.set(state.avatarSkinColor);
+    dollAvatarGroup.scale.set(1.0, state.avatarHeight, 1.0);
+
+    let torsoWidth = 1.0;
+    if (state.avatarType === 'petite') torsoWidth = 0.85;
+    if (state.avatarType === 'curvy') torsoWidth = 1.25;
+
+    if (torsoMesh) torsoMesh.scale.set(torsoWidth, 1.0, torsoWidth);
+
+    if (state.avatarPose === 'poseA') {
+        if (leftArmMesh) leftArmMesh.rotation.z = 0.45;
+        if (rightArmMesh) rightArmMesh.rotation.z = -0.45;
+    } else {
+        if (leftArmMesh) leftArmMesh.rotation.z = 0.1;
+        if (rightArmMesh) rightArmMesh.rotation.z = -0.1;
+    }
+}
+
+function onDollResize() {
+    const container = document.getElementById('doll-canvas-container');
+    if (!container || !dollRenderer || !dollCamera) return;
+
+    dollCamera.aspect = container.clientWidth / container.clientHeight;
+    dollCamera.updateProjectionMatrix();
+    dollRenderer.setSize(container.clientWidth, container.clientHeight);
+}
+
+// ============================================================================
+// 3. THREE.JS 3D DRESS CANVAS ENGINE
 // ============================================================================
 let scene, camera, renderer, controls;
 let dressMeshGroup, bodiceMesh, skirtMesh, necklineMesh, sleevesGroup;
@@ -227,37 +368,6 @@ function onWindowResize() {
 }
 
 // ============================================================================
-// 3. DOLL & MODEL VISUALIZER CONTROLLER
-// ============================================================================
-function updateDollPreview() {
-    const head = document.getElementById('doll-head');
-    const torso = document.getElementById('doll-torso');
-    const legs = document.getElementById('doll-legs');
-    const statusText = document.getElementById('doll-status-text');
-
-    if (head && torso && legs) {
-        head.style.backgroundColor = state.skinColor;
-        torso.style.backgroundColor = state.skinColor;
-        legs.style.backgroundColor = state.skinColor;
-
-        if (state.dollType === 'petite') {
-            torso.style.width = '4.5rem';
-            legs.style.width = '3.5rem';
-        } else if (state.dollType === 'curvy') {
-            torso.style.width = '6rem';
-            legs.style.width = '5rem';
-        } else { // standard
-            torso.style.width = '5.2rem';
-            legs.style.width = '4rem';
-        }
-    }
-
-    if (statusText) {
-        statusText.textContent = `${state.dollType.toUpperCase()} Model Doll • Skin Tone ${state.skinColor} • ${state.dollPose.toUpperCase()} Pose`;
-    }
-}
-
-// ============================================================================
 // 4. 100+ FABRICS CATALOG GENERATOR
 // ============================================================================
 const fabricsDatabase = [];
@@ -313,11 +423,11 @@ function renderFabrics(filterCat = 'All', searchQuery = '') {
 // ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
     
+    initDollThreeJS();
     initThreeJS();
     generate100Fabrics();
     renderFabrics();
 
-    // Top Header Navigation Tabs Switcher
     const navButtons = document.querySelectorAll('#main-nav .nav-btn');
     const tabViews = document.querySelectorAll('.tab-view');
 
@@ -337,7 +447,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        if (tabId === 'studio') {
+        if (tabId === 'doll') {
+            setTimeout(onDollResize, 100);
+        } else if (tabId === 'studio') {
             setTimeout(onWindowResize, 100);
         }
     }
@@ -346,31 +458,39 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => switchMainTab(btn.getAttribute('data-tab')));
     });
 
-    // Doll Customizer Handlers
-    document.querySelectorAll('[data-doll-type]').forEach(btn => {
+    // Avatar Controls Handlers
+    document.querySelectorAll('[data-avatar-type]').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            document.querySelectorAll('[data-doll-type]').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('[data-avatar-type]').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
-            state.dollType = e.target.getAttribute('data-doll-type');
-            updateDollPreview();
+            state.avatarType = e.target.getAttribute('data-avatar-type');
+            updateAvatarProportions();
         });
     });
 
-    document.querySelectorAll('[data-skin]').forEach(btn => {
+    document.querySelectorAll('[data-avatar-skin]').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            document.querySelectorAll('[data-skin]').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('[data-avatar-skin]').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
-            state.skinColor = e.target.getAttribute('data-skin');
-            updateDollPreview();
+            state.avatarSkinColor = e.target.getAttribute('data-avatar-skin');
+            updateAvatarProportions();
         });
     });
 
-    document.querySelectorAll('[data-pose]').forEach(btn => {
+    const heightSlider = document.getElementById('avatar-height-slider');
+    if (heightSlider) {
+        heightSlider.addEventListener('input', (e) => {
+            state.avatarHeight = parseFloat(e.target.value);
+            updateAvatarProportions();
+        });
+    }
+
+    document.querySelectorAll('[data-avatar-pose]').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            document.querySelectorAll('[data-pose]').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('[data-avatar-pose]').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
-            state.dollPose = e.target.getAttribute('data-pose');
-            updateDollPreview();
+            state.avatarPose = e.target.getAttribute('data-avatar-pose');
+            updateAvatarProportions();
         });
     });
 
@@ -378,11 +498,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (goToDesignBtn) {
         goToDesignBtn.addEventListener('click', () => {
             switchMainTab('studio');
-            showToast('Doll model configured. Now designing dress silhouette.');
+            showToast('3D Doll Avatar configured. Ready to design dress.');
         });
     }
 
-    // Sidebar Roman Numeral Sub-Tabs Switcher
+    // Sidebar Sub-Tabs Handler
     const sidebarTabs = document.querySelectorAll('.sidebar-tab-btn');
     const sidebarContents = document.querySelectorAll('.sidebar-content');
 
@@ -405,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3D Garment Configurator Options
+    // Garment Options
     document.querySelectorAll('[data-silhouette]').forEach(btn => {
         btn.addEventListener('click', (e) => {
             document.querySelectorAll('[data-silhouette]').forEach(b => b.classList.remove('active'));
@@ -461,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Reviews Modal Logic
+    // Modal Rating Handlers
     const reviewModal = document.getElementById('review-modal');
     const openReviewBtn = document.getElementById('open-review-btn');
     const closeReviewBtn = document.getElementById('close-review-btn');

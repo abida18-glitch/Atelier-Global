@@ -72,8 +72,8 @@ body {
     font-weight: 600;
 }
 
-/* Configurator & Doll Controls Buttons */
-.option-btn, .texture-btn, .cam-btn, .filter-btn, .doll-option-btn, .doll-pose-btn {
+/* Configurator & Avatar Controls Buttons */
+.option-btn, .texture-btn, .cam-btn, .filter-btn, .avatar-option-btn, .avatar-pose-btn {
     padding: 0.5rem;
     font-size: 0.75rem;
     border: 1px solid #E6DDD3;
@@ -83,12 +83,12 @@ body {
     transition: all 0.2s ease;
 }
 
-.option-btn:hover, .texture-btn:hover, .cam-btn:hover, .filter-btn:hover, .doll-option-btn:hover, .doll-pose-btn:hover {
+.option-btn:hover, .texture-btn:hover, .cam-btn:hover, .filter-btn:hover, .avatar-option-btn:hover, .avatar-pose-btn:hover {
     border-color: #3A2E2B;
     color: #3A2E2B;
 }
 
-.option-btn.active, .texture-btn.active, .cam-btn.active, .filter-btn.active, .doll-option-btn.active, .doll-pose-btn.active {
+.option-btn.active, .texture-btn.active, .cam-btn.active, .filter-btn.active, .avatar-option-btn.active, .avatar-pose-btn.active {
     border-color: #3A2E2B;
     background-color: #FDFBF7;
     color: #3A2E2B;
@@ -101,8 +101,8 @@ body {
 }
 
 .skin-btn.active {
-    ring: 2px;
     outline: 2px solid #3A2E2B;
+    outline-offset: 1px;
 }
 
 /* Custom Scrollbar for Fabric Catalog */

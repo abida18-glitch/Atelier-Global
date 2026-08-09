@@ -16,12 +16,18 @@ import {
   Palette,
   AlertTriangle,
   RefreshCw,
-  ImageOff
+  ImageOff,
+  ZoomIn,
+  ZoomOut,
+  Sliders,
+  Sparkles,
+  Heart,
+  Share2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ==============================================================================
-// 1. ERROR BOUNDARY COMPONENT (CATCHES UNHANDLED UI/RENDER ERRORS)
+// 1. ERROR BOUNDARY COMPONENT
 // ==============================================================================
 
 class AtelierErrorBoundary extends Component {
@@ -76,10 +82,10 @@ class AtelierErrorBoundary extends Component {
 }
 
 // ==============================================================================
-// 2. IMAGE COMPONENT WITH FALLBACK ERROR HANDLING
+// 2. IMAGE COMPONENT WITH FALLBACK HANDLING
 // ==============================================================================
 
-function ImageWithFallback({ src, alt, className }) {
+function ImageWithFallback({ src, alt, className, style }) {
   const [hasError, setHasError] = useState(false);
 
   if (hasError) {
@@ -96,13 +102,14 @@ function ImageWithFallback({ src, alt, className }) {
       src={src}
       alt={alt}
       className={className}
+      style={style}
       onError={() => setHasError(true)}
     />
   );
 }
 
 // ==============================================================================
-// 3. COLOR PALETTES & DATASETS
+// 3. COLOR PALETTES & COMPREHENSIVE DRESS CATALOG WITH ONLINE IMAGES
 // ==============================================================================
 
 const EXTENDED_COLOR_PALETTES = [
@@ -185,8 +192,8 @@ const DRESS_CATALOG = [
     silhouette: 'Ballgown',
     fabric: 'Silk',
     price: 850,
-    image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=800&q=80',
-    macroImage: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=1000&q=80',
     description: 'Item One: Premium 100% Mulberry Silk in fluid drape dynamics with subtle luster.',
     weight: '19mm Silk Crepe'
   },
@@ -196,8 +203,8 @@ const DRESS_CATALOG = [
     silhouette: 'Bodycon',
     fabric: 'Velvet',
     price: 640,
-    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80',
-    macroImage: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1000&q=80',
     description: 'Item Two: Rich combed velvet with soft structured boning and light-absorbing depth.',
     weight: '380 GSM Velvet'
   },
@@ -207,10 +214,43 @@ const DRESS_CATALOG = [
     silhouette: 'Slip',
     fabric: 'Lace',
     price: 720,
-    image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=800&q=80',
-    macroImage: 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=1000&q=80',
     description: 'Item Three: Intricate French corded floral lace motif overlaid across sheer silk lining.',
     weight: '110 GSM Fine Lace'
+  },
+  {
+    id: 'd4',
+    name: 'Emerald Satin Column Dress',
+    silhouette: 'Column',
+    fabric: 'Satin',
+    price: 790,
+    image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80',
+    description: 'Item Four: Luminous liquid satin tailored with a sleek column drape and side slit.',
+    weight: '240 GSM Satin'
+  },
+  {
+    id: 'd5',
+    name: 'Garnet Chiffon Tiered Gown',
+    silhouette: 'A-Line',
+    fabric: 'Chiffon',
+    price: 610,
+    image: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1528458876861-544fd1761a91?auto=format&fit=crop&w=1000&q=80',
+    description: 'Item Five: Sheer layered chiffon offering weightless motion and romantic cascading pleats.',
+    weight: '65 GSM Silk Chiffon'
+  },
+  {
+    id: 'd6',
+    name: 'Midnight Velvet Brocade Gown',
+    silhouette: 'Mermaid',
+    fabric: 'Brocade',
+    price: 980,
+    image: 'https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1000&q=80',
+    description: 'Item Six: Woven floral jacquard brocade structured into a fitting mermaid outline.',
+    weight: '410 GSM Brocade'
   }
 ];
 
@@ -224,16 +264,19 @@ function AtelierStudioAppContent() {
   const [selectedDress, setSelectedDress] = useState(DRESS_CATALOG[0]);
   const [cameraAngle, setCameraAngle] = useState('front');
   const [fabricFilter, setFabricFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [favorites, setFavorites] = useState([]);
+
+  // Interactive Customizer States
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [sleeveLength, setSleeveLength] = useState('Sleeveless');
+  const [necklineStyle, setNecklineStyle] = useState('Sweetheart');
+  const [trainLength, setTrainLength] = useState('Court Train');
+  const [brightness, setBrightness] = useState(100);
+
+  // Turntable animation
   const [turntableAngle, setTurntableAngle] = useState(0);
-
-  // Form State & Error Validation
-  const [newAuthor, setNewAuthor] = useState('');
-  const [newComment, setNewComment] = useState('');
-  const [userRating, setUserRating] = useState(5);
-  const [formError, setFormError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // 360-Degree Turntable Loop
   useEffect(() => {
     let timer;
     if (cameraAngle === 'turntable') {
@@ -244,7 +287,13 @@ function AtelierStudioAppContent() {
     return () => clearInterval(timer);
   }, [cameraAngle]);
 
-  // Review State
+  // Review Form & Error Handling States
+  const [newAuthor, setNewAuthor] = useState('');
+  const [newComment, setNewComment] = useState('');
+  const [userRating, setUserRating] = useState(5);
+  const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [reviews, setReviews] = useState([
     {
       id: 'r1',
@@ -257,14 +306,18 @@ function AtelierStudioAppContent() {
     }
   ]);
 
-  // Handled Submission with try...catch
+  const toggleFavorite = (id) => {
+    setFavorites(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
     setIsSubmitting(true);
 
     try {
-      // Input Validation Errors
       if (!newAuthor.trim()) {
         throw new Error('Please enter a valid client name.');
       }
@@ -272,7 +325,6 @@ function AtelierStudioAppContent() {
         throw new Error('Feedback comment must be at least 10 characters long.');
       }
 
-      // Simulate network request latency
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       const newEntry = {
@@ -291,14 +343,17 @@ function AtelierStudioAppContent() {
       setUserRating(5);
     } catch (err) {
       setFormError(err.message || 'Failed to record feedback. Please try again.');
-    } finally {
+    } font-sans finally {
       setIsSubmitting(false);
     }
   };
 
-  const filteredDresses = fabricFilter === 'All' 
-    ? DRESS_CATALOG 
-    : DRESS_CATALOG.filter(d => d.fabric === fabricFilter);
+  const filteredDresses = DRESS_CATALOG.filter(d => {
+    const matchesFabric = fabricFilter === 'All' || d.fabric === fabricFilter;
+    const matchesSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          d.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesFabric && matchesSearch;
+  });
 
   return (
     <div className="flex min-h-screen bg-stone-50 text-stone-900 font-sans antialiased selection:bg-stone-200 transition-colors duration-700">
@@ -319,7 +374,7 @@ function AtelierStudioAppContent() {
           </div>
 
           {/* PALETTE SELECTOR */}
-          <div className="mb-10 p-4 rounded-sm bg-white border border-stone-200/80 shadow-xs font-sans">
+          <div className="mb-8 p-4 rounded-sm bg-white border border-stone-200/80 shadow-xs font-sans">
             <div className="flex items-center gap-2 mb-3">
               <Palette className={`w-3.5 h-3.5 ${activeTheme.textAccent}`} />
               <span className="text-[10px] uppercase font-bold tracking-widest text-stone-600">
@@ -355,7 +410,7 @@ function AtelierStudioAppContent() {
                   Tab One
                 </span>
                 <span className="text-[11px] uppercase tracking-widest text-stone-500 font-sans">
-                  3D Fabric Catalog & Camera
+                  3D Studio & Interactive Customizer
                 </span>
               </div>
               <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === 'catalog' ? `opacity-100 translate-x-1 ${activeTheme.textAccent}` : 'opacity-0'}`} />
@@ -379,6 +434,16 @@ function AtelierStudioAppContent() {
             </button>
           </nav>
         </div>
+
+        {/* WISHLIST SUMMARY */}
+        <div className={`p-4 bg-white border ${activeTheme.border} rounded-sm font-sans text-xs`}>
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-stone-600 text-[11px] font-semibold uppercase tracking-wider">
+              <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" /> Favorites
+            </span>
+            <span className={`font-bold ${activeTheme.textPrimary}`}>{favorites.length} Saved</span>
+          </div>
+        </div>
       </aside>
 
       {/* MAIN WORKSPACE */}
@@ -391,41 +456,238 @@ function AtelierStudioAppContent() {
               </h2>
             </div>
 
+            {/* INTERACTIVE VIEWPORT & LIVE CUSTOMIZER */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-16">
-              <div className={`lg:col-span-8 bg-white border ${activeTheme.border} rounded-sm p-8 shadow-sm flex flex-col justify-between min-h-[520px]`}>
+              
+              {/* INTERACTIVE CANVAS */}
+              <div className={`lg:col-span-8 bg-white border ${activeTheme.border} rounded-sm p-8 shadow-sm flex flex-col justify-between min-h-[560px]`}>
                 <div className="flex justify-between items-center font-sans text-xs border-b border-stone-100 pb-4">
-                  <span className="text-stone-400 uppercase tracking-widest text-[10px]">Viewport Camera</span>
-                  <span className={`font-medium ${activeTheme.textPrimary}`}>{selectedDress.name}</span>
+                  <span className="text-stone-400 uppercase tracking-widest text-[10px]">Interactive Studio Viewport</span>
+                  <div className="flex items-center gap-4">
+                    <button 
+                      onClick={() => toggleFavorite(selectedDress.id)} 
+                      className={`flex items-center gap-1 text-xs transition-colors ${favorites.includes(selectedDress.id) ? 'text-red-600 font-bold' : 'text-stone-400 hover:text-stone-700'}`}
+                    >
+                      <Heart className={`w-4 h-4 ${favorites.includes(selectedDress.id) ? 'fill-current' : ''}`} />
+                      {favorites.includes(selectedDress.id) ? 'Saved' : 'Save'}
+                    </button>
+                    <span className={`font-medium ${activeTheme.textPrimary}`}>{selectedDress.name}</span>
+                  </div>
                 </div>
 
+                {/* IMAGE CANVAS WITH INTERACTIVE CONTROLS */}
                 <div className={`relative my-6 h-96 flex items-center justify-center overflow-hidden rounded-sm ${activeTheme.bgLight}`}>
                   <AnimatePresence mode="wait">
-                    <motion.div key={selectedDress.id} className="w-full h-full flex items-center justify-center p-4">
+                    <motion.div 
+                      key={selectedDress.id} 
+                      className="w-full h-full flex items-center justify-center p-4"
+                      style={{
+                        transform: cameraAngle === 'turntable' ? `rotateY(${turntableAngle}deg)` : `scale(${zoomLevel}) rotate(${rotation}deg)`,
+                        filter: `brightness(${brightness}%)`
+                      }}
+                    >
                       <ImageWithFallback
                         src={cameraAngle === 'macro' ? selectedDress.macroImage : selectedDress.image}
                         alt={selectedDress.name}
-                        className="h-full object-contain filter drop-shadow-md"
+                        className="h-full object-contain filter drop-shadow-md transition-transform duration-300"
                       />
                     </motion.div>
                   </AnimatePresence>
+
+                  {/* OVERLAY INTERACTIVE BADGES */}
+                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 border border-stone-200 rounded-xs text-[10px] font-sans text-stone-700 space-y-0.5">
+                    <p>Neckline: <strong>{necklineStyle}</strong></p>
+                    <p>Sleeves: <strong>{sleeveLength}</strong></p>
+                    <p>Train: <strong>{trainLength}</strong></p>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-3 font-sans">
-                  <button onClick={() => setCameraAngle('front')} className={`py-2 text-xs border ${cameraAngle === 'front' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>Front View</button>
-                  <button onClick={() => setCameraAngle('macro')} className={`py-2 text-xs border ${cameraAngle === 'macro' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>Macro View</button>
-                  <button onClick={() => setCameraAngle('turntable')} className={`py-2 text-xs border ${cameraAngle === 'turntable' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>360 View</button>
+                {/* CAMERA & CANVAS SLIDERS */}
+                <div className="space-y-4 border-t border-stone-100 pt-4 font-sans">
+                  <div className="grid grid-cols-4 gap-3">
+                    <button onClick={() => setCameraAngle('front')} className={`py-2 text-xs border ${cameraAngle === 'front' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>Front View</button>
+                    <button onClick={() => setCameraAngle('macro')} className={`py-2 text-xs border ${cameraAngle === 'macro' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>Macro View</button>
+                    <button onClick={() => setCameraAngle('turntable')} className={`py-2 text-xs border ${cameraAngle === 'turntable' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>360 View</button>
+                    <button onClick={() => { setZoomLevel(1); setRotation(0); setBrightness(100); }} className="py-2 text-xs border bg-stone-100 text-stone-700">Reset Canvas</button>
+                  </div>
+
+                  {/* INTERACTIVE SLIDERS FOR ZOOM / ROTATION / LIGHTING */}
+                  <div className="grid grid-cols-3 gap-4 pt-2 text-[10px] uppercase text-stone-500 font-semibold tracking-wider">
+                    <div>
+                      <label className="block mb-1">Zoom Level ({zoomLevel.toFixed(1)}x)</label>
+                      <input 
+                        type="range" min="0.8" max="2" step="0.1" 
+                        value={zoomLevel} 
+                        onChange={(e) => setZoomLevel(parseFloat(e.target.value))}
+                        className="w-full accent-stone-900" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-1">Canvas Angle ({rotation}°)</label>
+                      <input 
+                        type="range" min="-30" max="30" step="5" 
+                        value={rotation} 
+                        onChange={(e) => setRotation(parseInt(e.target.value))}
+                        className="w-full accent-stone-900" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-1">Lighting ({brightness}%)</label>
+                      <input 
+                        type="range" min="70" max="130" step="5" 
+                        value={brightness} 
+                        onChange={(e) => setBrightness(parseInt(e.target.value))}
+                        className="w-full accent-stone-900" 
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className={`lg:col-span-4 bg-white border ${activeTheme.border} rounded-sm p-8 flex flex-col justify-between`}>
+              {/* LIVE DRESS CUSTOMIZER PANEL */}
+              <div className={`lg:col-span-4 bg-white border ${activeTheme.border} rounded-sm p-8 flex flex-col justify-between shadow-sm`}>
                 <div>
-                  <span className={`text-[10px] uppercase px-2.5 py-1 rounded-full font-medium ${activeTheme.badgeBg} ${activeTheme.badgeText}`}>{selectedDress.fabric}</span>
-                  <h3 className={`text-3xl font-light italic mt-4 mb-2 ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>{selectedDress.name}</h3>
-                  <p className="text-xl text-stone-800 mb-6 font-light">${selectedDress.price} USD</p>
-                  <p className="text-xs text-stone-600 leading-relaxed">{selectedDress.description}</p>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Sparkles className={`w-4 h-4 ${activeTheme.textAccent}`} />
+                    <h3 className={`text-2xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                      Bespoke Customizer
+                    </h3>
+                  </div>
+
+                  <div className="space-y-4 font-sans text-xs mb-6">
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1.5">Neckline Silhouette</label>
+                      <select 
+                        value={necklineStyle} 
+                        onChange={(e) => setNecklineStyle(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-200 p-2 text-stone-800 rounded-xs focus:outline-none"
+                      >
+                        <option>Sweetheart</option>
+                        <option>Off-the-Shoulder</option>
+                        <option>High Neck Lace</option>
+                        <option>V-Neck Plunge</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1.5">Sleeve Style</label>
+                      <select 
+                        value={sleeveLength} 
+                        onChange={(e) => setSleeveLength(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-200 p-2 text-stone-800 rounded-xs focus:outline-none"
+                      >
+                        <option>Sleeveless</option>
+                        <option>Cap Sleeves</option>
+                        <option>Juliet Sheer Sleeves</option>
+                        <option>Full Lace Sleeves</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1.5">Train Extension</label>
+                      <select 
+                        value={trainLength} 
+                        onChange={(e) => setTrainLength(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-200 p-2 text-stone-800 rounded-xs focus:outline-none"
+                      >
+                        <option>Sweep Train</option>
+                        <option>Court Train</option>
+                        <option>Cathedral Train (+ $150)</option>
+                      </select>
+                    </div>
+
+                    <div className="pt-4 border-t border-stone-100">
+                      <span className={`text-2xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                        ${selectedDress.price} USD
+                      </span>
+                      <p className="text-[11px] text-stone-500 mt-1">{selectedDress.description}</p>
+                    </div>
+                  </div>
                 </div>
+
+                <button className={`w-full ${activeTheme.bgPrimary} ${activeTheme.bgHover} text-white py-3.5 text-xs font-sans uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm`}>
+                  Save Custom Configuration
+                </button>
+              </div>
+
+            </div>
+
+            {/* INTERACTIVE SEARCH & FILTERABLE DRESS CATALOG */}
+            <div className={`bg-white border ${activeTheme.border} rounded-sm p-8 shadow-sm`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-stone-100">
+                <div>
+                  <h3 className={`text-2xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Couture Catalog
+                  </h3>
+                  <p className="text-xs uppercase tracking-widest text-stone-400 font-sans mt-1">Select garment specimen for live 3D customization</p>
+                </div>
+
+                {/* SEARCH INPUT */}
+                <div className="relative font-sans w-full sm:w-64">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-stone-400" />
+                  <input
+                    type="text"
+                    placeholder="Search dress or fabric..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-200 pl-8 pr-3 py-2 text-xs text-stone-900 focus:outline-none focus:border-stone-900"
+                  />
+                </div>
+              </div>
+
+              {/* FABRIC FILTER PILLS */}
+              <div className="flex flex-wrap gap-2 mb-8 font-sans">
+                <button
+                  onClick={() => setFabricFilter('All')}
+                  className={`px-3 py-1 text-xs transition-all ${fabricFilter === 'All' ? `${activeTheme.bgPrimary} text-white` : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
+                >
+                  All Fabrics
+                </button>
+                {FABRICS_LIST.map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFabricFilter(f)}
+                    className={`px-3 py-1 text-xs transition-all ${fabricFilter === f ? `${activeTheme.bgPrimary} text-white` : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+
+              {/* DRESS GRID */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredDresses.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => setSelectedDress(item)}
+                    className={`group cursor-pointer border transition-all ${selectedDress.id === item.id ? `${activeTheme.border} ring-1 ring-stone-900` : 'border-stone-200 hover:border-stone-400'}`}
+                  >
+                    <div className={`h-72 overflow-hidden relative ${activeTheme.bgLight}`}>
+                      <ImageWithFallback 
+                        src={item.image} 
+                        alt={item.name} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}
+                        className="absolute top-3 right-3 p-1.5 bg-white/80 backdrop-blur-md rounded-full text-stone-700 hover:text-red-600"
+                      >
+                        <Heart className={`w-3.5 h-3.5 ${favorites.includes(item.id) ? 'fill-red-600 text-red-600' : ''}`} />
+                      </button>
+                      <span className={`absolute top-3 left-3 bg-white/90 ${activeTheme.textAccent} text-[10px] font-sans font-medium px-2 py-0.5 tracking-wider uppercase border border-stone-200`}>
+                        {item.fabric}
+                      </span>
+                    </div>
+                    <div className="p-4 font-sans bg-white">
+                      <p className="text-[10px] text-stone-400 uppercase tracking-widest">{item.silhouette}</p>
+                      <h4 className={`font-serif italic text-lg mt-0.5 ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>{item.name}</h4>
+                      <p className="text-xs text-stone-700 mt-1">${item.price} USD</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
+
           </motion.div>
         )}
 

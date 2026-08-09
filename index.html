@@ -3,417 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelier Global — Bespoke Haute Couture & 3D Interactive Studio</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        cream: '#FDFBF7',
-                        sand: '#F5F0EB',
-                        charcoal: '#3A2E2B',
-                        taupe: '#8C7A6B',
-                        sage: '#4A6B53',
-                        'sage-light': '#E8EFE9',
-                        blush: '#E8C5C8',
-                    },
-                    fontFamily: {
-                        serif: ['Didot', 'Bodoni MT', 'Cinzel', 'serif'],
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
+    <title>Interactive Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --border-color: #e5e7eb;
         }
-    </script>
-    
-    <link rel="stylesheet" href="style.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+        .dark-mode {
+            --bg-color: #111827;
+            --card-bg: #1f2937;
+            --text-color: #f3f4f6;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --border-color: #374151;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        button.theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .counter-display {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--primary-color);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button.action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        button.action-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .todo-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        .delete-btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .delete-btn:hover {
+            background-color: #dc2626;
+        }
+    </style>
 </head>
-<body class="bg-cream text-charcoal font-sans antialiased flex flex-col min-h-screen">
+<body>
 
-    <div id="toast" class="hidden fixed top-5 right-5 z-50 bg-charcoal text-cream px-5 py-3 rounded shadow-2xl text-xs uppercase tracking-widest flex items-center gap-3 transition-opacity duration-300">
-        <span id="toast-message">Notification</span>
-    </div>
-
-    <header class="sticky top-0 z-40 bg-cream/90 backdrop-blur-md border-b border-[#E6DDD3] px-6 py-4">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <span class="font-serif text-2xl tracking-[0.2em] font-light uppercase">Atelier Global</span>
-                <span class="bg-sage-light text-sage text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-full font-medium">Bespoke 3D Studio</span>
-            </div>
-
-            <nav class="flex flex-wrap justify-center gap-1 overflow-x-auto w-full md:w-auto pb-1 md:pb-0" id="main-nav">
-                <button data-tab="doll" class="nav-btn active">I. 3D Doll Avatar</button>
-                <button data-tab="studio" class="nav-btn">II. 3D Dress Designer</button>
-                <button data-tab="fabrics" class="nav-btn">100+ Fabrics</button>
-                <button data-tab="embellishments" class="nav-btn">Embellishments</button>
-                <button data-tab="sizing" class="nav-btn">AI Size & Fit</button>
-                <button data-tab="designers" class="nav-btn">Designer Comms</button>
-                <button data-tab="tracking" class="nav-btn">Live Map Route</button>
-                <button data-tab="clearance" class="nav-btn">Clearance Archive</button>
-                <button data-tab="checkout" class="nav-btn">Secure Checkout</button>
-            </nav>
-        </div>
+    <header>
+        <h1>Interactive Dashboard</h1>
+        <button class="theme-toggle" id="themeToggleBtn">Toggle Theme</button>
     </header>
 
-    <main class="max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex-1">
-
-        <section id="view-doll" class="tab-view active space-y-6">
-            <div class="text-center max-w-xl mx-auto">
-                <span class="section-label">Interactive Avatar Studio</span>
-                <h1 class="font-serif text-3xl my-1">Customize Your 3D Doll Model</h1>
-                <p class="text-xs text-taupe">Spin 360° in any angle, zoom in/out, modify body frames, and apply foundational adjustments prior to tailoring.</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-xl p-5 shadow-sm space-y-5">
-                    <div>
-                        <label class="section-label">Doll Body Proportions</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button data-avatar-type="petite" class="avatar-option-btn active">Petite</button>
-                            <button data-avatar-type="classic" class="avatar-option-btn">Classic</button>
-                            <button data-avatar-type="curvy" class="avatar-option-btn">Curvy</button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="section-label">Skin Tone Palette</label>
-                        <div class="grid grid-cols-5 gap-2">
-                            <button data-avatar-skin="#F5D0C5" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#F5D0C5] active"></button>
-                            <button data-avatar-skin="#E0AC69" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#E0AC69]"></button>
-                            <button data-avatar-skin="#C68642" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#C68642]"></button>
-                            <button data-avatar-skin="#8D5524" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#8D5524]"></button>
-                            <button data-avatar-skin="#3C2011" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#3C2011]"></button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="section-label">Height Scale Factor</label>
-                        <input type="range" id="avatar-height-slider" min="0.8" max="1.2" step="0.05" value="1.0" class="w-full accent-charcoal cursor-pointer">
-                    </div>
-
-                    <div>
-                        <label class="section-label">Stance Mode</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button data-avatar-pose="runway" class="avatar-pose-btn active">Runway Pose</button>
-                            <button data-avatar-pose="apose" class="avatar-pose-btn">A-Frame Stance</button>
-                        </div>
-                    </div>
-
-                    <button id="go-to-design-btn" class="w-full py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded mt-4 hover:bg-taupe transition-all">
-                        Proceed to Dress Designer ➔
-                    </button>
-                </div>
-
-                <div class="lg:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl h-[540px] relative overflow-hidden shadow-inner">
-                    <div class="absolute top-4 left-4 z-10 bg-cream/80 backdrop-blur-md px-3 py-1.5 rounded border border-[#E6DDD3] text-[10px] uppercase tracking-widest">
-                        3D Doll Engine • Click & Drag to Rotate 360° • Pinch/Scroll to Zoom
-                    </div>
-                    <div id="doll-canvas-container" class="w-full h-full"></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-studio" class="tab-view hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
-                <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-xl p-5 shadow-sm space-y-6 sticky top-24">
-                    <div class="flex border-b border-[#E6DDD3] pb-3 gap-2">
-                        <button id="sidebar-tab-1" data-sidebar-tab="I" class="sidebar-tab-btn active">I. Silhouette</button>
-                        <button id="sidebar-tab-2" data-sidebar-tab="II" class="sidebar-tab-btn">II. Texture & Color</button>
-                        <button id="sidebar-tab-3" data-sidebar-tab="III" class="sidebar-tab-btn">III. WIP Route</button>
-                    </div>
-
-                    <div id="sidebar-content-I" class="sidebar-content active space-y-5">
-                        <div>
-                            <label class="section-label">Structural Silhouette Selection</label>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button data-silhouette="a-line" class="option-btn active">A-Line</button>
-                                <button data-silhouette="column" class="option-btn">Column</button>
-                                <button data-silhouette="ballgown" class="option-btn">Ballgown</button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="section-label">Neckline Cut</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button data-neckline="sweetheart" class="option-btn active">Sweetheart</button>
-                                <button data-neckline="v-neck" class="option-btn">V-Neck</button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="section-label">Sleeve Structure</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button data-sleeve="sleeveless" class="option-btn active">Sleeveless</button>
-                                <button data-sleeve="long" class="option-btn">Long Sleeve</button>
-                            </div>
-                        </div>
-
-                        <div class="pt-2 border-t border-[#E6DDD3]">
-                            <label class="section-label">Cinematic Camera Control Panel</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button data-cam="360" class="cam-btn active">1) 360° Rotation</button>
-                                <button data-cam="top" class="cam-btn">2) High-Angle Top</button>
-                                <button data-cam="front" class="cam-btn">3) Studio Front</button>
-                                <button data-cam="macro" class="cam-btn">4) Macro Close-up</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="sidebar-content-II" class="sidebar-content hidden space-y-5">
-                        <div>
-                            <label class="section-label">Interactive Color Wheel & Custom Palette</label>
-                            <div class="flex items-center gap-3 bg-cream p-2.5 rounded border border-[#E6DDD3]">
-                                <input type="color" id="fabric-color-picker" value="#6B4E3D" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent">
-                                <span id="fabric-color-hex" class="font-mono text-xs uppercase">#6B4E3D</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="section-label">Shader Reference Maps & Materials</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button data-texture="Silk" class="texture-btn active">Mulberry Silk</button>
-                                <button data-texture="Satin" class="texture-btn">Duchess Satin</button>
-                                <button data-texture="Velvet" class="texture-btn">Lyons Velvet</button>
-                                <button data-texture="Lace" class="texture-btn">Chantilly Lace</button>
-                                <button data-texture="Leather" class="texture-btn">Fine Leather</button>
-                            </div>
-                        </div>
-
-                        <div class="pt-3 border-t border-[#E6DDD3]">
-                            <label class="section-label">✨ AI Internet Vision Search Engine</label>
-                            <p class="text-[11px] text-taupe mb-2">Pulls references from Google, Pinterest, Instagram, & TikTok.</p>
-                            <form id="ai-search-form" class="flex gap-2">
-                                <input type="text" id="ai-input" placeholder="e.g. 1920s corseted silk gown..." class="flex-1 px-3 py-2 text-xs bg-cream border border-[#E6DDD3] rounded focus:outline-none">
-                                <button type="submit" class="px-3 py-2 bg-charcoal text-white text-xs rounded hover:bg-taupe transition-colors">Search</button>
-                            </form>
-                            <div id="ai-results" class="grid grid-cols-3 gap-2 mt-3">
-                                <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=300&q=80" alt="Ref 1" class="w-full h-16 object-cover rounded border border-[#E6DDD3] cursor-pointer">
-                                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=300&q=80" alt="Ref 2" class="w-full h-16 object-cover rounded border border-[#E6DDD3] cursor-pointer">
-                                <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=300&q=80" alt="Ref 3" class="w-full h-16 object-cover rounded border border-[#E6DDD3] cursor-pointer">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="sidebar-content-III" class="sidebar-content hidden space-y-4">
-                        <label class="section-label">Digital Crafting Gamified Timeline</label>
-                        <div class="space-y-3 text-xs">
-                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded">
-                                <span class="font-medium">1. 3D Digital Sketching</span>
-                                <span class="text-[9px] uppercase px-2 py-0.5 rounded bg-sage-light text-sage font-medium">Completed</span>
-                            </div>
-                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded">
-                                <span class="font-medium">2. Virtual Pattern Tailoring</span>
-                                <span class="text-[9px] uppercase px-2 py-0.5 rounded bg-sage-light text-sage font-medium">Active</span>
-                            </div>
-                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded">
-                                <span class="font-medium">3. Ready for Export & Manufacturing</span>
-                                <span class="text-[9px] uppercase px-2 py-0.5 rounded bg-gray-100 text-gray-400 font-medium">Pending</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button id="open-review-btn" class="w-full py-2.5 border border-charcoal text-charcoal text-xs uppercase tracking-widest rounded hover:bg-charcoal hover:text-white transition-all">
-                        ★ Rate Atelier Experience
-                    </button>
-                </div>
-
-                <div class="lg:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl h-[580px] relative overflow-hidden shadow-inner">
-                    <div class="absolute top-4 left-4 z-10 bg-cream/80 backdrop-blur-md px-3 py-1.5 rounded border border-[#E6DDD3] text-[10px] uppercase tracking-widest">
-                        Interactive 3D Mannequin Viewport • OrbitControls Active
-                    </div>
-                    <div id="webgl-error" class="hidden absolute inset-0 bg-cream/95 z-20 flex flex-col items-center justify-center p-6 text-center">
-                        <p class="font-serif text-lg text-charcoal">3D Acceleration Unavailable</p>
-                        <p class="text-xs text-taupe mt-1">Please ensure WebGL is enabled in your browser settings.</p>
-                    </div>
-                    <div id="three-canvas-container" class="w-full h-full"></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-fabrics" class="tab-view hidden space-y-6">
-            <div class="text-center max-w-xl mx-auto">
-                <span class="section-label">Curated Master Textiles</span>
-                <h1 class="font-serif text-3xl my-1">Over 100+ Master Fabrics</h1>
-                <p class="text-xs text-taupe">Search across over 100 unique fabric variants sourced from around the globe.</p>
-            </div>
-            <div class="flex flex-col md:flex-row gap-4 justify-between bg-sand p-4 rounded-xl border border-[#E6DDD3]">
-                <input type="text" id="fabric-search-input" placeholder="Search 100+ fabric names..." class="flex-1 px-4 py-2 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
-                <div class="flex gap-2 overflow-x-auto" id="fabric-cat-filters">
-                    <button data-cat="All" class="filter-btn active">All</button>
-                    <button data-cat="Silks" class="filter-btn">Silks</button>
-                    <button data-cat="Velvets" class="filter-btn">Velvets</button>
-                    <button data-cat="Laces" class="filter-btn">Laces</button>
-                    <button data-cat="Organza & Tulle" class="filter-btn">Organza & Tulle</button>
-                </div>
-            </div>
-            <div id="fabric-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-[500px] overflow-y-auto pr-2"></div>
-        </section>
-
-        <section id="view-embellishments" class="tab-view hidden space-y-6">
-            <div class="text-center max-w-xl mx-auto">
-                <span class="section-label">Handcrafted Artisanship</span>
-                <h1 class="font-serif text-3xl my-1">Sequences, Beading & Gems</h1>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-sand p-5 border border-[#E6DDD3] rounded-xl space-y-3">
-                    <h3 class="font-serif text-lg">Swarovski Crystal Beading</h3>
-                    <p class="text-xs text-taupe">Hand-stitched precision crystal embellishments along necklines or trains.</p>
-                    <button class="embellish-select-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded" data-name="Swarovski Crystal Beading">Select Beading</button>
-                </div>
-                <div class="bg-sand p-5 border border-[#E6DDD3] rounded-xl space-y-3">
-                    <h3 class="font-serif text-lg">French Gold Thread Embroidery</h3>
-                    <p class="text-xs text-taupe">Intricate metallic gold embroidery work across bodice panels.</p>
-                    <button class="embellish-select-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded" data-name="French Gold Thread">Select Embroidery</button>
-                </div>
-                <div class="bg-sand p-5 border border-[#E6DDD3] rounded-xl space-y-3">
-                    <h3 class="font-serif text-lg">Pearlescent Gem Inlays</h3>
-                    <p class="text-xs text-taupe">Custom freshwater pearl and seed bead gem constellations.</p>
-                    <button class="embellish-select-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded" data-name="Pearlescent Gem Inlays">Select Gems</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-sizing" class="tab-view hidden max-w-2xl mx-auto space-y-6">
-            <div class="text-center">
-                <span class="section-label">Precision Fit Technology</span>
-                <h1 class="font-serif text-3xl my-1">AI Camera Size Detector & Video Tutorial</h1>
-            </div>
-            <div class="bg-sand p-8 rounded-xl border border-[#E6DDD3] text-center space-y-4">
-                <div id="camera-box" class="w-full h-48 bg-cream border border-dashed border-taupe rounded-lg flex items-center justify-center p-4">
-                    <span id="camera-status" class="text-xs text-taupe">Camera feed offline. Ready to snapshot or stream.</span>
-                </div>
-                <div class="flex gap-3 justify-center">
-                    <button id="start-scan-btn" class="px-6 py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded">Start AI Camera Scan</button>
-                    <button id="video-tutorial-btn" class="px-6 py-3 border border-charcoal text-charcoal text-xs uppercase tracking-widest rounded hover:bg-charcoal hover:text-white transition-colors">Watch Measuring Tutorial</button>
-                </div>
-                <div id="scan-results" class="hidden p-4 bg-cream border border-sage rounded-lg text-left space-y-2">
-                    <p class="font-serif text-lg text-charcoal">AI Fit Analysis Complete: Size US 4</p>
-                    <p class="text-xs text-taupe">Bust: 34" • Waist: 26" • Hips: 36"</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-designers" class="tab-view hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                <div class="md:col-span-5 space-y-3">
-                    <span class="section-label">Master Artisans Showcase</span>
-                    <div class="p-4 bg-sand border border-charcoal rounded-xl flex items-center gap-4">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-12 h-12 rounded-full object-cover" alt="Elena">
-                        <div>
-                            <h4 class="font-serif text-base">Elena Vance-Amore</h4>
-                            <p class="text-xs text-taupe">Paris, France • Lead Couture Designer</p>
-                        </div>
-                    </div>
-                    <div class="p-4 bg-sand border border-[#E6DDD3] rounded-xl flex items-center gap-4">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" class="w-12 h-12 rounded-full object-cover" alt="Marcus">
-                        <div>
-                            <h4 class="font-serif text-base">Marcus Thorne</h4>
-                            <p class="text-xs text-taupe">Milan, Italy • Structural Tailor</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="md:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl p-5 flex flex-col h-[450px]">
-                    <div class="flex justify-between items-center pb-3 border-b border-[#E6DDD3]">
-                        <span class="font-serif text-sm">Direct Atelier Chat & Video Link</span>
-                        <div class="flex gap-2">
-                            <button class="px-2.5 py-1 bg-cream border border-[#E6DDD3] rounded text-[10px] uppercase">FaceTime</button>
-                            <button class="px-2.5 py-1 bg-cream border border-[#E6DDD3] rounded text-[10px] uppercase">Direct Call</button>
-                        </div>
-                    </div>
-                    <div id="chat-messages" class="flex-1 overflow-y-auto py-4 space-y-3">
-                        <div class="p-3 bg-cream border border-[#E6DDD3] rounded text-xs max-w-xs">Bonjour! I am reviewing your 3D dress architecture now.</div>
-                    </div>
-                    <form id="chat-form" class="flex gap-2 pt-3 border-t border-[#E6DDD3]">
-                        <input type="text" id="chat-input" placeholder="Type message to designer..." class="flex-1 px-3 py-2 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
-                        <button type="submit" class="px-4 py-2 bg-charcoal text-white text-xs rounded">Send</button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-tracking" class="tab-view hidden max-w-3xl mx-auto space-y-6">
-            <div class="text-center">
-                <span class="section-label">Live Logistics & Tracking</span>
-                <h1 class="font-serif text-3xl my-1">Waybill #ATG-8902-PARIS</h1>
-                <p class="text-xs text-taupe">Visual map showing real-time manufacturing and shipping progress.</p>
-            </div>
-            <div class="bg-sand p-6 rounded-xl border border-[#E6DDD3] space-y-4">
-                <div class="w-full h-64 bg-cream border border-[#E6DDD3] rounded-lg relative flex items-center justify-center overflow-hidden">
-                    <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#3A2E2B_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                    <div class="text-center z-10 space-y-2">
-                        <span class="text-xs uppercase tracking-widest text-sage font-medium">📍 Status: Hand-Stitching in Paris Atelier</span>
-                        <p class="text-xs text-taupe">Estimated Delivery: 14 Business Days</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-clearance" class="tab-view hidden space-y-6">
-            <div class="text-center max-w-xl mx-auto">
-                <span class="section-label">Private Archive</span>
-                <h1 class="font-serif text-3xl my-1">Clearance Collection</h1>
-                <p class="text-xs text-taupe">Archived runway samples available for immediate acquisition.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-sand p-4 rounded-xl border border-[#E6DDD3] space-y-3">
-                    <img src="https://images.unsplash.com/photo-1594552072238-b8a3da72ae9a?auto=format&fit=crop&w=400&q=80" alt="Clearance 1" class="w-full h-64 object-cover rounded">
-                    <h3 class="font-serif text-base">The Ivory Silk Slip Sample</h3>
-                    <p class="text-xs text-taupe">$1,200 <span class="line-through">$3,400</span></p>
-                    <button class="w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded">Claim Sample</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-checkout" class="tab-view hidden max-w-2xl mx-auto space-y-6">
-            <div class="text-center">
-                <span class="section-label">Secure Commission</span>
-                <h1 class="font-serif text-3xl my-1">Checkout & Payment Gateway</h1>
-            </div>
-            <form id="checkout-form" class="bg-sand p-6 rounded-xl border border-[#E6DDD3] space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" placeholder="First Name" required class="p-3 bg-cream border border-[#E6DDD3] rounded text-xs">
-                    <input type="text" placeholder="Last Name" required class="p-3 bg-cream border border-[#E6DDD3] rounded text-xs">
-                </div>
-                <input type="email" placeholder="Email Address" required class="w-full p-3 bg-cream border border-[#E6DDD3] rounded text-xs">
-                <input type="text" placeholder="Shipping Address" required class="w-full p-3 bg-cream border border-[#E6DDD3] rounded text-xs">
-                
-                <div class="pt-2 border-t border-[#E6DDD3]">
-                    <label class="section-label mb-2">Select Payment Method</label>
-                    <div class="grid grid-cols-4 gap-2">
-                        <button type="button" class="pay-btn active py-2 border border-[#E6DDD3] rounded text-xs">Credit Card</button>
-                        <button type="button" class="pay-btn py-2 border border-[#E6DDD3] rounded text-xs">Apple Pay</button>
-                        <button type="button" class="pay-btn py-2 border border-[#E6DDD3] rounded text-xs">Debit Card</button>
-                        <button type="button" class="pay-btn py-2 border border-[#E6DDD3] rounded text-xs">CashApp</button>
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded mt-2">Complete Commission</button>
-            </form>
-        </section>
-    </main>
-
-    <div id="review-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-cream border border-[#E6DDD3] rounded-xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
-            <button id="close-review-btn" class="absolute top-4 right-4 text-taupe text-lg">✕</button>
-            <h3 class="font-serif text-2xl text-center">Rate Your Atelier Experience</h3>
-            <div id="star-rating-container" class="flex justify-center gap-2 text-2xl cursor-pointer">
-                <span data-star="1" class="text-taupe">★</span>
-                <span data-star="2" class="text-taupe">★</span>
-                <span data-star="3" class="text-taupe">★</span>
-                <span data-star="4" class="text-taupe">★</span>
-                <span data-star="5" class="text-taupe">★</span>
-            </div>
-            <textarea id="review-text" rows="3" placeholder="Share your feedback..." class="w-full p-3 text-xs bg-sand border border-[#E6DDD3] rounded focus:outline-none"></textarea>
-            <button id="submit-review-btn" class="w-full py-2.5 bg-charcoal text-white text-xs uppercase tracking-widest rounded">Submit Feedback</button>
+    <div class="card">
+        <h2>Counter Widget</h2>
+        <div class="counter-display" id="counterValue">0</div>
+        <div class="btn-group">
+            <button class="action-btn" id="decrementBtn">- Decrease</button>
+            <button class="action-btn" id="resetBtn">Reset</button>
+            <button class="action-btn" id="incrementBtn">+ Increase</button>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <div class="card">
+        <h2>Simple Todo List</h2>
+        <div class="todo-input-group">
+            <input type="text" id="todoInput" placeholder="Add a new task...">
+            <button class="action-btn" id="addTodoBtn">Add</button>
+        </div>
+        <ul id="todoList">
+            </ul>
+    </div>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // Counter Logic
+        let count = 0;
+        const counterValue = document.getElementById('counterValue');
+        const incrementBtn = document.getElementById('incrementBtn');
+        const decrementBtn = document.getElementById('decrementBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function updateCounter() {
+            counterValue.textContent = count;
+        }
+
+        incrementBtn.addEventListener('click', () => {
+            count++;
+            updateCounter();
+        });
+
+        decrementBtn.addEventListener('click', () => {
+            count--;
+            updateCounter();
+        });
+
+        resetBtn.addEventListener('click', () => {
+            count = 0;
+            updateCounter();
+        });
+
+        // Todo List Logic
+        const todoInput = document.getElementById('todoInput');
+        const addTodoBtn = document.getElementById('addTodoBtn');
+        const todoList = document.getElementById('todoList');
+
+        function addTodo() {
+            const taskText = todoInput.value.trim();
+            if (taskText === '') return;
+
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${taskText}</span>
+                <button class="delete-btn">Delete</button>
+            `;
+
+            // Delete functionality
+            li.querySelector('.delete-btn').addEventListener('click', () => {
+                li.remove();
+            });
+
+            todoList.appendChild(li);
+            todoInput.value = '';
+            todoInput.focus();
+        }
+
+        addTodoBtn.addEventListener('click', addTodo);
+        
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+    </script>
 </body>
 </html>

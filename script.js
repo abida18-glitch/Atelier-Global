@@ -1,478 +1,782 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import { 
-  Compass, 
   Package, 
-  MessageSquare, 
-  Camera, 
-  RotateCw, 
-  ZoomIn, 
-  ZoomOut, 
   Star, 
+  RotateCw, 
+  Eye, 
+  Maximize2, 
+  Search, 
+  CheckCircle2, 
+  Clock, 
   MapPin, 
+  Truck, 
+  ShieldCheck, 
   Send,
-  Navigation
+  ChevronRight,
+  Palette,
+  AlertTriangle,
+  RefreshCw,
+  ImageOff,
+  ZoomIn,
+  ZoomOut,
+  Sliders,
+  Sparkles,
+  Heart,
+  Share2
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default function FashionDesignStudio() {
-  const [activeTab, setActiveTab] = useState('II');
-  const [selectedGarment, setSelectedGarment] = useState(0);
-  const [rating, setRating] = useState(5);
-  const [reviewText, setReviewText] = useState('');
-  const [selectedWaypoint, setSelectedWaypoint] = useState(1); // Active tracking step
+// ==============================================================================
+// 1. ERROR BOUNDARY COMPONENT
+// ==============================================================================
 
-  const [reviews, setReviews] = useState([
-    { id: 1, author: 'Evelyn V.', rating: 5, date: 'OCT 24, 2025', text: 'The structural silhouette and drape of the Silk Atelier Gown exceeded expectations. Uncompromising precision.' },
-    { id: 2, author: 'Julian C.', rating: 4, date: 'NOV 12, 2025', text: 'Minimalist aesthetic realized perfectly. Minor delay in rendering high-poly textures, but overall sublime.' }
-  ]);
+class AtelierErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, errorMessage: '' };
+  }
 
-  // Catalog Data
-  const garments = [
-    { id: 1, name: 'Silk Atelier Gown', code: 'LOOK 01', category: 'Eveningwear', img: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=800&q=80' },
-    { id: 2, name: 'Structured Wool Coat', code: 'LOOK 02', category: 'Outerwear', img: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&w=800&q=80' },
-    { id: 3, name: 'Draped Linen Blazer', code: 'LOOK 03', category: 'Tailoring', img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80' },
-    { id: 4, name: 'Monochrome Slip Dress', code: 'LOOK 04', category: 'Prêt-à-Porter', img: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=800&q=80' },
-  ];
+  static getDerivedStateFromError(error) {
+    return { hasError: true, errorMessage: error.message || 'An unexpected rendering error occurred.' };
+  }
 
-  // Tracking Waypoints Data
-  const waypoints = [
-    { id: 0, title: 'Atelier Origin', city: 'Milan, IT', coords: '45.4642° N, 9.1900° E', status: 'Completed', time: 'NOV 10 • 09:00 AM' },
-    { id: 1, title: 'Regional Logistics Hub', city: 'Paris, FR', coords: '48.8566° N, 2.3522° E', status: 'In Transit', time: 'TODAY • 08:30 AM' },
-    { id: 2, title: 'Customs Clearance', city: 'London, UK', coords: '51.5074° N, 0.1278° W', status: 'Pending', time: 'EST. NOV 16' },
-    { id: 3, title: 'Destination Studio', city: 'New York, US', coords: '40.7128° N, 74.0060° W', status: 'Pending', time: 'EST. NOV 18' }
-  ];
+  componentDidCatch(error, errorInfo) {
+    console.error('Atelier Couture Error Boundary caught an error:', error, errorInfo);
+  }
 
-  const handleCameraAction = (action) => {
-    console.log(`Camera Action Triggered: ${action}`);
+  handleReset = () => {
+    this.setState({ hasError: false, errorMessage: '' });
   };
 
-  const handleReviewSubmit = (e) => {
-    e.preventDefault();
-    if (!reviewText.trim()) return;
-    setReviews([
-      { id: Date.now(), author: 'Client Visitor', rating, date: 'JUST NOW', text: reviewText },
-      ...reviews
-    ]);
-    setReviewText('');
-  };
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6 font-sans">
+          <div className="max-w-md w-full bg-white border border-stone-200 rounded-sm p-8 shadow-sm text-center">
+            <div className="w-12 h-12 bg-red-100 text-red-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h2 className="text-2xl font-serif italic text-stone-900 mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              Studio Interface Error
+            </h2>
+            <p className="text-xs text-stone-600 mb-6 leading-relaxed">
+              We encountered an issue displaying this component. Please attempt to recover the session.
+            </p>
+            <div className="bg-stone-100 p-3 rounded text-[11px] font-mono text-stone-700 mb-6 text-left overflow-x-auto">
+              {this.state.errorMessage}
+            </div>
+            <button
+              onClick={this.handleReset}
+              className="w-full bg-stone-900 hover:bg-stone-800 text-white py-3 text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Reload Studio Viewport
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// ==============================================================================
+// 2. IMAGE COMPONENT WITH FALLBACK HANDLING
+// ==============================================================================
+
+function ImageWithFallback({ src, alt, className, style }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return (
+      <div className={`bg-stone-200 flex flex-col items-center justify-center text-stone-500 p-4 text-center ${className}`}>
+        <ImageOff className="w-6 h-6 mb-2 stroke-[1.5]" />
+        <span className="text-[10px] uppercase font-sans tracking-wider">Asset Unavailable</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#FBFBFA] text-[#1A1A1A] font-sans flex antialiased selection:bg-[#2A2A2A] selection:text-[#FBFBFA]">
-      
-      {/* ------------------------------------------------------------------- */}
-      {/* SIDEBAR NAVIGATION                                                  */}
-      {/* ------------------------------------------------------------------- */}
-      <aside className="w-72 border-r border-[#E5E5E0] p-8 flex flex-col justify-between h-screen sticky top-0 bg-[#FBFBFA]">
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      style={style}
+      onError={() => setHasError(true)}
+    />
+  );
+}
+
+// ==============================================================================
+// 3. COLOR PALETTES & COMPREHENSIVE DRESS CATALOG WITH ONLINE IMAGES
+// ==============================================================================
+
+const EXTENDED_COLOR_PALETTES = [
+  {
+    id: 'ruby',
+    name: 'Ruby Crimson',
+    bgLight: 'bg-rose-50/50',
+    border: 'border-red-900/20',
+    textPrimary: 'text-red-950',
+    textAccent: 'text-red-800',
+    bgPrimary: 'bg-red-950',
+    bgHover: 'hover:bg-red-900',
+    badgeBg: 'bg-rose-100',
+    badgeText: 'text-red-950',
+    accentHex: '#881337'
+  },
+  {
+    id: 'burgundy',
+    name: 'Deep Burgundy',
+    bgLight: 'bg-stone-100/60',
+    border: 'border-rose-950/20',
+    textPrimary: 'text-rose-950',
+    textAccent: 'text-rose-900',
+    bgPrimary: 'bg-rose-950',
+    bgHover: 'hover:bg-rose-900',
+    badgeBg: 'bg-rose-200/50',
+    badgeText: 'text-rose-950',
+    accentHex: '#4c0519'
+  },
+  {
+    id: 'emerald',
+    name: 'Emerald Green',
+    bgLight: 'bg-emerald-50/50',
+    border: 'border-emerald-900/20',
+    textPrimary: 'text-emerald-950',
+    textAccent: 'text-emerald-800',
+    bgPrimary: 'bg-emerald-950',
+    bgHover: 'hover:bg-emerald-900',
+    badgeBg: 'bg-emerald-100',
+    badgeText: 'text-emerald-950',
+    accentHex: '#064e3b'
+  },
+  {
+    id: 'sapphire',
+    name: 'Sapphire Blue',
+    bgLight: 'bg-sky-50/50',
+    border: 'border-blue-900/20',
+    textPrimary: 'text-blue-950',
+    textAccent: 'text-blue-800',
+    bgPrimary: 'bg-blue-950',
+    bgHover: 'hover:bg-blue-900',
+    badgeBg: 'bg-blue-100',
+    badgeText: 'text-blue-950',
+    accentHex: '#1e3a8a'
+  },
+  {
+    id: 'onyx',
+    name: 'Onyx Black',
+    bgLight: 'bg-stone-100',
+    border: 'border-stone-900/20',
+    textPrimary: 'text-stone-950',
+    textAccent: 'text-stone-800',
+    bgPrimary: 'bg-stone-950',
+    bgHover: 'hover:bg-stone-900',
+    badgeBg: 'bg-stone-200',
+    badgeText: 'text-stone-950',
+    accentHex: '#0c0a09'
+  }
+];
+
+const FABRICS_LIST = [
+  'Silk', 'Satin', 'Lace', 'Chiffon', 'Velvet', 'Brocade', 'Organza', 
+  'Linen', 'Tweed', 'Taffeta', 'Georgette', 'Crepe', 'Tulle'
+];
+
+const DRESS_CATALOG = [
+  {
+    id: 'd1',
+    name: 'Ruby Silk Evening Gown',
+    silhouette: 'Ballgown',
+    fabric: 'Silk',
+    price: 850,
+    image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=1000&q=80',
+    description: 'Item One: Premium 100% Mulberry Silk in fluid drape dynamics with subtle luster.',
+    weight: '19mm Silk Crepe'
+  },
+  {
+    id: 'd2',
+    name: 'Scarlet Velvet Corset Dress',
+    silhouette: 'Bodycon',
+    fabric: 'Velvet',
+    price: 640,
+    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1000&q=80',
+    description: 'Item Two: Rich combed velvet with soft structured boning and light-absorbing depth.',
+    weight: '380 GSM Velvet'
+  },
+  {
+    id: 'd3',
+    name: 'Chantilly Crimson Lace Slip',
+    silhouette: 'Slip',
+    fabric: 'Lace',
+    price: 720,
+    image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=1000&q=80',
+    description: 'Item Three: Intricate French corded floral lace motif overlaid across sheer silk lining.',
+    weight: '110 GSM Fine Lace'
+  },
+  {
+    id: 'd4',
+    name: 'Emerald Satin Column Dress',
+    silhouette: 'Column',
+    fabric: 'Satin',
+    price: 790,
+    image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80',
+    description: 'Item Four: Luminous liquid satin tailored with a sleek column drape and side slit.',
+    weight: '240 GSM Satin'
+  },
+  {
+    id: 'd5',
+    name: 'Garnet Chiffon Tiered Gown',
+    silhouette: 'A-Line',
+    fabric: 'Chiffon',
+    price: 610,
+    image: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1528458876861-544fd1761a91?auto=format&fit=crop&w=1000&q=80',
+    description: 'Item Five: Sheer layered chiffon offering weightless motion and romantic cascading pleats.',
+    weight: '65 GSM Silk Chiffon'
+  },
+  {
+    id: 'd6',
+    name: 'Midnight Velvet Brocade Gown',
+    silhouette: 'Mermaid',
+    fabric: 'Brocade',
+    price: 980,
+    image: 'https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1000&q=80',
+    macroImage: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1000&q=80',
+    description: 'Item Six: Woven floral jacquard brocade structured into a fitting mermaid outline.',
+    weight: '410 GSM Brocade'
+  }
+];
+
+// ==============================================================================
+// 4. MAIN APPLICATION COMPONENT
+// ==============================================================================
+
+function AtelierStudioAppContent() {
+  const [activeTab, setActiveTab] = useState('catalog');
+  const [activeTheme, setActiveTheme] = useState(EXTENDED_COLOR_PALETTES[0]);
+  const [selectedDress, setSelectedDress] = useState(DRESS_CATALOG[0]);
+  const [cameraAngle, setCameraAngle] = useState('front');
+  const [fabricFilter, setFabricFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [favorites, setFavorites] = useState([]);
+
+  // Interactive Customizer States
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [sleeveLength, setSleeveLength] = useState('Sleeveless');
+  const [necklineStyle, setNecklineStyle] = useState('Sweetheart');
+  const [trainLength, setTrainLength] = useState('Court Train');
+  const [brightness, setBrightness] = useState(100);
+
+  // Turntable animation
+  const [turntableAngle, setTurntableAngle] = useState(0);
+  useEffect(() => {
+    let timer;
+    if (cameraAngle === 'turntable') {
+      timer = setInterval(() => {
+        setTurntableAngle((prev) => (prev + 3) % 360);
+      }, 50);
+    }
+    return () => clearInterval(timer);
+  }, [cameraAngle]);
+
+  // Review Form & Error Handling States
+  const [newAuthor, setNewAuthor] = useState('');
+  const [newComment, setNewComment] = useState('');
+  const [userRating, setUserRating] = useState(5);
+  const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [reviews, setReviews] = useState([
+    {
+      id: 'r1',
+      author: 'Duchess Victoria Vance',
+      rating: 5,
+      date: '2026-08-01',
+      comment: 'Review One: The macro texture review predicted the silk drape flawlessly.',
+      verified: true,
+      dressName: 'Ruby Silk Evening Gown'
+    }
+  ]);
+
+  const toggleFavorite = (id) => {
+    setFavorites(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setFormError('');
+    setIsSubmitting(true);
+
+    try {
+      if (!newAuthor.trim()) {
+        throw new Error('Please enter a valid client name.');
+      }
+      if (!newComment.trim() || newComment.trim().length < 10) {
+        throw new Error('Feedback comment must be at least 10 characters long.');
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
+      const newEntry = {
+        id: `rev-${Date.now()}`,
+        author: newAuthor.trim(),
+        rating: userRating,
+        date: new Date().toISOString().split('T')[0],
+        comment: newComment.trim(),
+        verified: true,
+        dressName: selectedDress.name
+      };
+
+      setReviews([newEntry, ...reviews]);
+      setNewAuthor('');
+      setNewComment('');
+      setUserRating(5);
+    } catch (err) {
+      setFormError(err.message || 'Failed to record feedback. Please try again.');
+    } font-sans finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const filteredDresses = DRESS_CATALOG.filter(d => {
+    const matchesFabric = fabricFilter === 'All' || d.fabric === fabricFilter;
+    const matchesSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          d.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesFabric && matchesSearch;
+  });
+
+  return (
+    <div className="flex min-h-screen bg-stone-50 text-stone-900 font-sans antialiased selection:bg-stone-200 transition-colors duration-700">
+
+      {/* SIDEBAR */}
+      <aside className={`w-80 bg-stone-100/90 backdrop-blur-md border-r ${activeTheme.border} flex flex-col justify-between p-8 sticky top-0 h-screen z-50 shrink-0 transition-colors duration-700`}>
         <div>
-          <div className="mb-16">
-            <h1 className="font-serif text-2xl tracking-widest uppercase text-[#1A1A1A] font-normal">
-              A T E L I E R
+          <div className={`mb-8 pb-6 border-b ${activeTheme.border} transition-colors duration-700`}>
+            <h1 
+              className={`text-3xl tracking-wide font-light italic transition-colors duration-700 ${activeTheme.textPrimary}`}
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            >
+              Atelier Couture
             </h1>
-            <p className="text-[10px] tracking-widest text-[#737370] uppercase mt-1">
-              3D Digital Studio
+            <p className={`text-[10px] uppercase tracking-[0.3em] font-sans mt-2 font-semibold transition-colors duration-700 ${activeTheme.textAccent}`}>
+              HAUTE COUTURE STUDIO
             </p>
           </div>
 
-          <nav className="space-y-6">
+          {/* PALETTE SELECTOR */}
+          <div className="mb-8 p-4 rounded-sm bg-white border border-stone-200/80 shadow-xs font-sans">
+            <div className="flex items-center gap-2 mb-3">
+              <Palette className={`w-3.5 h-3.5 ${activeTheme.textAccent}`} />
+              <span className="text-[10px] uppercase font-bold tracking-widest text-stone-600">
+                Custom Theme Palette
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-5 gap-1.5">
+              {EXTENDED_COLOR_PALETTES.map((palette) => (
+                <button
+                  key={palette.id}
+                  onClick={() => setActiveTheme(palette)}
+                  title={palette.name}
+                  className={`h-7 rounded-xs transition-all duration-300 relative flex items-center justify-center border text-[9px] font-medium ${
+                    activeTheme.id === palette.id ? 'ring-2 ring-offset-1 ring-stone-900 scale-105 text-white' : 'hover:scale-100 opacity-80 hover:opacity-100 text-white'
+                  }`}
+                  style={{ backgroundColor: palette.accentHex }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* NAVIGATION */}
+          <nav className="space-y-6 font-sans">
             <button
-              onClick={() => setActiveTab('I')}
-              className={`w-full flex items-center justify-between text-xs tracking-widest uppercase transition-colors duration-200 pb-2 border-b ${
-                activeTab === 'I' 
-                  ? 'border-[#1A1A1A] text-[#1A1A1A] font-medium' 
-                  : 'border-transparent text-[#737370] hover:text-[#1A1A1A]'
+              onClick={() => setActiveTab('catalog')}
+              className={`w-full text-left py-2 flex items-center justify-between group transition-all ${
+                activeTab === 'catalog' ? `${activeTheme.textPrimary} font-semibold` : 'text-stone-500 hover:text-stone-800'
               }`}
             >
-              <span className="font-serif text-sm mr-3 text-[#A3A39E]">I.</span>
-              <span className="flex-1 text-left">Catalog & Studio</span>
-              <Compass className="w-3.5 h-3.5 stroke-[1.5]" />
+              <div>
+                <span className="block text-xl font-serif font-light italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  Tab One
+                </span>
+                <span className="text-[11px] uppercase tracking-widest text-stone-500 font-sans">
+                  3D Studio & Interactive Customizer
+                </span>
+              </div>
+              <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === 'catalog' ? `opacity-100 translate-x-1 ${activeTheme.textAccent}` : 'opacity-0'}`} />
             </button>
 
             <button
-              onClick={() => setActiveTab('II')}
-              className={`w-full flex items-center justify-between text-xs tracking-widest uppercase transition-colors duration-200 pb-2 border-b ${
-                activeTab === 'II' 
-                  ? 'border-[#1A1A1A] text-[#1A1A1A] font-medium' 
-                  : 'border-transparent text-[#737370] hover:text-[#1A1A1A]'
+              onClick={() => setActiveTab('reviews')}
+              className={`w-full text-left py-2 flex items-center justify-between group transition-all ${
+                activeTab === 'reviews' ? `${activeTheme.textPrimary} font-semibold` : 'text-stone-500 hover:text-stone-800'
               }`}
             >
-              <span className="font-serif text-sm mr-3 text-[#A3A39E]">II.</span>
-              <span className="flex-1 text-left">Logistics Tracker</span>
-              <Package className="w-3.5 h-3.5 stroke-[1.5]" />
-            </button>
-
-            <button
-              onClick={() => setActiveTab('III')}
-              className={`w-full flex items-center justify-between text-xs tracking-widest uppercase transition-colors duration-200 pb-2 border-b ${
-                activeTab === 'III' 
-                  ? 'border-[#1A1A1A] text-[#1A1A1A] font-medium' 
-                  : 'border-transparent text-[#737370] hover:text-[#1A1A1A]'
-              }`}
-            >
-              <span className="font-serif text-sm mr-3 text-[#A3A39E]">III.</span>
-              <span className="flex-1 text-left">Client Reviews</span>
-              <MessageSquare className="w-3.5 h-3.5 stroke-[1.5]" />
+              <div>
+                <span className="block text-xl font-serif font-light italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  Tab Two
+                </span>
+                <span className="text-[11px] uppercase tracking-widest text-stone-500 font-sans">
+                  Client Feedback & Ratings
+                </span>
+              </div>
+              <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === 'reviews' ? `opacity-100 translate-x-1 ${activeTheme.textAccent}` : 'opacity-0'}`} />
             </button>
           </nav>
         </div>
 
-        <div className="pt-8 border-t border-[#E5E5E0]">
-          <p className="text-[10px] text-[#A3A39E] tracking-wider uppercase">
-            Edition 2026 / V2.04
-          </p>
+        {/* WISHLIST SUMMARY */}
+        <div className={`p-4 bg-white border ${activeTheme.border} rounded-sm font-sans text-xs`}>
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-stone-600 text-[11px] font-semibold uppercase tracking-wider">
+              <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" /> Favorites
+            </span>
+            <span className={`font-bold ${activeTheme.textPrimary}`}>{favorites.length} Saved</span>
+          </div>
         </div>
       </aside>
 
-      {/* ------------------------------------------------------------------- */}
-      {/* MAIN CONTENT AREA                                                   */}
-      {/* ------------------------------------------------------------------- */}
-      <main className="flex-1 overflow-y-auto p-12 lg:p-16">
-
-        {/* =================================================================== */}
-        {/* TAB I: 3D CATALOG & CAMERA                                          */}
-        {/* =================================================================== */}
-        {activeTab === 'I' && (
-          <div className="max-w-6xl mx-auto space-y-12">
-            <div className="border-b border-[#E5E5E0] pb-6 flex justify-between items-end">
-              <div>
-                <span className="text-xs font-serif text-[#A3A39E] tracking-widest">SECTION I</span>
-                <h2 className="font-serif text-3xl font-light text-[#1A1A1A] tracking-wide mt-1">
-                  Collection Gallery & Virtual Studio
-                </h2>
-              </div>
-              <p className="text-xs text-[#737370] tracking-widest uppercase">
-                {garments.length} Active Renderings
-              </p>
+      {/* MAIN WORKSPACE */}
+      <main className="flex-1 p-12 overflow-y-auto max-w-7xl mx-auto">
+        {activeTab === 'catalog' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
+            <div className={`mb-10 pb-6 border-b ${activeTheme.border}`}>
+              <h2 className={`text-4xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                3D Garment Design Studio
+              </h2>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-              <div className="lg:col-span-8 bg-[#F2F2EE] border border-[#E5E5E0] p-8 flex flex-col justify-between h-[560px] relative">
-                <div className="flex justify-between items-start z-10">
-                  <div>
-                    <span className="text-[10px] tracking-widest uppercase text-[#737370]">
-                      {garments[selectedGarment].code}
-                    </span>
-                    <h3 className="font-serif text-xl font-normal text-[#1A1A1A]">
-                      {garments[selectedGarment].name}
-                    </h3>
-                  </div>
-                  <span className="text-[10px] tracking-widest uppercase border border-[#2A2A2A] px-2.5 py-1 text-[#2A2A2A]">
-                    Interactive Canvas
-                  </span>
-                </div>
-
-                <div className="absolute inset-0 p-8 flex items-center justify-center">
-                  <img 
-                    src={garments[selectedGarment].img} 
-                    alt={garments[selectedGarment].name}
-                    className="max-h-full max-w-full object-contain grayscale opacity-90 contrast-105 transition-all duration-500 ease-out"
-                  />
-                </div>
-
-                <div className="z-10 bg-[#FBFBFA]/90 backdrop-blur-sm border border-[#E5E5E0] p-2 flex items-center justify-between self-center gap-6">
-                  <button 
-                    onClick={() => handleCameraAction('Rotate Left')}
-                    className="flex items-center gap-2 text-[11px] tracking-widest uppercase text-[#737370] hover:text-[#1A1A1A] transition-colors px-3 py-1.5"
-                  >
-                    <RotateCw className="w-3 h-3 transform -scale-x-100" />
-                    <span>Orbit L</span>
-                  </button>
-                  <span className="text-[#E5E5E0]">|</span>
-                  <button 
-                    onClick={() => handleCameraAction('Zoom In')}
-                    className="flex items-center gap-2 text-[11px] tracking-widest uppercase text-[#737370] hover:text-[#1A1A1A] transition-colors px-3 py-1.5"
-                  >
-                    <ZoomIn className="w-3 h-3" />
-                    <span>Zoom In</span>
-                  </button>
-                  <span className="text-[#E5E5E0]">|</span>
-                  <button 
-                    onClick={() => handleCameraAction('Zoom Out')}
-                    className="flex items-center gap-2 text-[11px] tracking-widest uppercase text-[#737370] hover:text-[#1A1A1A] transition-colors px-3 py-1.5"
-                  >
-                    <ZoomOut className="w-3 h-3" />
-                    <span>Zoom Out</span>
-                  </button>
-                  <span className="text-[#E5E5E0]">|</span>
-                  <button 
-                    onClick={() => handleCameraAction('Reset')}
-                    className="flex items-center gap-2 text-[11px] tracking-widest uppercase text-[#737370] hover:text-[#1A1A1A] transition-colors px-3 py-1.5"
-                  >
-                    <Camera className="w-3 h-3" />
-                    <span>Reset View</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="lg:col-span-4 space-y-4">
-                <p className="text-xs uppercase tracking-widest text-[#737370] mb-2 font-medium">
-                  Select Garment
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                  {garments.map((item, idx) => (
-                    <button
-                      key={item.id}
-                      onClick={() => setSelectedGarment(idx)}
-                      className={`text-left border transition-all p-3 group bg-[#FBFBFA] ${
-                        selectedGarment === idx 
-                          ? 'border-[#1A1A1A]' 
-                          : 'border-[#E5E5E0] hover:border-[#A3A39E]'
-                      }`}
-                    >
-                      <div className="aspect-[3/4] bg-[#F2F2EE] mb-3 overflow-hidden">
-                        <img 
-                          src={item.img} 
-                          alt={item.name} 
-                          className="w-full h-full object-cover grayscale opacity-80 group-hover:opacity-100 transition-opacity"
-                        />
-                      </div>
-                      <p className="text-[10px] tracking-widest uppercase text-[#737370]">{item.code}</p>
-                      <p className="font-serif text-sm font-normal text-[#1A1A1A] truncate">{item.name}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-          </div>
-        )}
-
-        {/* =================================================================== */}
-        {/* TAB II: INTERACTIVE PACKAGE TRACKER MAP                             */}
-        {/* =================================================================== */}
-        {activeTab === 'II' && (
-          <div className="max-w-5xl mx-auto space-y-12">
-            
-            {/* Header */}
-            <div className="border-b border-[#E5E5E0] pb-6 flex justify-between items-end">
-              <div>
-                <span className="text-xs font-serif text-[#A3A39E] tracking-widest">SECTION II</span>
-                <h2 className="font-serif text-3xl font-light text-[#1A1A1A] tracking-wide mt-1">
-                  Logistics & Real-Time Track
-                </h2>
-              </div>
-              <p className="text-xs text-[#737370] tracking-widest uppercase">
-                WAYBILL: #882-9012-LX
-              </p>
-            </div>
-
-            <div className="bg-[#F2F2EE] border border-[#E5E5E0] p-8 space-y-8">
+            {/* INTERACTIVE VIEWPORT & LIVE CUSTOMIZER */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-16">
               
-              {/* Delivery Meta Summary */}
-              <div className="flex flex-wrap justify-between items-center pb-6 border-b border-[#E5E5E0] gap-4">
-                <div>
-                  <span className="text-[10px] uppercase tracking-widest text-[#737370]">Current Location</span>
-                  <p className="font-serif text-xl text-[#1A1A1A] mt-0.5">
-                    {waypoints[selectedWaypoint].city} — {waypoints[selectedWaypoint].title}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] uppercase tracking-widest text-[#737370]">Coordinates</span>
-                  <p className="font-mono text-xs text-[#2A2A2A] mt-1">{waypoints[selectedWaypoint].coords}</p>
-                </div>
-              </div>
-
-              {/* ----------------------------------------------------------- */}
-              {/* INTERACTIVE VECTOR MAP CONTAINER                            */}
-              {/* ----------------------------------------------------------- */}
-              <div className="h-80 border border-[#E5E5E0] bg-[#FBFBFA] relative overflow-hidden flex flex-col justify-between p-6">
-                
-                {/* Background Grid Lines (Map Cartography aesthetic) */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e0_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e0_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-30"></div>
-                
-                {/* Map Overlay Controls */}
-                <div className="relative z-10 flex justify-between items-start">
-                  <div className="flex items-center gap-2 bg-[#FBFBFA]/90 border border-[#E5E5E0] px-3 py-1.5 backdrop-blur-sm">
-                    <Navigation className="w-3 h-3 text-[#1A1A1A]" />
-                    <span className="text-[10px] uppercase tracking-widest text-[#1A1A1A] font-medium">Live GPS Feed</span>
-                  </div>
-                  
-                  <div className="bg-[#FBFBFA]/90 border border-[#E5E5E0] text-[10px] uppercase tracking-widest text-[#737370] px-3 py-1.5 backdrop-blur-sm">
-                    Route: MXP ➔ CDG ➔ LHR ➔ JFK
-                  </div>
-                </div>
-
-                {/* SVG Route Curve & Interactive Location Nodes */}
-                <div className="relative z-10 my-auto w-full px-12">
-                  <svg className="w-full h-24 overflow-visible" viewBox="0 0 800 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* Background Transit Line */}
-                    <path d="M 50 50 Q 250 10, 400 50 T 750 50" stroke="#E5E5E0" strokeWidth="2" strokeDasharray="4 4" />
-                    
-                    {/* Active Transit Path Segment */}
-                    <path d="M 50 50 Q 250 10, 400 50" stroke="#1A1A1A" strokeWidth="1.5" />
-
-                    {/* Nodes along the path */}
-                    {[
-                      { cx: 50, cy: 50, idx: 0 },
-                      { cx: 280, cy: 26, idx: 1 },
-                      { cx: 520, cy: 42, idx: 2 },
-                      { cx: 750, cy: 50, idx: 3 }
-                    ].map((node) => (
-                      <g 
-                        key={node.idx} 
-                        onClick={() => setSelectedWaypoint(node.idx)} 
-                        className="cursor-pointer group"
-                      >
-                        {/* Node Halo for Active Step */}
-                        {selectedWaypoint === node.idx && (
-                          <circle cx={node.cx} cy={node.cy} r="14" className="fill-none stroke-[#1A1A1A] stroke-1 animate-ping opacity-25" />
-                        )}
-                        <circle 
-                          cx={node.cx} 
-                          cy={node.cy} 
-                          r={selectedWaypoint === node.idx ? "6" : "4"} 
-                          className={`${
-                            node.idx <= 1 ? 'fill-[#1A1A1A]' : 'fill-[#FBFBFA] stroke-[#A3A39E] stroke-2'
-                          } transition-all duration-300 group-hover:scale-125`} 
-                        />
-                      </g>
-                    ))}
-                  </svg>
-                </div>
-
-                {/* Interactive Map Waypoint Selector Bar */}
-                <div className="relative z-10 grid grid-cols-4 gap-2 pt-4 border-t border-[#E5E5E0]">
-                  {waypoints.map((wp) => (
-                    <button
-                      key={wp.id}
-                      onClick={() => setSelectedWaypoint(wp.id)}
-                      className={`text-left p-2.5 transition-colors border ${
-                        selectedWaypoint === wp.id
-                          ? 'border-[#1A1A1A] bg-[#FBFBFA]'
-                          : 'border-transparent hover:border-[#E5E5E0]'
-                      }`}
+              {/* INTERACTIVE CANVAS */}
+              <div className={`lg:col-span-8 bg-white border ${activeTheme.border} rounded-sm p-8 shadow-sm flex flex-col justify-between min-h-[560px]`}>
+                <div className="flex justify-between items-center font-sans text-xs border-b border-stone-100 pb-4">
+                  <span className="text-stone-400 uppercase tracking-widest text-[10px]">Interactive Studio Viewport</span>
+                  <div className="flex items-center gap-4">
+                    <button 
+                      onClick={() => toggleFavorite(selectedDress.id)} 
+                      className={`flex items-center gap-1 text-xs transition-colors ${favorites.includes(selectedDress.id) ? 'text-red-600 font-bold' : 'text-stone-400 hover:text-stone-700'}`}
                     >
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className={`w-3 h-3 ${selectedWaypoint === wp.id ? 'text-[#1A1A1A]' : 'text-[#A3A39E]'}`} />
-                        <span className="text-[10px] uppercase tracking-wider font-medium text-[#1A1A1A]">
-                          {wp.city}
-                        </span>
-                      </div>
-                      <p className="text-[9px] text-[#737370] truncate mt-0.5">{wp.title}</p>
+                      <Heart className={`w-4 h-4 ${favorites.includes(selectedDress.id) ? 'fill-current' : ''}`} />
+                      {favorites.includes(selectedDress.id) ? 'Saved' : 'Save'}
                     </button>
-                  ))}
+                    <span className={`font-medium ${activeTheme.textPrimary}`}>{selectedDress.name}</span>
+                  </div>
                 </div>
 
-              </div>
+                {/* IMAGE CANVAS WITH INTERACTIVE CONTROLS */}
+                <div className={`relative my-6 h-96 flex items-center justify-center overflow-hidden rounded-sm ${activeTheme.bgLight}`}>
+                  <AnimatePresence mode="wait">
+                    <motion.div 
+                      key={selectedDress.id} 
+                      className="w-full h-full flex items-center justify-center p-4"
+                      style={{
+                        transform: cameraAngle === 'turntable' ? `rotateY(${turntableAngle}deg)` : `scale(${zoomLevel}) rotate(${rotation}deg)`,
+                        filter: `brightness(${brightness}%)`
+                      }}
+                    >
+                      <ImageWithFallback
+                        src={cameraAngle === 'macro' ? selectedDress.macroImage : selectedDress.image}
+                        alt={selectedDress.name}
+                        className="h-full object-contain filter drop-shadow-md transition-transform duration-300"
+                      />
+                    </motion.div>
+                  </AnimatePresence>
 
-              {/* Waypoint Details Timeline */}
-              <div className="space-y-6 max-w-2xl mx-auto pt-2">
-                {waypoints.map((wp) => (
-                  <div key={wp.id} className={`flex gap-6 items-start transition-opacity ${selectedWaypoint === wp.id ? 'opacity-100' : 'opacity-50'}`}>
-                    <div className="w-28 text-right pt-0.5">
-                      <span className="text-[10px] font-mono text-[#737370]">{wp.time}</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div className={`w-2 h-2 rounded-full ${wp.id <= 1 ? 'bg-[#1A1A1A]' : 'border border-[#A3A39E] bg-[#FBFBFA]'}`} />
-                      {wp.id < waypoints.length - 1 && <div className="w-[1px] h-10 bg-[#E5E5E0]" />}
+                  {/* OVERLAY INTERACTIVE BADGES */}
+                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 border border-stone-200 rounded-xs text-[10px] font-sans text-stone-700 space-y-0.5">
+                    <p>Neckline: <strong>{necklineStyle}</strong></p>
+                    <p>Sleeves: <strong>{sleeveLength}</strong></p>
+                    <p>Train: <strong>{trainLength}</strong></p>
+                  </div>
+                </div>
+
+                {/* CAMERA & CANVAS SLIDERS */}
+                <div className="space-y-4 border-t border-stone-100 pt-4 font-sans">
+                  <div className="grid grid-cols-4 gap-3">
+                    <button onClick={() => setCameraAngle('front')} className={`py-2 text-xs border ${cameraAngle === 'front' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>Front View</button>
+                    <button onClick={() => setCameraAngle('macro')} className={`py-2 text-xs border ${cameraAngle === 'macro' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>Macro View</button>
+                    <button onClick={() => setCameraAngle('turntable')} className={`py-2 text-xs border ${cameraAngle === 'turntable' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>360 View</button>
+                    <button onClick={() => { setZoomLevel(1); setRotation(0); setBrightness(100); }} className="py-2 text-xs border bg-stone-100 text-stone-700">Reset Canvas</button>
+                  </div>
+
+                  {/* INTERACTIVE SLIDERS FOR ZOOM / ROTATION / LIGHTING */}
+                  <div className="grid grid-cols-3 gap-4 pt-2 text-[10px] uppercase text-stone-500 font-semibold tracking-wider">
+                    <div>
+                      <label className="block mb-1">Zoom Level ({zoomLevel.toFixed(1)}x)</label>
+                      <input 
+                        type="range" min="0.8" max="2" step="0.1" 
+                        value={zoomLevel} 
+                        onChange={(e) => setZoomLevel(parseFloat(e.target.value))}
+                        className="w-full accent-stone-900" 
+                      />
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wider text-[#1A1A1A] font-medium">{wp.title} — {wp.city}</p>
-                      <p className="text-xs text-[#737370] font-light mt-0.5">Status: {wp.status}</p>
+                      <label className="block mb-1">Canvas Angle ({rotation}°)</label>
+                      <input 
+                        type="range" min="-30" max="30" step="5" 
+                        value={rotation} 
+                        onChange={(e) => setRotation(parseInt(e.target.value))}
+                        className="w-full accent-stone-900" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-1">Lighting ({brightness}%)</label>
+                      <input 
+                        type="range" min="70" max="130" step="5" 
+                        value={brightness} 
+                        onChange={(e) => setBrightness(parseInt(e.target.value))}
+                        className="w-full accent-stone-900" 
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* LIVE DRESS CUSTOMIZER PANEL */}
+              <div className={`lg:col-span-4 bg-white border ${activeTheme.border} rounded-sm p-8 flex flex-col justify-between shadow-sm`}>
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Sparkles className={`w-4 h-4 ${activeTheme.textAccent}`} />
+                    <h3 className={`text-2xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                      Bespoke Customizer
+                    </h3>
+                  </div>
+
+                  <div className="space-y-4 font-sans text-xs mb-6">
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1.5">Neckline Silhouette</label>
+                      <select 
+                        value={necklineStyle} 
+                        onChange={(e) => setNecklineStyle(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-200 p-2 text-stone-800 rounded-xs focus:outline-none"
+                      >
+                        <option>Sweetheart</option>
+                        <option>Off-the-Shoulder</option>
+                        <option>High Neck Lace</option>
+                        <option>V-Neck Plunge</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1.5">Sleeve Style</label>
+                      <select 
+                        value={sleeveLength} 
+                        onChange={(e) => setSleeveLength(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-200 p-2 text-stone-800 rounded-xs focus:outline-none"
+                      >
+                        <option>Sleeveless</option>
+                        <option>Cap Sleeves</option>
+                        <option>Juliet Sheer Sleeves</option>
+                        <option>Full Lace Sleeves</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1.5">Train Extension</label>
+                      <select 
+                        value={trainLength} 
+                        onChange={(e) => setTrainLength(e.target.value)}
+                        className="w-full bg-stone-50 border border-stone-200 p-2 text-stone-800 rounded-xs focus:outline-none"
+                      >
+                        <option>Sweep Train</option>
+                        <option>Court Train</option>
+                        <option>Cathedral Train (+ $150)</option>
+                      </select>
+                    </div>
+
+                    <div className="pt-4 border-t border-stone-100">
+                      <span className={`text-2xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                        ${selectedDress.price} USD
+                      </span>
+                      <p className="text-[11px] text-stone-500 mt-1">{selectedDress.description}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <button className={`w-full ${activeTheme.bgPrimary} ${activeTheme.bgHover} text-white py-3.5 text-xs font-sans uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm`}>
+                  Save Custom Configuration
+                </button>
+              </div>
+
+            </div>
+
+            {/* INTERACTIVE SEARCH & FILTERABLE DRESS CATALOG */}
+            <div className={`bg-white border ${activeTheme.border} rounded-sm p-8 shadow-sm`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-stone-100">
+                <div>
+                  <h3 className={`text-2xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Couture Catalog
+                  </h3>
+                  <p className="text-xs uppercase tracking-widest text-stone-400 font-sans mt-1">Select garment specimen for live 3D customization</p>
+                </div>
+
+                {/* SEARCH INPUT */}
+                <div className="relative font-sans w-full sm:w-64">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-stone-400" />
+                  <input
+                    type="text"
+                    placeholder="Search dress or fabric..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-200 pl-8 pr-3 py-2 text-xs text-stone-900 focus:outline-none focus:border-stone-900"
+                  />
+                </div>
+              </div>
+
+              {/* FABRIC FILTER PILLS */}
+              <div className="flex flex-wrap gap-2 mb-8 font-sans">
+                <button
+                  onClick={() => setFabricFilter('All')}
+                  className={`px-3 py-1 text-xs transition-all ${fabricFilter === 'All' ? `${activeTheme.bgPrimary} text-white` : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
+                >
+                  All Fabrics
+                </button>
+                {FABRICS_LIST.map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFabricFilter(f)}
+                    className={`px-3 py-1 text-xs transition-all ${fabricFilter === f ? `${activeTheme.bgPrimary} text-white` : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+
+              {/* DRESS GRID */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredDresses.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => setSelectedDress(item)}
+                    className={`group cursor-pointer border transition-all ${selectedDress.id === item.id ? `${activeTheme.border} ring-1 ring-stone-900` : 'border-stone-200 hover:border-stone-400'}`}
+                  >
+                    <div className={`h-72 overflow-hidden relative ${activeTheme.bgLight}`}>
+                      <ImageWithFallback 
+                        src={item.image} 
+                        alt={item.name} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}
+                        className="absolute top-3 right-3 p-1.5 bg-white/80 backdrop-blur-md rounded-full text-stone-700 hover:text-red-600"
+                      >
+                        <Heart className={`w-3.5 h-3.5 ${favorites.includes(item.id) ? 'fill-red-600 text-red-600' : ''}`} />
+                      </button>
+                      <span className={`absolute top-3 left-3 bg-white/90 ${activeTheme.textAccent} text-[10px] font-sans font-medium px-2 py-0.5 tracking-wider uppercase border border-stone-200`}>
+                        {item.fabric}
+                      </span>
+                    </div>
+                    <div className="p-4 font-sans bg-white">
+                      <p className="text-[10px] text-stone-400 uppercase tracking-widest">{item.silhouette}</p>
+                      <h4 className={`font-serif italic text-lg mt-0.5 ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>{item.name}</h4>
+                      <p className="text-xs text-stone-700 mt-1">${item.price} USD</p>
                     </div>
                   </div>
                 ))}
               </div>
-
             </div>
-          </div>
+
+          </motion.div>
         )}
 
-        {/* =================================================================== */}
-        {/* TAB III: REVIEWS & RATINGS                                         */}
-        {/* =================================================================== */}
-        {activeTab === 'III' && (
-          <div className="max-w-4xl mx-auto space-y-12">
-            <div className="border-b border-[#E5E5E0] pb-6 flex justify-between items-end">
-              <div>
-                <span className="text-xs font-serif text-[#A3A39E] tracking-widest">SECTION III</span>
-                <h2 className="font-serif text-3xl font-light text-[#1A1A1A] tracking-wide mt-1">
-                  Client Evaluations & Feedback
-                </h2>
-              </div>
-              <p className="text-xs text-[#737370] tracking-widest uppercase">
-                {reviews.length} Submissions
-              </p>
+        {/* REVIEWS TAB WITH FORM ERROR HANDLING */}
+        {activeTab === 'reviews' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
+            <div className={`mb-10 pb-6 border-b ${activeTheme.border}`}>
+              <h2 className={`text-4xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>Client Reviews</h2>
             </div>
 
-            <form onSubmit={handleReviewSubmit} className="border border-[#E5E5E0] bg-[#FBFBFA] p-8 space-y-6">
-              <div className="flex justify-between items-center">
-                <span className="text-xs uppercase tracking-widest text-[#1A1A1A] font-medium">
-                  Submit Assessment
-                </span>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+              <div className={`lg:col-span-5 bg-white border ${activeTheme.border} rounded-sm p-8 shadow-sm h-fit font-sans`}>
+                <h3 className={`text-2xl font-light italic mb-2 ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>Record Assessment</h3>
                 
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      type="button"
-                      key={star}
-                      onClick={() => setRating(star)}
-                      className="p-1 focus:outline-none"
-                    >
-                      <Star 
-                        className={`w-4 h-4 transition-colors ${
-                          star <= rating 
-                            ? 'fill-[#2A2A2A] stroke-[#2A2A2A]' 
-                            : 'fill-transparent stroke-[#A3A39E]'
-                        }`} 
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
+                {/* Error Banner */}
+                {formError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 rounded-xs text-xs flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
+                    <span>{formError}</span>
+                  </div>
+                )}
 
-              <textarea
-                rows={3}
-                value={reviewText}
-                onChange={(e) => setReviewText(e.target.value)}
-                placeholder="Share your experience regarding fabric drape, fit accuracy, or digital presentation..."
-                className="w-full bg-[#F2F2EE] border border-[#E5E5E0] p-4 text-xs text-[#1A1A1A] placeholder-[#A3A39E] focus:outline-none focus:border-[#1A1A1A] resize-none transition-colors"
-              />
-
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="flex items-center gap-2 bg-[#1A1A1A] text-[#FBFBFA] px-6 py-2.5 text-xs uppercase tracking-widest hover:bg-[#2A2A2A] transition-colors"
-                >
-                  <span>Submit Review</span>
-                  <Send className="w-3 h-3" />
-                </button>
-              </div>
-            </form>
-
-            <div className="space-y-6">
-              {reviews.map((rev) => (
-                <div key={rev.id} className="border-b border-[#E5E5E0] pb-6 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <span className="font-serif text-base text-[#1A1A1A]">{rev.author}</span>
-                      <span className="text-[10px] text-[#A3A39E] tracking-widest">•</span>
-                      <span className="text-[10px] tracking-widest text-[#737370] uppercase">{rev.date}</span>
-                    </div>
-                    
+                <form onSubmit={handleReviewSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] uppercase font-semibold text-stone-500 mb-1">Rating</label>
                     <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <Star 
-                          key={s} 
-                          className={`w-3 h-3 ${
-                            s <= rev.rating 
-                              ? 'fill-[#2A2A2A] stroke-[#2A2A2A]' 
-                              : 'fill-transparent stroke-[#E5E5E0]'
-                          }`} 
-                        />
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button key={star} type="button" onClick={() => setUserRating(star)} className="text-amber-500">
+                          <Star className={`w-4 h-4 ${userRating >= star ? 'fill-current' : 'text-stone-200'}`} />
+                        </button>
                       ))}
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#2A2A2A] leading-relaxed font-light">
-                    "{rev.text}"
-                  </p>
-                </div>
-              ))}
+                  <div>
+                    <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1">Client Name</label>
+                    <input
+                      type="text"
+                      value={newAuthor}
+                      onChange={(e) => setNewAuthor(e.target.value)}
+                      placeholder="Enter client name"
+                      className="w-full bg-stone-50 border border-stone-200 px-3.5 py-2 text-xs focus:outline-none focus:border-stone-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1">Feedback</label>
+                    <textarea
+                      rows={4}
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Minimum 10 characters detailing quality..."
+                      className="w-full bg-stone-50 border border-stone-200 px-3.5 py-2 text-xs focus:outline-none focus:border-stone-900 resize-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`w-full ${activeTheme.bgPrimary} ${activeTheme.bgHover} text-white py-3 text-xs uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50`}
+                  >
+                    {isSubmitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                    Submit Review
+                  </button>
+                </form>
+              </div>
+
+              <div className="lg:col-span-7 space-y-4 font-sans">
+                {reviews.map((rev) => (
+                  <div key={rev.id} className={`bg-white border ${activeTheme.border} p-6 shadow-sm`}>
+                    <h4 className={`font-serif italic text-lg ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>{rev.author}</h4>
+                    <p className="text-xs text-stone-600 my-2">{rev.comment}</p>
+                    <span className="text-[10px] text-stone-400 uppercase tracking-widest">{rev.date}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-
-          </div>
+          </motion.div>
         )}
-
       </main>
     </div>
+  );
+}
+
+// Wrap Content Component in Error Boundary
+export default function AtelierStudioApp() {
+  return (
+    <AtelierErrorBoundary>
+      <AtelierStudioAppContent />
+    </AtelierErrorBoundary>
   );
 }

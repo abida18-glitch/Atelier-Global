@@ -69,7 +69,7 @@ body {
     font-weight: 600;
 }
 
-.option-btn, .texture-btn, .cam-btn, .filter-btn, .avatar-option-btn, .avatar-pose-btn {
+.option-btn, .texture-btn, .cam-btn, .filter-btn, .avatar-option-btn, .avatar-pose-btn, .pay-btn {
     padding: 0.5rem;
     font-size: 0.75rem;
     border: 1px solid #E6DDD3;
@@ -79,12 +79,12 @@ body {
     transition: all 0.2s ease;
 }
 
-.option-btn:hover, .texture-btn:hover, .cam-btn:hover, .filter-btn:hover, .avatar-option-btn:hover, .avatar-pose-btn:hover {
+.option-btn:hover, .texture-btn:hover, .cam-btn:hover, .filter-btn:hover, .avatar-option-btn:hover, .avatar-pose-btn:hover, .pay-btn:hover {
     border-color: #3A2E2B;
     color: #3A2E2B;
 }
 
-.option-btn.active, .texture-btn.active, .cam-btn.active, .filter-btn.active, .avatar-option-btn.active, .avatar-pose-btn.active {
+.option-btn.active, .texture-btn.active, .cam-btn.active, .filter-btn.active, .avatar-option-btn.active, .avatar-pose-btn.active, .pay-btn.active {
     border-color: #3A2E2B;
     background-color: #FDFBF7;
     color: #3A2E2B;

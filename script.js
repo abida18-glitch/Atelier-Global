@@ -1,782 +1,259 @@
-import React, { useState, useEffect, Component } from 'react';
-import { 
-  Package, 
-  Star, 
-  RotateCw, 
-  Eye, 
-  Maximize2, 
-  Search, 
-  CheckCircle2, 
-  Clock, 
-  MapPin, 
-  Truck, 
-  ShieldCheck, 
-  Send,
-  ChevronRight,
-  Palette,
-  AlertTriangle,
-  RefreshCw,
-  ImageOff,
-  ZoomIn,
-  ZoomOut,
-  Sliders,
-  Sparkles,
-  Heart,
-  Share2
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+document.addEventListener('DOMContentLoaded', () => {
 
-// ==============================================================================
-// 1. ERROR BOUNDARY COMPONENT
-// ==============================================================================
+  // ==========================================
+  // 1. TAB SWITCHING LOGIC (Smooth Transitions)
+  // ==========================================
+  const navButtons = document.querySelectorAll('.nav-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
 
-class AtelierErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, errorMessage: '' };
-  }
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true, errorMessage: error.message || 'An unexpected rendering error occurred.' };
-  }
+      // Update Nav active states
+      navButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-  componentDidCatch(error, errorInfo) {
-    console.error('Atelier Couture Error Boundary caught an error:', error, errorInfo);
-  }
-
-  handleReset = () => {
-    this.setState({ hasError: false, errorMessage: '' });
-  };
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6 font-sans">
-          <div className="max-w-md w-full bg-white border border-stone-200 rounded-sm p-8 shadow-sm text-center">
-            <div className="w-12 h-12 bg-red-100 text-red-800 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="w-6 h-6" />
-            </div>
-            <h2 className="text-2xl font-serif italic text-stone-900 mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-              Studio Interface Error
-            </h2>
-            <p className="text-xs text-stone-600 mb-6 leading-relaxed">
-              We encountered an issue displaying this component. Please attempt to recover the session.
-            </p>
-            <div className="bg-stone-100 p-3 rounded text-[11px] font-mono text-stone-700 mb-6 text-left overflow-x-auto">
-              {this.state.errorMessage}
-            </div>
-            <button
-              onClick={this.handleReset}
-              className="w-full bg-stone-900 hover:bg-stone-800 text-white py-3 text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Reload Studio Viewport
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
-// ==============================================================================
-// 2. IMAGE COMPONENT WITH FALLBACK HANDLING
-// ==============================================================================
-
-function ImageWithFallback({ src, alt, className, style }) {
-  const [hasError, setHasError] = useState(false);
-
-  if (hasError) {
-    return (
-      <div className={`bg-stone-200 flex flex-col items-center justify-center text-stone-500 p-4 text-center ${className}`}>
-        <ImageOff className="w-6 h-6 mb-2 stroke-[1.5]" />
-        <span className="text-[10px] uppercase font-sans tracking-wider">Asset Unavailable</span>
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={src}
-      alt={alt}
-      className={className}
-      style={style}
-      onError={() => setHasError(true)}
-    />
-  );
-}
-
-// ==============================================================================
-// 3. COLOR PALETTES & COMPREHENSIVE DRESS CATALOG WITH ONLINE IMAGES
-// ==============================================================================
-
-const EXTENDED_COLOR_PALETTES = [
-  {
-    id: 'ruby',
-    name: 'Ruby Crimson',
-    bgLight: 'bg-rose-50/50',
-    border: 'border-red-900/20',
-    textPrimary: 'text-red-950',
-    textAccent: 'text-red-800',
-    bgPrimary: 'bg-red-950',
-    bgHover: 'hover:bg-red-900',
-    badgeBg: 'bg-rose-100',
-    badgeText: 'text-red-950',
-    accentHex: '#881337'
-  },
-  {
-    id: 'burgundy',
-    name: 'Deep Burgundy',
-    bgLight: 'bg-stone-100/60',
-    border: 'border-rose-950/20',
-    textPrimary: 'text-rose-950',
-    textAccent: 'text-rose-900',
-    bgPrimary: 'bg-rose-950',
-    bgHover: 'hover:bg-rose-900',
-    badgeBg: 'bg-rose-200/50',
-    badgeText: 'text-rose-950',
-    accentHex: '#4c0519'
-  },
-  {
-    id: 'emerald',
-    name: 'Emerald Green',
-    bgLight: 'bg-emerald-50/50',
-    border: 'border-emerald-900/20',
-    textPrimary: 'text-emerald-950',
-    textAccent: 'text-emerald-800',
-    bgPrimary: 'bg-emerald-950',
-    bgHover: 'hover:bg-emerald-900',
-    badgeBg: 'bg-emerald-100',
-    badgeText: 'text-emerald-950',
-    accentHex: '#064e3b'
-  },
-  {
-    id: 'sapphire',
-    name: 'Sapphire Blue',
-    bgLight: 'bg-sky-50/50',
-    border: 'border-blue-900/20',
-    textPrimary: 'text-blue-950',
-    textAccent: 'text-blue-800',
-    bgPrimary: 'bg-blue-950',
-    bgHover: 'hover:bg-blue-900',
-    badgeBg: 'bg-blue-100',
-    badgeText: 'text-blue-950',
-    accentHex: '#1e3a8a'
-  },
-  {
-    id: 'onyx',
-    name: 'Onyx Black',
-    bgLight: 'bg-stone-100',
-    border: 'border-stone-900/20',
-    textPrimary: 'text-stone-950',
-    textAccent: 'text-stone-800',
-    bgPrimary: 'bg-stone-950',
-    bgHover: 'hover:bg-stone-900',
-    badgeBg: 'bg-stone-200',
-    badgeText: 'text-stone-950',
-    accentHex: '#0c0a09'
-  }
-];
-
-const FABRICS_LIST = [
-  'Silk', 'Satin', 'Lace', 'Chiffon', 'Velvet', 'Brocade', 'Organza', 
-  'Linen', 'Tweed', 'Taffeta', 'Georgette', 'Crepe', 'Tulle'
-];
-
-const DRESS_CATALOG = [
-  {
-    id: 'd1',
-    name: 'Ruby Silk Evening Gown',
-    silhouette: 'Ballgown',
-    fabric: 'Silk',
-    price: 850,
-    image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=1000&q=80',
-    macroImage: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=1000&q=80',
-    description: 'Item One: Premium 100% Mulberry Silk in fluid drape dynamics with subtle luster.',
-    weight: '19mm Silk Crepe'
-  },
-  {
-    id: 'd2',
-    name: 'Scarlet Velvet Corset Dress',
-    silhouette: 'Bodycon',
-    fabric: 'Velvet',
-    price: 640,
-    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1000&q=80',
-    macroImage: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1000&q=80',
-    description: 'Item Two: Rich combed velvet with soft structured boning and light-absorbing depth.',
-    weight: '380 GSM Velvet'
-  },
-  {
-    id: 'd3',
-    name: 'Chantilly Crimson Lace Slip',
-    silhouette: 'Slip',
-    fabric: 'Lace',
-    price: 720,
-    image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=1000&q=80',
-    macroImage: 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=1000&q=80',
-    description: 'Item Three: Intricate French corded floral lace motif overlaid across sheer silk lining.',
-    weight: '110 GSM Fine Lace'
-  },
-  {
-    id: 'd4',
-    name: 'Emerald Satin Column Dress',
-    silhouette: 'Column',
-    fabric: 'Satin',
-    price: 790,
-    image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=1000&q=80',
-    macroImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=80',
-    description: 'Item Four: Luminous liquid satin tailored with a sleek column drape and side slit.',
-    weight: '240 GSM Satin'
-  },
-  {
-    id: 'd5',
-    name: 'Garnet Chiffon Tiered Gown',
-    silhouette: 'A-Line',
-    fabric: 'Chiffon',
-    price: 610,
-    image: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=1000&q=80',
-    macroImage: 'https://images.unsplash.com/photo-1528458876861-544fd1761a91?auto=format&fit=crop&w=1000&q=80',
-    description: 'Item Five: Sheer layered chiffon offering weightless motion and romantic cascading pleats.',
-    weight: '65 GSM Silk Chiffon'
-  },
-  {
-    id: 'd6',
-    name: 'Midnight Velvet Brocade Gown',
-    silhouette: 'Mermaid',
-    fabric: 'Brocade',
-    price: 980,
-    image: 'https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=1000&q=80',
-    macroImage: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1000&q=80',
-    description: 'Item Six: Woven floral jacquard brocade structured into a fitting mermaid outline.',
-    weight: '410 GSM Brocade'
-  }
-];
-
-// ==============================================================================
-// 4. MAIN APPLICATION COMPONENT
-// ==============================================================================
-
-function AtelierStudioAppContent() {
-  const [activeTab, setActiveTab] = useState('catalog');
-  const [activeTheme, setActiveTheme] = useState(EXTENDED_COLOR_PALETTES[0]);
-  const [selectedDress, setSelectedDress] = useState(DRESS_CATALOG[0]);
-  const [cameraAngle, setCameraAngle] = useState('front');
-  const [fabricFilter, setFabricFilter] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [favorites, setFavorites] = useState([]);
-
-  // Interactive Customizer States
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [rotation, setRotation] = useState(0);
-  const [sleeveLength, setSleeveLength] = useState('Sleeveless');
-  const [necklineStyle, setNecklineStyle] = useState('Sweetheart');
-  const [trainLength, setTrainLength] = useState('Court Train');
-  const [brightness, setBrightness] = useState(100);
-
-  // Turntable animation
-  const [turntableAngle, setTurntableAngle] = useState(0);
-  useEffect(() => {
-    let timer;
-    if (cameraAngle === 'turntable') {
-      timer = setInterval(() => {
-        setTurntableAngle((prev) => (prev + 3) % 360);
-      }, 50);
-    }
-    return () => clearInterval(timer);
-  }, [cameraAngle]);
-
-  // Review Form & Error Handling States
-  const [newAuthor, setNewAuthor] = useState('');
-  const [newComment, setNewComment] = useState('');
-  const [userRating, setUserRating] = useState(5);
-  const [formError, setFormError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [reviews, setReviews] = useState([
-    {
-      id: 'r1',
-      author: 'Duchess Victoria Vance',
-      rating: 5,
-      date: '2026-08-01',
-      comment: 'Review One: The macro texture review predicted the silk drape flawlessly.',
-      verified: true,
-      dressName: 'Ruby Silk Evening Gown'
-    }
-  ]);
-
-  const toggleFavorite = (id) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
-  };
-
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    setFormError('');
-    setIsSubmitting(true);
-
-    try {
-      if (!newAuthor.trim()) {
-        throw new Error('Please enter a valid client name.');
-      }
-      if (!newComment.trim() || newComment.trim().length < 10) {
-        throw new Error('Feedback comment must be at least 10 characters long.');
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 600));
-
-      const newEntry = {
-        id: `rev-${Date.now()}`,
-        author: newAuthor.trim(),
-        rating: userRating,
-        date: new Date().toISOString().split('T')[0],
-        comment: newComment.trim(),
-        verified: true,
-        dressName: selectedDress.name
-      };
-
-      setReviews([newEntry, ...reviews]);
-      setNewAuthor('');
-      setNewComment('');
-      setUserRating(5);
-    } catch (err) {
-      setFormError(err.message || 'Failed to record feedback. Please try again.');
-    } font-sans finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const filteredDresses = DRESS_CATALOG.filter(d => {
-    const matchesFabric = fabricFilter === 'All' || d.fabric === fabricFilter;
-    const matchesSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          d.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFabric && matchesSearch;
+      // Fade out current tab and fade in target tab
+      tabContents.forEach(content => {
+        if (content.classList.contains('active')) {
+          content.style.opacity = '0';
+          setTimeout(() => {
+            content.classList.remove('active');
+            const newTab = document.getElementById(targetTab);
+            if (newTab) {
+              newTab.classList.add('active');
+              setTimeout(() => { newTab.style.opacity = '1'; }, 50);
+            }
+          }, 200);
+        }
+      });
+    });
   });
 
-  return (
-    <div className="flex min-h-screen bg-stone-50 text-stone-900 font-sans antialiased selection:bg-stone-200 transition-colors duration-700">
+  // ==========================================
+  // 2. 3D STUDIO INTERACTION
+  // ==========================================
+  const colorPicker = document.getElementById('color-picker');
+  const colorOverlay = document.getElementById('color-overlay');
+  const hexCodeDisplay = document.getElementById('hex-code');
+  const swatches = document.querySelectorAll('.swatch');
+  const dressModelWrapper = document.getElementById('dress-model-wrapper');
+  const dressImage = document.getElementById('dress-image');
 
-      {/* SIDEBAR */}
-      <aside className={`w-80 bg-stone-100/90 backdrop-blur-md border-r ${activeTheme.border} flex flex-col justify-between p-8 sticky top-0 h-screen z-50 shrink-0 transition-colors duration-700`}>
-        <div>
-          <div className={`mb-8 pb-6 border-b ${activeTheme.border} transition-colors duration-700`}>
-            <h1 
-              className={`text-3xl tracking-wide font-light italic transition-colors duration-700 ${activeTheme.textPrimary}`}
-              style={{ fontFamily: "'Cormorant Garamond', serif" }}
-            >
-              Atelier Couture
-            </h1>
-            <p className={`text-[10px] uppercase tracking-[0.3em] font-sans mt-2 font-semibold transition-colors duration-700 ${activeTheme.textAccent}`}>
-              HAUTE COUTURE STUDIO
-            </p>
-          </div>
+  // Color Swatch Selection
+  const applyColor = (hex) => {
+    colorOverlay.style.backgroundColor = hex;
+    hexCodeDisplay.textContent = hex.toUpperCase();
+    colorPicker.value = hex;
+  };
 
-          {/* PALETTE SELECTOR */}
-          <div className="mb-8 p-4 rounded-sm bg-white border border-stone-200/80 shadow-xs font-sans">
-            <div className="flex items-center gap-2 mb-3">
-              <Palette className={`w-3.5 h-3.5 ${activeTheme.textAccent}`} />
-              <span className="text-[10px] uppercase font-bold tracking-widest text-stone-600">
-                Custom Theme Palette
-              </span>
-            </div>
-            
-            <div className="grid grid-cols-5 gap-1.5">
-              {EXTENDED_COLOR_PALETTES.map((palette) => (
-                <button
-                  key={palette.id}
-                  onClick={() => setActiveTheme(palette)}
-                  title={palette.name}
-                  className={`h-7 rounded-xs transition-all duration-300 relative flex items-center justify-center border text-[9px] font-medium ${
-                    activeTheme.id === palette.id ? 'ring-2 ring-offset-1 ring-stone-900 scale-105 text-white' : 'hover:scale-100 opacity-80 hover:opacity-100 text-white'
-                  }`}
-                  style={{ backgroundColor: palette.accentHex }}
-                />
-              ))}
-            </div>
-          </div>
+  colorPicker.addEventListener('input', (e) => applyColor(e.target.value));
 
-          {/* NAVIGATION */}
-          <nav className="space-y-6 font-sans">
-            <button
-              onClick={() => setActiveTab('catalog')}
-              className={`w-full text-left py-2 flex items-center justify-between group transition-all ${
-                activeTab === 'catalog' ? `${activeTheme.textPrimary} font-semibold` : 'text-stone-500 hover:text-stone-800'
-              }`}
-            >
-              <div>
-                <span className="block text-xl font-serif font-light italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                  Tab One
-                </span>
-                <span className="text-[11px] uppercase tracking-widest text-stone-500 font-sans">
-                  3D Studio & Interactive Customizer
-                </span>
-              </div>
-              <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === 'catalog' ? `opacity-100 translate-x-1 ${activeTheme.textAccent}` : 'opacity-0'}`} />
-            </button>
+  swatches.forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      applyColor(swatch.getAttribute('data-color'));
+    });
+  });
 
-            <button
-              onClick={() => setActiveTab('reviews')}
-              className={`w-full text-left py-2 flex items-center justify-between group transition-all ${
-                activeTab === 'reviews' ? `${activeTheme.textPrimary} font-semibold` : 'text-stone-500 hover:text-stone-800'
-              }`}
-            >
-              <div>
-                <span className="block text-xl font-serif font-light italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                  Tab Two
-                </span>
-                <span className="text-[11px] uppercase tracking-widest text-stone-500 font-sans">
-                  Client Feedback & Ratings
-                </span>
-              </div>
-              <ChevronRight className={`w-4 h-4 transition-transform ${activeTab === 'reviews' ? `opacity-100 translate-x-1 ${activeTheme.textAccent}` : 'opacity-0'}`} />
-            </button>
-          </nav>
-        </div>
+  // 3D Canvas Controls (Rotation & Zoom)
+  let rotation = 0;
+  let scale = 1;
 
-        {/* WISHLIST SUMMARY */}
-        <div className={`p-4 bg-white border ${activeTheme.border} rounded-sm font-sans text-xs`}>
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-stone-600 text-[11px] font-semibold uppercase tracking-wider">
-              <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" /> Favorites
-            </span>
-            <span className={`font-bold ${activeTheme.textPrimary}`}>{favorites.length} Saved</span>
-          </div>
-        </div>
-      </aside>
+  document.getElementById('btn-rotate').addEventListener('click', () => {
+    rotation += 45;
+    dressModelWrapper.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+  });
 
-      {/* MAIN WORKSPACE */}
-      <main className="flex-1 p-12 overflow-y-auto max-w-7xl mx-auto">
-        {activeTab === 'catalog' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
-            <div className={`mb-10 pb-6 border-b ${activeTheme.border}`}>
-              <h2 className={`text-4xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                3D Garment Design Studio
-              </h2>
-            </div>
+  document.getElementById('btn-zoom-in').addEventListener('click', () => {
+    scale = Math.min(scale + 0.15, 1.3);
+    dressModelWrapper.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+  });
 
-            {/* INTERACTIVE VIEWPORT & LIVE CUSTOMIZER */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-16">
-              
-              {/* INTERACTIVE CANVAS */}
-              <div className={`lg:col-span-8 bg-white border ${activeTheme.border} rounded-sm p-8 shadow-sm flex flex-col justify-between min-h-[560px]`}>
-                <div className="flex justify-between items-center font-sans text-xs border-b border-stone-100 pb-4">
-                  <span className="text-stone-400 uppercase tracking-widest text-[10px]">Interactive Studio Viewport</span>
-                  <div className="flex items-center gap-4">
-                    <button 
-                      onClick={() => toggleFavorite(selectedDress.id)} 
-                      className={`flex items-center gap-1 text-xs transition-colors ${favorites.includes(selectedDress.id) ? 'text-red-600 font-bold' : 'text-stone-400 hover:text-stone-700'}`}
-                    >
-                      <Heart className={`w-4 h-4 ${favorites.includes(selectedDress.id) ? 'fill-current' : ''}`} />
-                      {favorites.includes(selectedDress.id) ? 'Saved' : 'Save'}
-                    </button>
-                    <span className={`font-medium ${activeTheme.textPrimary}`}>{selectedDress.name}</span>
-                  </div>
-                </div>
+  document.getElementById('btn-zoom-out').addEventListener('click', () => {
+    scale = Math.max(scale - 0.15, 0.7);
+    dressModelWrapper.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+  });
 
-                {/* IMAGE CANVAS WITH INTERACTIVE CONTROLS */}
-                <div className={`relative my-6 h-96 flex items-center justify-center overflow-hidden rounded-sm ${activeTheme.bgLight}`}>
-                  <AnimatePresence mode="wait">
-                    <motion.div 
-                      key={selectedDress.id} 
-                      className="w-full h-full flex items-center justify-center p-4"
-                      style={{
-                        transform: cameraAngle === 'turntable' ? `rotateY(${turntableAngle}deg)` : `scale(${zoomLevel}) rotate(${rotation}deg)`,
-                        filter: `brightness(${brightness}%)`
-                      }}
-                    >
-                      <ImageWithFallback
-                        src={cameraAngle === 'macro' ? selectedDress.macroImage : selectedDress.image}
-                        alt={selectedDress.name}
-                        className="h-full object-contain filter drop-shadow-md transition-transform duration-300"
-                      />
-                    </motion.div>
-                  </AnimatePresence>
+  // Silhouette Switcher
+  const silhouetteBtns = document.querySelectorAll('.silhouette-btn');
+  silhouetteBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      silhouetteBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      dressImage.src = btn.getAttribute('data-img');
+    });
+  });
 
-                  {/* OVERLAY INTERACTIVE BADGES */}
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 border border-stone-200 rounded-xs text-[10px] font-sans text-stone-700 space-y-0.5">
-                    <p>Neckline: <strong>{necklineStyle}</strong></p>
-                    <p>Sleeves: <strong>{sleeveLength}</strong></p>
-                    <p>Train: <strong>{trainLength}</strong></p>
-                  </div>
-                </div>
+  // AI Generator Form Handler
+  const aiForm = document.getElementById('ai-form');
+  aiForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const gallery = document.getElementById('ai-gallery');
+    gallery.style.opacity = '0.5';
+    setTimeout(() => {
+      gallery.style.opacity = '1';
+    }, 800);
+  });
 
-                {/* CAMERA & CANVAS SLIDERS */}
-                <div className="space-y-4 border-t border-stone-100 pt-4 font-sans">
-                  <div className="grid grid-cols-4 gap-3">
-                    <button onClick={() => setCameraAngle('front')} className={`py-2 text-xs border ${cameraAngle === 'front' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>Front View</button>
-                    <button onClick={() => setCameraAngle('macro')} className={`py-2 text-xs border ${cameraAngle === 'macro' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>Macro View</button>
-                    <button onClick={() => setCameraAngle('turntable')} className={`py-2 text-xs border ${cameraAngle === 'turntable' ? `${activeTheme.bgPrimary} text-white` : 'bg-white text-stone-600'}`}>360 View</button>
-                    <button onClick={() => { setZoomLevel(1); setRotation(0); setBrightness(100); }} className="py-2 text-xs border bg-stone-100 text-stone-700">Reset Canvas</button>
-                  </div>
+  // ==========================================
+  // 3. 100+ FABRICS GENERATOR & FILTERING
+  // ==========================================
+  const fabricGrid = document.getElementById('fabric-grid');
+  const fabricCategories = ['Silks', 'Velvets', 'Laces', 'Organza & Tulle'];
 
-                  {/* INTERACTIVE SLIDERS FOR ZOOM / ROTATION / LIGHTING */}
-                  <div className="grid grid-cols-3 gap-4 pt-2 text-[10px] uppercase text-stone-500 font-semibold tracking-wider">
-                    <div>
-                      <label className="block mb-1">Zoom Level ({zoomLevel.toFixed(1)}x)</label>
-                      <input 
-                        type="range" min="0.8" max="2" step="0.1" 
-                        value={zoomLevel} 
-                        onChange={(e) => setZoomLevel(parseFloat(e.target.value))}
-                        className="w-full accent-stone-900" 
-                      />
-                    </div>
-                    <div>
-                      <label className="block mb-1">Canvas Angle ({rotation}°)</label>
-                      <input 
-                        type="range" min="-30" max="30" step="5" 
-                        value={rotation} 
-                        onChange={(e) => setRotation(parseInt(e.target.value))}
-                        className="w-full accent-stone-900" 
-                      />
-                    </div>
-                    <div>
-                      <label className="block mb-1">Lighting ({brightness}%)</label>
-                      <input 
-                        type="range" min="70" max="130" step="5" 
-                        value={brightness} 
-                        onChange={(e) => setBrightness(parseInt(e.target.value))}
-                        className="w-full accent-stone-900" 
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+  // Seed data generator for 100+ fabrics
+  const generate100Fabrics = () => {
+    const fabrics = [
+      { name: 'Mulberry Silk Charmeuse', category: 'Silks', tag: 'Atelier Recommended' },
+      { name: 'French Chantilly Lace', category: 'Laces', tag: 'Couture Classic' },
+      { name: 'Silk Organza Triple-Gazar', category: 'Organza & Tulle', tag: 'Architectural' },
+      { name: 'Lyons Cotton-Silk Velvet', category: 'Velvets', tag: 'Winter Gala' }
+    ];
 
-              {/* LIVE DRESS CUSTOMIZER PANEL */}
-              <div className={`lg:col-span-4 bg-white border ${activeTheme.border} rounded-sm p-8 flex flex-col justify-between shadow-sm`}>
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Sparkles className={`w-4 h-4 ${activeTheme.textAccent}`} />
-                    <h3 className={`text-2xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                      Bespoke Customizer
-                    </h3>
-                  </div>
+    fabricCategories.forEach(cat => {
+      for (let i = 1; i <= 25; i++) {
+        fabrics.push({
+          name: `${cat.slice(0, -1)} Grade ${i * 5} Variant`,
+          category: cat,
+          tag: i % 5 === 0 ? 'Recommended' : 'Standard'
+        });
+      }
+    });
 
-                  <div className="space-y-4 font-sans text-xs mb-6">
-                    <div>
-                      <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1.5">Neckline Silhouette</label>
-                      <select 
-                        value={necklineStyle} 
-                        onChange={(e) => setNecklineStyle(e.target.value)}
-                        className="w-full bg-stone-50 border border-stone-200 p-2 text-stone-800 rounded-xs focus:outline-none"
-                      >
-                        <option>Sweetheart</option>
-                        <option>Off-the-Shoulder</option>
-                        <option>High Neck Lace</option>
-                        <option>V-Neck Plunge</option>
-                      </select>
-                    </div>
+    return fabrics;
+  };
 
-                    <div>
-                      <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1.5">Sleeve Style</label>
-                      <select 
-                        value={sleeveLength} 
-                        onChange={(e) => setSleeveLength(e.target.value)}
-                        className="w-full bg-stone-50 border border-stone-200 p-2 text-stone-800 rounded-xs focus:outline-none"
-                      >
-                        <option>Sleeveless</option>
-                        <option>Cap Sleeves</option>
-                        <option>Juliet Sheer Sleeves</option>
-                        <option>Full Lace Sleeves</option>
-                      </select>
-                    </div>
+  const allFabrics = generate100Fabrics();
 
-                    <div>
-                      <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1.5">Train Extension</label>
-                      <select 
-                        value={trainLength} 
-                        onChange={(e) => setTrainLength(e.target.value)}
-                        className="w-full bg-stone-50 border border-stone-200 p-2 text-stone-800 rounded-xs focus:outline-none"
-                      >
-                        <option>Sweep Train</option>
-                        <option>Court Train</option>
-                        <option>Cathedral Train (+ $150)</option>
-                      </select>
-                    </div>
+  const renderFabrics = (filterText = '', filterCat = 'All') => {
+    fabricGrid.innerHTML = '';
+    const filtered = allFabrics.filter(f => {
+      const matchSearch = f.name.toLowerCase().includes(filterText.toLowerCase());
+      const matchCat = filterCat === 'All' || f.category === filterCat;
+      return matchSearch && matchCat;
+    });
 
-                    <div className="pt-4 border-t border-stone-100">
-                      <span className={`text-2xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                        ${selectedDress.price} USD
-                      </span>
-                      <p className="text-[11px] text-stone-500 mt-1">{selectedDress.description}</p>
-                    </div>
-                  </div>
-                </div>
+    filtered.slice(0, 12).forEach((f, idx) => {
+      const card = document.createElement('div');
+      card.className = `fabric-card ${idx === 0 ? 'active' : ''}`;
+      card.innerHTML = `
+        <span class="badge">${f.tag}</span>
+        <h4 style="font-family: var(--font-serif); font-size: 1.1rem; margin-top: 0.5rem;">${f.name}</h4>
+        <p class="small-text">${f.category}</p>
+      `;
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.fabric-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+      });
+      fabricGrid.appendChild(card);
+    });
+  };
 
-                <button className={`w-full ${activeTheme.bgPrimary} ${activeTheme.bgHover} text-white py-3.5 text-xs font-sans uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm`}>
-                  Save Custom Configuration
-                </button>
-              </div>
+  renderFabrics();
 
-            </div>
+  // Search Input Event
+  document.getElementById('fabric-search').addEventListener('input', (e) => {
+    renderFabrics(e.target.value, document.querySelector('.filter-btn.active').getAttribute('data-cat'));
+  });
 
-            {/* INTERACTIVE SEARCH & FILTERABLE DRESS CATALOG */}
-            <div className={`bg-white border ${activeTheme.border} rounded-sm p-8 shadow-sm`}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-stone-100">
-                <div>
-                  <h3 className={`text-2xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Couture Catalog
-                  </h3>
-                  <p className="text-xs uppercase tracking-widest text-stone-400 font-sans mt-1">Select garment specimen for live 3D customization</p>
-                </div>
+  // Category Filter Events
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderFabrics(
+        document.getElementById('fabric-search').value,
+        btn.getAttribute('data-cat')
+      );
+    });
+  });
 
-                {/* SEARCH INPUT */}
-                <div className="relative font-sans w-full sm:w-64">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-stone-400" />
-                  <input
-                    type="text"
-                    placeholder="Search dress or fabric..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-200 pl-8 pr-3 py-2 text-xs text-stone-900 focus:outline-none focus:border-stone-900"
-                  />
-                </div>
-              </div>
+  // ==========================================
+  // 4. SIZING & AI SCANNER TOGGLE
+  // ==========================================
+  const modeAiBtn = document.getElementById('mode-ai-btn');
+  const modeVideoBtn = document.getElementById('mode-video-btn');
+  const aiScannerView = document.getElementById('ai-scanner-view');
+  const videoGuideView = document.getElementById('video-guide-view');
 
-              {/* FABRIC FILTER PILLS */}
-              <div className="flex flex-wrap gap-2 mb-8 font-sans">
-                <button
-                  onClick={() => setFabricFilter('All')}
-                  className={`px-3 py-1 text-xs transition-all ${fabricFilter === 'All' ? `${activeTheme.bgPrimary} text-white` : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
-                >
-                  All Fabrics
-                </button>
-                {FABRICS_LIST.map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFabricFilter(f)}
-                    className={`px-3 py-1 text-xs transition-all ${fabricFilter === f ? `${activeTheme.bgPrimary} text-white` : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
-                  >
-                    {f}
-                  </button>
-                ))}
-              </div>
+  modeAiBtn.addEventListener('click', () => {
+    modeAiBtn.classList.add('active');
+    modeVideoBtn.classList.remove('active');
+    aiScannerView.classList.remove('hidden');
+    videoGuideView.classList.add('hidden');
+  });
 
-              {/* DRESS GRID */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredDresses.map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => setSelectedDress(item)}
-                    className={`group cursor-pointer border transition-all ${selectedDress.id === item.id ? `${activeTheme.border} ring-1 ring-stone-900` : 'border-stone-200 hover:border-stone-400'}`}
-                  >
-                    <div className={`h-72 overflow-hidden relative ${activeTheme.bgLight}`}>
-                      <ImageWithFallback 
-                        src={item.image} 
-                        alt={item.name} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}
-                        className="absolute top-3 right-3 p-1.5 bg-white/80 backdrop-blur-md rounded-full text-stone-700 hover:text-red-600"
-                      >
-                        <Heart className={`w-3.5 h-3.5 ${favorites.includes(item.id) ? 'fill-red-600 text-red-600' : ''}`} />
-                      </button>
-                      <span className={`absolute top-3 left-3 bg-white/90 ${activeTheme.textAccent} text-[10px] font-sans font-medium px-2 py-0.5 tracking-wider uppercase border border-stone-200`}>
-                        {item.fabric}
-                      </span>
-                    </div>
-                    <div className="p-4 font-sans bg-white">
-                      <p className="text-[10px] text-stone-400 uppercase tracking-widest">{item.silhouette}</p>
-                      <h4 className={`font-serif italic text-lg mt-0.5 ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>{item.name}</h4>
-                      <p className="text-xs text-stone-700 mt-1">${item.price} USD</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+  modeVideoBtn.addEventListener('click', () => {
+    modeVideoBtn.classList.add('active');
+    modeAiBtn.classList.remove('active');
+    videoGuideView.classList.remove('hidden');
+    aiScannerView.classList.add('hidden');
+  });
 
-          </motion.div>
-        )}
+  const startScanBtn = document.getElementById('start-scan-btn');
+  const scanResults = document.getElementById('scan-results');
 
-        {/* REVIEWS TAB WITH FORM ERROR HANDLING */}
-        {activeTab === 'reviews' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
-            <div className={`mb-10 pb-6 border-b ${activeTheme.border}`}>
-              <h2 className={`text-4xl font-light italic ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>Client Reviews</h2>
-            </div>
+  startScanBtn.addEventListener('click', () => {
+    startScanBtn.textContent = 'Scanning Contours...';
+    setTimeout(() => {
+      startScanBtn.textContent = 'Start Camera Scan';
+      scanResults.classList.remove('hidden');
+    }, 1500);
+  });
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-              <div className={`lg:col-span-5 bg-white border ${activeTheme.border} rounded-sm p-8 shadow-sm h-fit font-sans`}>
-                <h3 className={`text-2xl font-light italic mb-2 ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>Record Assessment</h3>
-                
-                {/* Error Banner */}
-                {formError && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 rounded-xs text-xs flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
-                    <span>{formError}</span>
-                  </div>
-                )}
+  // ==========================================
+  // 5. DESIGNERS CHAT SYSTEM
+  // ==========================================
+  const designerCards = document.querySelectorAll('.designer-card');
+  const chatAvatar = document.getElementById('chat-avatar');
+  const chatName = document.getElementById('chat-designer-name');
+  const chatLoc = document.getElementById('chat-designer-loc');
 
-                <form onSubmit={handleReviewSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-[10px] uppercase font-semibold text-stone-500 mb-1">Rating</label>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button key={star} type="button" onClick={() => setUserRating(star)} className="text-amber-500">
-                          <Star className={`w-4 h-4 ${userRating >= star ? 'fill-current' : 'text-stone-200'}`} />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+  designerCards.forEach(card => {
+    card.addEventListener('click', () => {
+      designerCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
 
-                  <div>
-                    <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1">Client Name</label>
-                    <input
-                      type="text"
-                      value={newAuthor}
-                      onChange={(e) => setNewAuthor(e.target.value)}
-                      placeholder="Enter client name"
-                      className="w-full bg-stone-50 border border-stone-200 px-3.5 py-2 text-xs focus:outline-none focus:border-stone-900"
-                    />
-                  </div>
+      chatAvatar.src = card.getAttribute('data-img');
+      chatName.textContent = card.getAttribute('data-name');
+      chatLoc.textContent = `Atelier • ${card.getAttribute('data-loc')}`;
+    });
+  });
 
-                  <div>
-                    <label className="block text-[10px] uppercase text-stone-500 font-semibold mb-1">Feedback</label>
-                    <textarea
-                      rows={4}
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Minimum 10 characters detailing quality..."
-                      className="w-full bg-stone-50 border border-stone-200 px-3.5 py-2 text-xs focus:outline-none focus:border-stone-900 resize-none"
-                    />
-                  </div>
+  const chatForm = document.getElementById('chat-form');
+  const chatInput = document.getElementById('chat-input');
+  const chatMessages = document.getElementById('chat-messages');
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`w-full ${activeTheme.bgPrimary} ${activeTheme.bgHover} text-white py-3 text-xs uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50`}
-                  >
-                    {isSubmitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                    Submit Review
-                  </button>
-                </form>
-              </div>
+  chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!chatInput.value.trim()) return;
 
-              <div className="lg:col-span-7 space-y-4 font-sans">
-                {reviews.map((rev) => (
-                  <div key={rev.id} className={`bg-white border ${activeTheme.border} p-6 shadow-sm`}>
-                    <h4 className={`font-serif italic text-lg ${activeTheme.textPrimary}`} style={{ fontFamily: "'Cormorant Garamond', serif" }}>{rev.author}</h4>
-                    <p className="text-xs text-stone-600 my-2">{rev.comment}</p>
-                    <span className="text-[10px] text-stone-400 uppercase tracking-widest">{rev.date}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </main>
-    </div>
-  );
-}
+    const userMsg = document.createElement('div');
+    userMsg.className = 'msg user';
+    userMsg.innerHTML = `<p>${chatInput.value}</p><span class="time">Just now</span>`;
+    chatMessages.appendChild(userMsg);
 
-// Wrap Content Component in Error Boundary
-export default function AtelierStudioApp() {
-  return (
-    <AtelierErrorBoundary>
-      <AtelierStudioAppContent />
-    </AtelierErrorBoundary>
-  );
-}
+    chatInput.value = '';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+
+  // ==========================================
+  // 6. 5-STAR RATING WIDGET
+  // ==========================================
+  const stars = document.querySelectorAll('#star-rating span');
+  stars.forEach(star => {
+    star.addEventListener('click', () => {
+      const rating = parseInt(star.getAttribute('data-star'));
+      stars.forEach((s, idx) => {
+        if (idx < rating) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+    });
+  });
+
+});

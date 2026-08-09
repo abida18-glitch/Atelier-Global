@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelier Global — Bespoke Haute Couture & 3D Studio</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#FDFBF7',
+                        sand: '#F5F0EB',
+                        charcoal: '#3A2E2B',
+                        taupe: '#8C7A6B',
+                        sage: '#4A6B53',
+                        'sage-light': '#E8EFE9',
+                        blush: '#E8C5C8',
+                    },
+                    fontFamily: {
+                        serif: ['Didot', 'Bodoni MT', 'Cinzel', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .tab-view {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .sidebar-content {
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-label {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #8C7A6B;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 0.25rem;
+            color: #8C7A6B;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover {
+            color: #3A2E2B;
+            background-color: #F5F0EB;
+        }
+
+        .nav-btn.active {
+            background-color: #3A2E2B;
+            color: #FDFBF7;
+        }
+
+        .sidebar-tab-btn {
+            flex: 1;
+            padding-bottom: 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: serif;
+            border-bottom: 2px solid transparent;
+            color: #8C7A6B;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-tab-btn.active {
+            border-color: #3A2E2B;
+            color: #3A2E2B;
+            font-weight: 600;
+        }
+
+        .option-btn, .texture-btn, .cam-btn, .filter-btn, .avatar-option-btn, .avatar-pose-btn {
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            border: 1px solid #E6DDD3;
+            border-radius: 0.375rem;
+            background-color: transparent;
+            color: #8C7A6B;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover, .texture-btn:hover, .cam-btn:hover, .filter-btn:hover, .avatar-option-btn:hover, .avatar-pose-btn:hover {
+            border-color: #3A2E2B;
+            color: #3A2E2B;
+        }
+
+        .option-btn.active, .texture-btn.active, .cam-btn.active, .filter-btn.active, .avatar-option-btn.active, .avatar-pose-btn.active {
+            border-color: #3A2E2B;
+            background-color: #FDFBF7;
+            color: #3A2E2B;
+            font-weight: 500;
+        }
+
+        .cam-btn.active {
+            background-color: #3A2E2B;
+            color: #FDFBF7;
+        }
+
+        .skin-btn.active {
+            outline: 2px solid #3A2E2B;
+            outline-offset: 1px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F5F0EB;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E6DDD3;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8C7A6B;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body class="bg-cream text-charcoal font-sans antialiased flex flex-col min-h-screen">
+
+    <div id="toast" class="hidden fixed top-5 right-5 z-50 bg-charcoal text-cream px-5 py-3 rounded shadow-2xl text-xs uppercase tracking-widest flex items-center gap-3 transition-opacity duration-300">
+        <span id="toast-message">Notification</span>
+    </div>
+
+    <header class="sticky top-0 z-40 bg-cream/90 backdrop-blur-md border-b border-[#E6DDD3] px-6 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="font-serif text-2xl tracking-[0.2em] font-light uppercase">Atelier Global</span>
+                <span class="bg-sage-light text-sage text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-full font-medium">Haute Couture</span>
+            </div>
+
+            <nav class="flex flex-wrap justify-center gap-1 overflow-x-auto w-full md:w-auto pb-1 md:pb-0" id="main-nav">
+                <button data-tab="doll" class="nav-btn active">3D Doll Customizer</button>
+                <button data-tab="studio" class="nav-btn">3D Dress Designer</button>
+                <button data-tab="fabrics" class="nav-btn">100+ Fabrics</button>
+                <button data-tab="embellishments" class="nav-btn">Embellishments</button>
+                <button data-tab="sizing" class="nav-btn">AI Size Fit</button>
+                <button data-tab="designers" class="nav-btn">Designers Chat</button>
+                <button data-tab="tracking" class="nav-btn">Route Map</button>
+                <button data-tab="clearance" class="nav-btn">Clearance</button>
+                <button data-tab="checkout" class="nav-btn">Commission</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex-1">
+
+        <section id="view-doll" class="tab-view active space-y-6">
+            <div class="text-center max-w-xl mx-auto">
+                <span class="section-label">Interactive Avatar Studio</span>
+                <h1 class="font-serif text-3xl my-1">Customize Your 3D Doll Model</h1>
+                <p class="text-xs text-taupe">Rotate 360°, zoom in/out, modify body frame, skin shade, height, and display pose prior to tailoring your dress.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-xl p-5 shadow-sm space-y-5">
+                    <div>
+                        <label class="section-label">Doll Body Proportions</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button data-avatar-type="petite" class="avatar-option-btn active">Petite</button>
+                            <button data-avatar-type="classic" class="avatar-option-btn">Classic</button>
+                            <button data-avatar-type="curvy" class="avatar-option-btn">Curvy</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="section-label">Skin Tone Palette</label>
+                        <div class="grid grid-cols-5 gap-2">
+                            <button data-avatar-skin="#F5D0C5" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#F5D0C5] active"></button>
+                            <button data-avatar-skin="#E0AC69" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#E0AC69]"></button>
+                            <button data-avatar-skin="#C68642" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#C68642]"></button>
+                            <button data-avatar-skin="#8D5524" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#8D5524]"></button>
+                            <button data-avatar-skin="#3C2011" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#3C2011]"></button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="section-label">Height Scaling</label>
+                        <input type="range" id="avatar-height-slider" min="0.8" max="1.2" step="0.05" value="1.0" class="w-full accent-charcoal cursor-pointer">
+                    </div>
+
+                    <div>
+                        <label class="section-label">Studio Stance</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button data-avatar-pose="runway" class="avatar-pose-btn active">Runway Pose</button>
+                            <button data-avatar-pose="poseA" class="avatar-pose-btn">A-Pose Stance</button>
+                        </div>
+                    </div>
+
+                    <button id="go-to-design-btn" class="w-full py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded mt-4 hover:bg-taupe transition-all">
+                        Proceed to Dress Designer ➔
+                    </button>
+                </div>
+
+                <div class="lg:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl h-[540px] relative overflow-hidden shadow-inner">
+                    <div class="absolute top-4 left-4 z-10 bg-cream/80 backdrop-blur-md px-3 py-1.5 rounded border border-[#E6DDD3] text-[10px] uppercase tracking-widest">
+                        3D Interactive Doll • Drag to Rotate 360° • Scroll to Zoom
+                    </div>
+                    <div id="doll-canvas-container" class="w-full h-full"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-studio" class="tab-view hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-xl p-5 shadow-sm space-y-6">
+                    
+                    <div class="flex border-b border-[#E6DDD3] pb-3 gap-2">
+                        <button id="sidebar-tab-1" data-sidebar-tab="I" class="sidebar-tab-btn active">I. Silhouette</button>
+                        <button id="sidebar-tab-2" data-sidebar-tab="II" class="sidebar-tab-btn">II. Textures</button>
+                        <button id="sidebar-tab-3" data-sidebar-tab="III" class="sidebar-tab-btn">III. Live Map</button>
+                    </div>
+
+                    <div id="sidebar-content-I" class="sidebar-content active space-y-5">
+                        <div>
+                            <label class="section-label">Base Silhouette</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button data-silhouette="a-line" class="option-btn active">A-Line</button>
+                                <button data-silhouette="column" class="option-btn">Column</button>
+                                <button data-silhouette="ballgown" class="option-btn">Ballgown</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="section-label">Neckline Cut</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button data-neckline="sweetheart" class="option-btn active">Sweetheart</button>
+                                <button data-neckline="v-neck" class="option-btn">V-Neck</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="section-label">Sleeve Style</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button data-sleeve="sleeveless" class="option-btn active">Sleeveless</button>
+                                <button data-sleeve="long" class="option-btn">Long Sleeve</button>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-[#E6DDD3]">
+                            <label class="section-label">Cinematic Camera Presets</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button data-cam="360" class="cam-btn active">1) 360° Rotate</button>
+                                <button data-cam="top" class="cam-btn">2) High-Angle Top</button>
+                                <button data-cam="front" class="cam-btn">3) Studio Front</button>
+                                <button data-cam="macro" class="cam-btn">4) Macro Close-up</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sidebar-content-II" class="sidebar-content hidden space-y-5">
+                        <div>
+                            <label class="section-label">Interactive Color Wheel Picker</label>
+                            <div class="flex items-center gap-3 bg-cream p-2.5 rounded border border-[#E6DDD3]">
+                                <input type="color" id="fabric-color-picker" value="#6B4E3D" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent">
+                                <span id="fabric-color-hex" class="font-mono text-xs uppercase">#6B4E3D</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="section-label">3D Shader Texture Finish</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button data-texture="Silk" class="texture-btn active">Mulberry Silk</button>
+                                <button data-texture="Satin" class="texture-btn">Duchess Satin</button>
+                                <button data-texture="Velvet" class="texture-btn">Lyons Velvet</button>
+                                <button data-texture="Lace" class="texture-btn">Chantilly Lace</button>
+                                <button data-texture="Leather" class="texture-btn">Fine Leather</button>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-[#E6DDD3]">
+                            <label class="section-label">✨ AI Internet Vision Search Engine</label>
+                            <p class="text-[11px] text-taupe mb-2">Pulls design inspiration across Pinterest, Instagram, Google, & TikTok.</p>
+                            <form id="ai-search-form" class="flex gap-2">
+                                <input type="text" id="ai-input" placeholder="e.g. 1920s corseted silk gown..." class="flex-1 px-3 py-2 text-xs bg-cream border border-[#E6DDD3] rounded focus:outline-none">
+                                <button type="submit" class="px-3 py-2 bg-charcoal text-white text-xs rounded hover:bg-taupe transition-colors">Search</button>
+                            </form>
+                            <div id="ai-results" class="grid grid-cols-3 gap-2 mt-3">
+                                <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=300&q=80" alt="Reference 1" class="w-full h-16 object-cover rounded border border-[#E6DDD3] cursor-pointer hover:opacity-80 transition-opacity">
+                                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=300&q=80" alt="Reference 2" class="w-full h-16 object-cover rounded border border-[#E6DDD3] cursor-pointer hover:opacity-80 transition-opacity">
+                                <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=300&q=80" alt="Reference 3" class="w-full h-16 object-cover rounded border border-[#E6DDD3] cursor-pointer hover:opacity-80 transition-opacity">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sidebar-content-III" class="sidebar-content hidden space-y-4">
+                        <label class="section-label">Digital Crafting Timeline</label>
+                        <div class="space-y-3 text-xs">
+                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded">
+                                <span class="font-medium">1. 3D Digital Modeling</span>
+                                <span class="text-[9px] uppercase px-2 py-0.5 rounded bg-sage-light text-sage font-medium">Active</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded">
+                                <span class="font-medium">2. Virtual Pattern Tailoring</span>
+                                <span class="text-[9px] uppercase px-2 py-0.5 rounded bg-gray-100 text-gray-400 font-medium">Pending</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded">
+                                <span class="font-medium">3. Material Sourcing & Beading</span>
+                                <span class="text-[9px] uppercase px-2 py-0.5 rounded bg-gray-100 text-gray-400 font-medium">Queued</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-cream border border-[#E6DDD3] rounded space-y-2">
+                            <label class="section-label">Simulated Logistics Route</label>
+                            <div class="h-24 bg-sand rounded flex flex-col items-center justify-center relative border border-dashed border-taupe">
+                                <span class="text-[10px] uppercase tracking-widest text-taupe">Paris Studio ➔ NY Atelier</span>
+                                <span class="text-xs font-serif mt-1 text-charcoal">Estimated transit: 4 days</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="open-review-btn" class="w-full py-2.5 border border-charcoal text-charcoal text-xs uppercase tracking-widest rounded hover:bg-charcoal hover:text-white transition-all">
+                        ★ Rate Atelier Experience
+                    </button>
+                </div>
+
+                <div class="lg:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl h-[580px] relative overflow-hidden shadow-inner">
+                    <div class="absolute top-4 left-4 z-10 bg-cream/80 backdrop-blur-md px-3 py-1.5 rounded border border-[#E6DDD3] text-[10px] uppercase tracking-widest">
+                        Interactive 3D Viewport • Drag to Rotate 360° • Zoom Supported
+                    </div>
+                    <div id="webgl-error" class="hidden absolute inset-0 bg-cream/95 z-20 flex flex-col items-center justify-center p-6 text-center">
+                        <p class="font-serif text-lg text-charcoal">3D Acceleration Unavailable</p>
+                        <p class="text-xs text-taupe mt-1">Please ensure WebGL is enabled in your browser settings.</p>
+                    </div>
+                    <div id="three-canvas-container" class="w-full h-full"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="view-fabrics" class="tab-view hidden space-y-6">
+            <div class="text-center max-w-xl mx-auto">
+                <span class="section-label">Curated Master Textiles</span>
+                <h1 class="font-serif text-3xl my-1">Over 100+ Master Fabrics</h1>
+                <p class="text-xs text-taupe">Search, filter, and choose from over 100 rare silks, laces, velvets, and organza weaves.</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-4 justify-between bg-sand p-4 rounded-xl border border-[#E6DDD3]">
+                <input type="text" id="fabric-search-input" placeholder="Search 100+ fabric names..." class="flex-1 px-4 py-2 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+                <div class="flex gap-2 overflow-x-auto" id="fabric-cat-filters">
+                    <button data-cat="All" class="filter-btn active">All</button>
+                    <button data-cat="Silks" class="filter-btn">Silks</button>
+                    <button data-cat="Velvets" class="filter-btn">Velvets</button>
+                    <button data-cat="Laces" class="filter-btn">Laces</button>
+                    <button data-cat="Organza & Tulle" class="filter-btn">Organza & Tulle</button>
+                </div>
+            </div>
+
+            <div id="fabric-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-[500px] overflow-y-auto pr-2">
+                </div>
+        </section>
+
+        <section id="view-embellishments" class="tab-view hidden space-y-6">
+            <div class="text-center max-w-xl mx-auto">
+                <span class="section-label">Handcrafted Artisanship</span>
+                <h1 class="font-serif text-3xl my-1">Embellishments & Sequences</h1>
+                <p class="text-xs text-taupe">Select custom hand-beading, gemstone clusters, and intricate embroidery.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-sand p-5 border border-[#E6DDD3] rounded-xl space-y-3">
+                    <h3 class="font-serif text-lg">Swarovski Beading</h3>
+                    <p class="text-xs text-taupe">Precision crystal clusters encrusted along bodice seams and waistlines.</p>
+                    <button class="embellish-select-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded hover:bg-taupe transition-colors" data-name="Swarovski Beading">Select Beading</button>
+                </div>
+                <div class="bg-sand p-5 border border-[#E6DDD3] rounded-xl space-y-3">
+                    <h3 class="font-serif text-lg">Gold Thread Embroidery</h3>
+                    <p class="text-xs text-taupe">Hand-stitched metallic filigree patterns tailored across the hemline.</p>
+                    <button class="embellish-select-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded hover:bg-taupe transition-colors" data-name="Gold Thread Embroidery">Select Embroidery</button>
+                </div>
+                <div class="bg-sand p-5 border border-[#E6DDD3] rounded-xl space-y-3">
+                    <h3 class="font-serif text-lg">Pearl Micro-Sequins</h3>
+                    <p class="text-xs text-taupe">Iridescent freshwater pearl micro-sequins layered on the gown train.</p>
+                    <button class="embellish-select-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded hover:bg-taupe transition-colors" data-name="Pearl Micro-Sequins">Select Pearls</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-sizing" class="tab-view hidden max-w-2xl mx-auto space-y-6">
+            <div class="text-center">
+                <span class="section-label">Precision Fit Technology</span>
+                <h1 class="font-serif text-3xl my-1">AI Size & Fit Detection</h1>
+            </div>
+
+            <div class="bg-sand p-8 rounded-xl border border-[#E6DDD3] text-center space-y-4">
+                <h3 class="font-serif text-xl">Encrypted AI Camera Detector</h3>
+                <p class="text-xs text-taupe max-w-md mx-auto">
+                    Stand in front of your camera. Our encrypted computer vision model calculates your body proportions instantly.
+                </p>
+
+                <div id="camera-box" class="w-full h-48 bg-cream border border-dashed border-taupe rounded-lg flex flex-col items-center justify-center p-4">
+                    <span id="camera-status" class="text-xs text-taupe">Camera feed offline</span>
+                </div>
+
+                <button id="start-scan-btn" class="px-6 py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded hover:bg-taupe transition-colors">Start AI Camera Scan</button>
+                
+                <div id="scan-results" class="hidden p-4 bg-cream border border-sage rounded-lg text-left space-y-2">
+                    <span class="text-[10px] uppercase text-sage font-bold block">✓ Size Scan Complete</span>
+                    <p class="font-serif text-lg text-charcoal">Calculated Fit: Size US 4 (Bespoke S-1)</p>
+                    <p class="text-xs text-taupe">Bust: 34.5 in | Waist: 26.0 in | Hips: 37.2 in</p>
+                </div>
+
+                <div class="pt-4 border-t border-[#E6DDD3] text-left">
+                    <h4 class="font-serif text-sm text-charcoal mb-1">Manual Measurement Video Guide</h4>
+                    <p class="text-xs text-taupe">Prefer manual measurement? Watch our step-by-step video guide for tailoring accuracy.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-designers" class="tab-view hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div class="md:col-span-5 space-y-3">
+                    <span class="section-label">Master Artisans Showcase</span>
+                    <div class="p-4 bg-sand border border-charcoal rounded-xl flex items-center gap-4 cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-12 h-12 rounded-full object-cover" alt="Elena">
+                        <div>
+                            <h4 class="font-serif text-base">Elena Vance-Amore</h4>
+                            <p class="text-xs text-taupe">Paris, France • Haute Couture Lead</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl p-5 flex flex-col h-[450px]">
+                    <div class="flex justify-between items-center pb-3 border-b border-[#E6DDD3]">
+                        <h4 class="font-serif text-sm">Elena Vance-Amore (Direct Line)</h4>
+                        <div class="flex gap-2">
+                            <button id="call-btn" class="text-xs px-3 py-1 bg-cream border border-[#E6DDD3] rounded hover:border-charcoal transition-colors">📞 Call</button>
+                            <button id="facetime-btn" class="text-xs px-3 py-1 bg-cream border border-[#E6DDD3] rounded hover:border-charcoal transition-colors">📹 FaceTime</button>
+                        </div>
+                    </div>
+
+                    <div id="chat-messages" class="flex-1 overflow-y-auto py-4 space-y-3">
+                        <div class="p-3 bg-cream border border-[#E6DDD3] rounded text-xs max-w-xs">
+                            Bonjour! I am reviewing your 3D drape selection. The mulberry silk choice will frame your design beautifully.
+                        </div>
+                    </div>
+
+                    <form id="chat-form" class="flex gap-2 pt-3 border-t border-[#E6DDD3]">
+                        <input type="text" id="chat-input" placeholder="Type message to designer..." class="flex-1 px-3 py-2 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+                        <button type="submit" class="px-4 py-2 bg-charcoal text-white text-xs rounded hover:bg-taupe transition-colors">Send</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-tracking" class="tab-view hidden max-w-3xl mx-auto space-y-6">
+            <div class="text-center">
+                <span class="section-label">Live Logistics Route</span>
+                <h1 class="font-serif text-3xl my-1">Waybill #ATG-8902-PARIS</h1>
+            </div>
+
+            <div class="bg-sand p-6 rounded-xl border border-[#E6DDD3] space-y-6">
+                <div class="h-32 bg-cream border border-dashed border-taupe rounded-lg flex items-center justify-around px-4">
+                    <div class="text-center">
+                        <div class="w-3 h-3 bg-charcoal rounded-full mx-auto mb-1"></div>
+                        <span class="text-[10px] uppercase font-bold">Paris Studio</span>
+                    </div>
+                    <div class="h-0.5 bg-charcoal flex-1 mx-4 border-t border-dashed border-charcoal"></div>
+                    <div class="text-center">
+                        <div class="w-3 h-3 bg-sage rounded-full mx-auto mb-1 animate-pulse"></div>
+                        <span class="text-[10px] uppercase font-bold text-sage">In Transit</span>
+                    </div>
+                    <div class="h-0.5 bg-gray-300 flex-1 mx-4"></div>
+                    <div class="text-center">
+                        <div class="w-3 h-3 bg-gray-300 rounded-full mx-auto mb-1"></div>
+                        <span class="text-[10px] uppercase font-bold text-gray-400">Destination</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-clearance" class="tab-view hidden space-y-6">
+            <div class="text-center">
+                <span class="section-label">Private Archive</span>
+                <h1 class="font-serif text-3xl my-1">Clearance Collection</h1>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-sand border border-[#E6DDD3] rounded-xl p-4 space-y-3">
+                    <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=600&q=80" class="w-full h-64 object-cover rounded-lg" alt="Rosé Silk Dress">
+                    <h4 class="font-serif text-lg">Rosé Silk Pleated Gown</h4>
+                    <div class="flex gap-3 items-center">
+                        <span class="text-xs line-through text-taupe">$2,400</span>
+                        <span class="font-serif text-xl text-charcoal">$890</span>
+                    </div>
+                    <button class="buy-clearance-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded hover:bg-taupe transition-colors">Acquire Piece</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-checkout" class="tab-view hidden max-w-2xl mx-auto space-y-6">
+            <div class="text-center">
+                <span class="section-label">Secure Commission</span>
+                <h1 class="font-serif text-3xl my-1">Checkout Gateway</h1>
+            </div>
+
+            <form id="checkout-form" class="bg-sand p-6 rounded-xl border border-[#E6DDD3] space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" placeholder="First Name" required class="p-3 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+                    <input type="text" placeholder="Last Name" required class="p-3 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+                </div>
+                <input type="email" placeholder="Email Address" required class="w-full p-3 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+                <input type="text" placeholder="Shipping Address" required class="w-full p-3 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+
+                <div class="pt-2">
+                    <label class="section-label">Payment Method</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button type="button" class="pay-method-btn active p-2.5 bg-charcoal text-white text-[11px] rounded">Card</button>
+                        <button type="button" class="pay-method-btn p-2.5 bg-cream border border-[#E6DDD3] text-[11px] rounded">Apple Pay</button>
+                        <button type="button" class="pay-method-btn p-2.5 bg-cream border border-[#E6DDD3] text-[11px] rounded">Cash App</button>
+                        <button type="button" class="pay-method-btn p-2.5 bg-cream border border-[#E6DDD3] text-[11px] rounded">Debit</button>
+                    </div>
+                </div>
+
+                <input type="text" placeholder="Card Number (16 Digits)" required class="w-full p-3 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+
+                <button type="submit" class="w-full py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded mt-4 hover:bg-taupe transition-colors">Place Custom Order</button>
+            </form>
+        </section>
+
+    </main>
+
+    <div id="review-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-cream border border-[#E6DDD3] rounded-xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+            <button id="close-review-btn" class="absolute top-4 right-4 text-taupe text-lg">✕</button>
+
+            <div class="text-center">
+                <span class="section-label">Client Feedback</span>
+                <h3 class="font-serif text-2xl mt-1">Rate Your Atelier Session</h3>
+            </div>
+
+            <div id="star-rating" class="flex justify-center gap-2 text-2xl cursor-pointer">
+                <span data-star="1" class="star text-charcoal">★</span>
+                <span data-star="2" class="star text-charcoal">★</span>
+                <span data-star="3" class="star text-charcoal">★</span>
+                <span data-star="4" class="star text-charcoal">★</span>
+                <span data-star="5" class="star text-charcoal">★</span>
+            </div>
+
+            <textarea id="review-text" rows="3" placeholder="Share your creative experience..." class="w-full p-3 text-xs bg-sand border border-[#E6DDD3] rounded focus:outline-none"></textarea>
+
+            <button id="submit-review-btn" class="w-full py-2.5 bg-charcoal text-white text-xs uppercase tracking-widest rounded hover:bg-taupe transition-colors">Submit Feedback</button>
+        </div>
+    </div>
+
+    <footer class="border-t border-[#E6DDD3] bg-cream py-6 px-6 text-center text-[10px] text-taupe uppercase tracking-widest space-y-1">
+        <p>Atelier Global — Paris • Tokyo • Milan • New York</p>
+        <p>© 2026 Atelier Global Inc. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        /**
+         * Atelier Global — Core Engine Script
+         */
+
+        // State Store
+        const state = {
+            activeTab: 'doll',
+            avatarType: 'petite',
+            avatarSkinColor: '#F5D0C5',
+            avatarHeight: 1.0,
+            avatarPose: 'runway',
+            silhouette: 'a-line',
+            neckline: 'sweetheart',
+            sleeve: 'sleeveless',
+            fabricColor: '#6B4E3D',
+            texture: 'Silk',
+            cameraPreset: '360'
+        };
+
+        // UI Toast Notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            if (!toast || !toastMsg) return;
+
+            toastMsg.textContent = message;
+            toast.classList.remove('hidden');
+            toast.style.opacity = '1';
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        // ============================================================================
+        // 1. THREE.JS 3D DOLL CUSTOMIZER
+        // ============================================================================
+        let dollScene, dollCamera, dollRenderer, dollControls;
+        let dollAvatarGroup, headMesh, torsoMesh, leftArmMesh, rightArmMesh, leftLegMesh, rightLegMesh;
+        let dollMaterial;
+
+        function initDollThreeJS() {
+            const container = document.getElementById('doll-canvas-container');
+            if (!container) return;
+
+            try {
+                dollScene = new THREE.Scene();
+                dollScene.background = new THREE.Color(0xF5F0EB);
+
+                dollCamera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+                dollCamera.position.set(0, 1.0, 4.0);
+
+                dollRenderer = new THREE.WebGLRenderer({ antialias: true });
+                dollRenderer.setSize(container.clientWidth, container.clientHeight);
+                dollRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                dollRenderer.shadowMap.enabled = true;
+
+                container.appendChild(dollRenderer.domElement);
+
+                if (typeof THREE.OrbitControls !== 'undefined') {
+                    dollControls = new THREE.OrbitControls(dollCamera, dollRenderer.domElement);
+                    dollControls.enableDamping = true;
+                    dollControls.dampingFactor = 0.05;
+                    dollControls.minDistance = 1.8;
+                    dollControls.maxDistance = 6.0;
+                    dollControls.target.set(0, 0.8, 0);
+                }
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+                dollScene.add(ambientLight);
+
+                const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+                dirLight.position.set(3, 5, 4);
+                dirLight.castShadow = true;
+                dollScene.add(dirLight);
+
+                build3DAvatarDoll();
+
+                const animateDoll = () => {
+                    requestAnimationFrame(animateDoll);
+                    if (dollControls) dollControls.update();
+
+                    if (dollAvatarGroup) {
+                        dollAvatarGroup.rotation.y += 0.003;
+                    }
+
+                    dollRenderer.render(dollScene, dollCamera);
+                };
+                animateDoll();
+
+                window.addEventListener('resize', onDollResize);
+            } catch (err) {
+                console.error("Doll Canvas Init Error: ", err);
+            }
+        }
+
+        function build3DAvatarDoll() {
+            dollAvatarGroup = new THREE.Group();
+            dollAvatarGroup.position.set(0, -0.4, 0);
+
+            dollMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(state.avatarSkinColor),
+                roughness: 0.4,
+                metalness: 0.05
+            });
+
+            // Head
+            const headGeo = new THREE.SphereGeometry(0.28, 32, 32);
+            headMesh = new THREE.Mesh(headGeo, dollMaterial);
+            headMesh.position.set(0, 1.85, 0);
+            headMesh.castShadow = true;
+            dollAvatarGroup.add(headMesh);
+
+            // Torso
+            const torsoGeo = new THREE.CylinderGeometry(0.22, 0.18, 0.7, 32);
+            torsoMesh = new THREE.Mesh(torsoGeo, dollMaterial);
+            torsoMesh.position.set(0, 1.25, 0);
+            torsoMesh.castShadow = true;
+            dollAvatarGroup.add(torsoMesh);
+
+            // Arms
+            const armGeo = new THREE.CylinderGeometry(0.07, 0.06, 0.6, 16);
+            leftArmMesh = new THREE.Mesh(armGeo, dollMaterial);
+            leftArmMesh.position.set(-0.33, 1.25, 0);
+            leftArmMesh.castShadow = true;
+            dollAvatarGroup.add(leftArmMesh);
+
+            rightArmMesh = new THREE.Mesh(armGeo, dollMaterial);
+            rightArmMesh.position.set(0.33, 1.25, 0);
+            rightArmMesh.castShadow = true;
+            dollAvatarGroup.add(rightArmMesh);
+
+            // Legs
+            const legGeo = new THREE.CylinderGeometry(0.08, 0.07, 0.8, 16);
+            leftLegMesh = new THREE.Mesh(legGeo, dollMaterial);
+            leftLegMesh.position.set(-0.12, 0.45, 0);
+            leftLegMesh.castShadow = true;
+            dollAvatarGroup.add(leftLegMesh);
+
+            rightLegMesh = new THREE.Mesh(legGeo, dollMaterial);
+            rightLegMesh.position.set(0.12, 0.45, 0);
+            rightLegMesh.castShadow = true;
+            dollAvatarGroup.add(rightLegMesh);
+
+            dollScene.add(dollAvatarGroup);
+            updateAvatarProportions();
+        }
+
+        function updateAvatarProportions() {
+            if (!dollAvatarGroup) return;
+
+            dollMaterial.color.set(state.avatarSkinColor);
+            dollAvatarGroup.scale.set(1.0, state.avatarHeight, 1.0);
+
+            let torsoWidth = 1.0;
+            if (state.avatarType === 'petite') torsoWidth = 0.85;
+            if (state.avatarType === 'curvy') torsoWidth = 1.25;
+
+            if (torsoMesh) torsoMesh.scale.set(torsoWidth, 1.0, torsoWidth);
+
+            if (state.avatarPose === 'poseA') {
+                if (leftArmMesh) leftArmMesh.rotation.z = 0.45;
+                if (rightArmMesh) rightArmMesh.rotation.z = -0.45;
+            } else {
+                if (leftArmMesh) leftArmMesh.rotation.z = 0.1;
+                if (rightArmMesh) rightArmMesh.rotation.z = -0.1;
+            }
+        }
+
+        function onDollResize() {
+            const container = document.getElementById('doll-canvas-container');
+            if (!container || !dollRenderer || !dollCamera) return;
+
+            dollCamera.aspect = container.clientWidth / container.clientHeight;
+            dollCamera.updateProjectionMatrix();
+            dollRenderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        // ============================================================================
+        // 2. THREE.JS 3D DRESS DESIGNER
+        // ============================================================================
+        let scene, camera, renderer, controls;
+        let dressMeshGroup, bodiceMesh, skirtMesh, necklineMesh, sleevesGroup;
+        let dressMaterial;
+
+        function initThreeJS() {
+            const container = document.getElementById('three-canvas-container');
+            const errorOverlay = document.getElementById('webgl-error');
+
+            if (!container) return;
+
+            try {
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0xF5F0EB);
+
+                camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+                camera.position.set(0, 0.5, 4.5);
+
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+                container.appendChild(renderer.domElement);
+
+                if (typeof THREE.OrbitControls !== 'undefined') {
+                    controls = new THREE.OrbitControls(camera, renderer.domElement);
+                    controls.enableDamping = true;
+                    controls.dampingFactor = 0.05;
+                    controls.minDistance = 1.5;
+                    controls.maxDistance = 7;
+                }
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+                scene.add(ambientLight);
+
+                const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+                keyLight.position.set(5, 8, 5);
+                keyLight.castShadow = true;
+                scene.add(keyLight);
+
+                const fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
+                fillLight.position.set(-5, -2, -5);
+                scene.add(fillLight);
+
+                createProceduralDress();
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    if (controls) controls.update();
+
+                    if (state.cameraPreset === '360' && dressMeshGroup) {
+                        dressMeshGroup.rotation.y += 0.005;
+                    }
+
+                    renderer.render(scene, camera);
+                };
+                animate();
+
+                window.addEventListener('resize', onWindowResize);
+
+            } catch (error) {
+                console.error('WebGL Initialization Error:', error);
+                if (errorOverlay) errorOverlay.classList.remove('hidden');
+            }
+        }
+
+        function createProceduralDress() {
+            dressMeshGroup = new THREE.Group();
+            dressMeshGroup.position.set(0, -1.2, 0);
+
+            dressMaterial = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color(state.fabricColor),
+                roughness: 0.3,
+                metalness: 0.1,
+                clearcoat: 0.5
+            });
+
+            const bodiceGeo = new THREE.CylinderGeometry(0.4, 0.35, 1.1, 32);
+            bodiceMesh = new THREE.Mesh(bodiceGeo, dressMaterial);
+            bodiceMesh.position.set(0, 2.2, 0);
+            bodiceMesh.castShadow = true;
+            dressMeshGroup.add(bodiceMesh);
+
+            rebuildSkirtGeometry();
+
+            const neckGeo = new THREE.ConeGeometry(0.3, 0.4, 32);
+            necklineMesh = new THREE.Mesh(neckGeo, new THREE.MeshStandardMaterial({ color: 0x3A2E2B }));
+            necklineMesh.position.set(0, 2.65, 0.2);
+            necklineMesh.rotation.x = 0.4;
+            dressMeshGroup.add(necklineMesh);
+
+            sleevesGroup = new THREE.Group();
+            dressMeshGroup.add(sleevesGroup);
+            rebuildSleeves();
+
+            scene.add(dressMeshGroup);
+        }
+
+        function rebuildSkirtGeometry() {
+            if (skirtMesh) dressMeshGroup.remove(skirtMesh);
+
+            let radius = 1.2;
+            if (state.silhouette === 'ballgown') radius = 1.8;
+            if (state.silhouette === 'column') radius = 0.7;
+
+            const skirtGeo = new THREE.CylinderGeometry(0.36, radius, 3.2, 48);
+            skirtMesh = new THREE.Mesh(skirtGeo, dressMaterial);
+            skirtMesh.position.set(0, 0.9, 0);
+            skirtMesh.castShadow = true;
+            dressMeshGroup.add(skirtMesh);
+        }
+
+        function rebuildSleeves() {
+            while (sleevesGroup.children.length > 0) {
+                sleevesGroup.remove(sleevesGroup.children[0]);
+            }
+
+            if (state.sleeve === 'long') {
+                const sleeveGeo = new THREE.CylinderGeometry(0.12, 0.09, 1.2, 16);
+                const leftSleeve = new THREE.Mesh(sleeveGeo, dressMaterial);
+                leftSleeve.position.set(-0.55, 2.3, 0);
+                leftSleeve.rotation.z = 0.3;
+
+                const rightSleeve = new THREE.Mesh(sleeveGeo, dressMaterial);
+                rightSleeve.position.set(0.55, 2.3, 0);
+                rightSleeve.rotation.z = -0.3;
+
+                sleevesGroup.add(leftSleeve);
+                sleevesGroup.add(rightSleeve);
+            }
+        }
+
+        function updateMaterialShader() {
+            if (!dressMaterial) return;
+            dressMaterial.color.set(state.fabricColor);
+
+            switch (state.texture) {
+                case 'Silk':
+                case 'Satin':
+                    dressMaterial.roughness = 0.15;
+                    dressMaterial.clearcoat = 0.8;
+                    dressMaterial.wireframe = false;
+                    break;
+                case 'Velvet':
+                    dressMaterial.roughness = 0.9;
+                    dressMaterial.clearcoat = 0.1;
+                    dressMaterial.wireframe = false;
+                    break;
+                case 'Lace':
+                    dressMaterial.roughness = 0.6;
+                    dressMaterial.wireframe = true;
+                    break;
+                default:
+                    dressMaterial.roughness = 0.4;
+                    dressMaterial.wireframe = false;
+            }
+        }
+
+        function applyCameraPreset(preset) {
+            state.cameraPreset = preset;
+            if (!camera) return;
+
+            switch (preset) {
+                case 'top':
+                    camera.position.set(0, 5, 0.1);
+                    break;
+                case 'front':
+                    camera.position.set(0, 0.5, 4.5);
+                    break;
+                case 'macro':
+                    camera.position.set(0, 1.2, 1.8);
+                    break;
+                default:
+                    camera.position.set(0, 0.5, 4.5);
+            }
+            if (controls) controls.target.set(0, 0.5, 0);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('three-canvas-container');
+            if (!container || !renderer || !camera) return;
+
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        // ============================================================================
+        // 3. 100+ FABRICS GENERATOR
+        // ============================================================================
+        const fabricsDatabase = [];
+
+        function generate100Fabrics() {
+            const categories = ['Silks', 'Velvets', 'Laces', 'Organza & Tulle'];
+            let id = 1;
+
+            categories.forEach(cat => {
+                for (let i = 1; i <= 25; i++) {
+                    fabricsDatabase.push({
+                        id: id++,
+                        name: `${cat.slice(0, -1)} Variant Grade ${i * 4}`,
+                        category: cat
+                    });
+                }
+            });
+        }
+
+        function renderFabrics(filterCat = 'All', searchQuery = '') {
+            const grid = document.getElementById('fabric-grid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            const filtered = fabricsDatabase.filter(f => {
+                const matchesCat = filterCat === 'All' || f.category === filterCat;
+                const matchesSearch = f.name.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p class="text-xs text-taupe col-span-4 text-center py-8">No textiles matched your search query.</p>';
+                return;
+            }
+
+            filtered.forEach(fabric => {
+                const card = document.createElement('div');
+                card.className = 'p-4 bg-cream border border-[#E6DDD3] rounded-xl cursor-pointer hover:border-charcoal transition-all';
+                card.innerHTML = `
+                    <span class="text-[9px] uppercase tracking-widest text-taupe">${fabric.category}</span>
+                    <h4 class="font-serif text-sm mt-1 text-charcoal">${fabric.name}</h4>
+                `;
+                card.addEventListener('click', () => {
+                    showToast(`Selected Material: ${fabric.name}`);
+                });
+                grid.appendChild(card);
+            });
+        }
+
+        // ============================================================================
+        // 4. EVENT BINDINGS
+        // ============================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initDollThreeJS();
+            initThreeJS();
+            generate100Fabrics();
+            renderFabrics();
+
+            // Main Header Navigation Switches
+            const navButtons = document.querySelectorAll('#main-nav .nav-btn');
+            const tabViews = document.querySelectorAll('.tab-view');
+
+            function switchMainTab(tabId) {
+                navButtons.forEach(b => {
+                    if (b.getAttribute('data-tab') === tabId) b.classList.add('active');
+                    else b.classList.remove('active');
+                });
+
+                tabViews.forEach(view => {
+                    if (view.id === `view-${tabId}`) {
+                        view.classList.remove('hidden');
+                        view.classList.add('active');
+                    } else {
+                        view.classList.add('hidden');
+                        view.classList.remove('active');
+                    }
+                });
+
+                if (tabId === 'doll') {
+                    setTimeout(onDollResize, 100);
+                } else if (tabId === 'studio') {
+                    setTimeout(onWindowResize, 100);
+                }
+            }
+
+            navButtons.forEach(btn => {
+                btn.addEventListener('click', () => switchMainTab(btn.getAttribute('data-tab')));
+            });
+
+            // Avatar Controls
+            document.querySelectorAll('[data-avatar-type]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('[data-avatar-type]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    state.avatarType = e.target.getAttribute('data-avatar-type');
+                    updateAvatarProportions();
+                });
+            });
+
+            document.querySelectorAll('[data-avatar-skin]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('[data-avatar-skin]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    state.avatarSkinColor = e.target.getAttribute('data-avatar-skin');
+                    updateAvatarProportions();
+                });
+            });
+
+            const heightSlider = document.getElementById('avatar-height-slider');
+            if (heightSlider) {
+                heightSlider.addEventListener('input', (e) => {
+                    state.avatarHeight = parseFloat(e.target.value);
+                    updateAvatarProportions();
+                });
+            }
+
+            document.querySelectorAll('[data-avatar-pose]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('[data-avatar-pose]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    state.avatarPose = e.target.getAttribute('data-avatar-pose');
+                    updateAvatarProportions();
+                });
+            });
+
+            const goToDesignBtn = document.getElementById('go-to-design-btn');
+            if (goToDesignBtn) {
+                goToDesignBtn.addEventListener('click', () => {
+                    switchMainTab('studio');
+                    showToast('3D Doll Avatar saved. Opening Dress Studio.');
+                });
+            }
+
+            // Sub-Tabs Switcher (Roman Numerals)
+            const sidebarTabs = document.querySelectorAll('.sidebar-tab-btn');
+            const sidebarContents = document.querySelectorAll('.sidebar-content');
+
+            sidebarTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-sidebar-tab');
+
+                    sidebarTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    sidebarContents.forEach(c => {
+                        if (c.id === `sidebar-content-${target}`) {
+                            c.classList.remove('hidden');
+                            c.classList.add('active');
+                        } else {
+                            c.classList.add('hidden');
+                            c.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            // 3D Garment Configurator Handlers
+            document.querySelectorAll('[data-silhouette]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('[data-silhouette]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    state.silhouette = e.target.getAttribute('data-silhouette');
+                    rebuildSkirtGeometry();
+                });
+            });
+
+            document.querySelectorAll('[data-neckline]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('[data-neckline]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    state.neckline = e.target.getAttribute('data-neckline');
+                    showToast(`Neckline set to ${state.neckline}`);
+                });
+            });
+
+            document.querySelectorAll('[data-sleeve]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('[data-sleeve]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    state.sleeve = e.target.getAttribute('data-sleeve');
+                    rebuildSleeves();
+                });
+            });
+
+            document.querySelectorAll('[data-cam]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('[data-cam]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    applyCameraPreset(e.target.getAttribute('data-cam'));
+                });
+            });
+
+            const colorPicker = document.getElementById('fabric-color-picker');
+            const colorHexLabel = document.getElementById('fabric-color-hex');
+
+            if (colorPicker) {
+                colorPicker.addEventListener('input', (e) => {
+                    state.fabricColor = e.target.value;
+                    if (colorHexLabel) colorHexLabel.textContent = state.fabricColor;
+                    updateMaterialShader();
+                });
+            }
+
+            document.querySelectorAll('[data-texture]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('[data-texture]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    state.texture = e.target.getAttribute('data-texture');
+                    updateMaterialShader();
+                });
+            });
+
+            // Search Filter Listener for Fabrics
+            const fabricSearchInput = document.getElementById('fabric-search-input');
+            if (fabricSearchInput) {
+                fabricSearchInput.addEventListener('input', (e) => {
+                    const activeCatBtn = document.querySelector('#fabric-cat-filters .filter-btn.active');
+                    const cat = activeCatBtn ? activeCatBtn.getAttribute('data-cat') : 'All';
+                    renderFabrics(cat, e.target.value);
+                });
+            }
+
+            document.querySelectorAll('#fabric-cat-filters .filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('#fabric-cat-filters .filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    const query = fabricSearchInput ? fabricSearchInput.value : '';
+                    renderFabrics(e.target.getAttribute('data-cat'), query);
+                });
+            });
+
+            // AI Camera Scan
+            const startScanBtn = document.getElementById('start-scan-btn');
+            const scanResults = document.getElementById('scan-results');
+            const cameraStatus = document.getElementById('camera-status');
+
+            if (startScanBtn) {
+                startScanBtn.addEventListener('click', () => {
+                    cameraStatus.textContent = "Scanning posture and proportions...";
+                    setTimeout(() => {
+                        cameraStatus.textContent = "Scan complete.";
+                        if (scanResults) scanResults.classList.remove('hidden');
+                        showToast('AI Camera Sizing Complete!');
+                    }, 2000);
+                });
+            }
+
+            // Call / FaceTime Buttons
+            const callBtn = document.getElementById('call-btn');
+            const facetimeBtn = document.getElementById('facetime-btn');
+
+            if (callBtn) callBtn.addEventListener('click', () => showToast('Connecting audio line to Paris Studio...'));
+            if (facetimeBtn) facetimeBtn.addEventListener('click', () => showToast('Starting encrypted FaceTime video call...'));
+
+            // Chat Form Submission
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+
+            if (chatForm) {
+                chatForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (!chatInput.value.trim()) return;
+
+                    const userMsg = document.createElement('div');
+                    userMsg.className = 'p-3 bg-sand border border-[#E6DDD3] rounded text-xs max-w-xs ml-auto text-right';
+                    userMsg.textContent = chatInput.value;
+                    chatMessages.appendChild(userMsg);
+
+                    chatInput.value = '';
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                    setTimeout(() => {
+                        const replyMsg = document.createElement('div');
+                        replyMsg.className = 'p-3 bg-cream border border-[#E6DDD3] rounded text-xs max-w-xs';
+                        replyMsg.textContent = 'Received your updates! I am applying those adjustments to your pattern drape.';
+                        chatMessages.appendChild(replyMsg);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }, 1200);
+                });
+            }
+
+            // Review Modal Triggering
+            const reviewModal = document.getElementById('review-modal');
+            const openReviewBtn = document.getElementById('open-review-btn');
+            const closeReviewBtn = document.getElementById('close-review-btn');
+            const submitReviewBtn = document.getElementById('submit-review-btn');
+
+            if (openReviewBtn) openReviewBtn.addEventListener('click', () => reviewModal.classList.remove('hidden'));
+            if (closeReviewBtn) closeReviewBtn.addEventListener('click', () => reviewModal.classList.add('hidden'));
+
+            if (submitReviewBtn) {
+                submitReviewBtn.addEventListener('click', () => {
+                    reviewModal.classList.add('hidden');
+                    showToast('Thank you for your rating!');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

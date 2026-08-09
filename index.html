@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelier Global — Bespoke Haute Couture</title>
+    <title>Atelier Global — Bespoke Haute Couture & Doll Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -44,7 +44,8 @@
             </div>
 
             <nav class="flex flex-wrap justify-center gap-1" id="main-nav">
-                <button data-tab="studio" class="nav-btn active">3D Studio</button>
+                <button data-tab="doll" class="nav-btn active">Doll & Model</button>
+                <button data-tab="studio" class="nav-btn">3D Design Dress</button>
                 <button data-tab="fabrics" class="nav-btn">100+ Fabrics</button>
                 <button data-tab="embellishments" class="nav-btn">Embellishments</button>
                 <button data-tab="sizing" class="nav-btn">AI Size Fit</button>
@@ -58,7 +59,62 @@
 
     <main class="max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex-1">
 
-        <section id="view-studio" class="tab-view active">
+        <section id="view-doll" class="tab-view active space-y-6">
+            <div class="text-center max-w-xl mx-auto">
+                <span class="section-label">Interactive Avatar Studio</span>
+                <h1 class="font-serif text-3xl my-1">Customize Your Doll Model</h1>
+                <p class="text-xs text-taupe">Select your 3D mannequin doll's body frame, skin tone, height, and display pose before styling your dress.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-xl p-5 shadow-sm space-y-5">
+                    <div>
+                        <label class="section-label">Doll Body Type</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button data-doll-type="petite" class="doll-option-btn active">Petite</button>
+                            <button data-doll-type="standard" class="doll-option-btn">Classic</button>
+                            <button data-doll-type="curvy" class="doll-option-btn">Curvy</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="section-label">Skin Tone Shade</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button data-skin="#F5D0C5" class="skin-btn rounded-lg h-10 border border-[#E6DDD3] bg-[#F5D0C5] active"></button>
+                            <button data-skin="#D8A48F" class="skin-btn rounded-lg h-10 border border-[#E6DDD3] bg-[#D8A48F]"></button>
+                            <button data-skin="#8D5524" class="skin-btn rounded-lg h-10 border border-[#E6DDD3] bg-[#8D5524]"></button>
+                            <button data-skin="#3C2011" class="skin-btn rounded-lg h-10 border border-[#E6DDD3] bg-[#3C2011]"></button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="section-label">Display Pose</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button data-pose="runway" class="doll-pose-btn active">Runway Pose</button>
+                            <button data-pose="studio" class="doll-pose-btn">Studio Stance</button>
+                        </div>
+                    </div>
+
+                    <button id="go-to-design-btn" class="w-full py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded mt-4">
+                        Proceed to Dress Designer ➔
+                    </button>
+                </div>
+
+                <div class="lg:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl h-[480px] flex flex-col items-center justify-center relative overflow-hidden p-6 text-center">
+                    <div class="absolute top-4 left-4 bg-cream/80 backdrop-blur-md px-3 py-1.5 rounded border border-[#E6DDD3] text-[10px] uppercase tracking-widest">
+                        Model Doll Avatar Preview
+                    </div>
+                    <div id="doll-display-card" class="w-48 h-80 bg-cream border border-[#E6DDD3] rounded-full flex flex-col items-center justify-center p-4 shadow-md transition-all duration-300">
+                        <div id="doll-head" class="w-16 h-16 rounded-full bg-[#F5D0C5] mb-2 border border-taupe/20 transition-all"></div>
+                        <div id="doll-torso" class="w-20 h-28 bg-[#F5D0C5] rounded-t-2xl mb-1 border border-taupe/20 transition-all"></div>
+                        <div id="doll-legs" class="w-16 h-28 bg-[#F5D0C5] rounded-b-xl border border-taupe/20 transition-all"></div>
+                    </div>
+                    <p id="doll-status-text" class="text-xs text-taupe mt-4 font-serif">Petite Model Doll • Light Complexion</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-studio" class="tab-view hidden">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
                 <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-xl p-5 shadow-sm space-y-6">

@@ -1,423 +1,404 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atelier Global — Haute Couture Network</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelier Global — Bespoke Haute Couture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#FDFBF7',
+                        sand: '#F5F0EB',
+                        charcoal: '#3A2E2B',
+                        taupe: '#8C7A6B',
+                        sage: '#4A6B53',
+                        'sage-light': '#E8EFE9',
+                        blush: '#E8C5C8',
+                    },
+                    fontFamily: {
+                        serif: ['Didot', 'Bodoni MT', 'Cinzel', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
-<body>
+<body class="bg-cream text-charcoal font-sans antialiased flex flex-col min-h-screen">
 
-  <div id="toast-notification" class="toast hidden" role="alert" aria-live="polite">
-    <span id="toast-message"></span>
-    <button id="toast-close" aria-label="Close notification">&times;</button>
-  </div>
-
-  <header>
-    <div class="header-container">
-      <div class="brand">
-        <span class="logo">ATELIER GLOBAL</span>
-        <span class="badge">Haute Couture Network</span>
-      </div>
-      <nav aria-label="Main Navigation">
-        <button class="nav-btn active" data-tab="studio">3D Studio & Design</button>
-        <button class="nav-btn" data-tab="fabrics">100+ Fabrics & Jewels</button>
-        <button class="nav-btn" data-tab="sizing">AI Size Detector</button>
-        <button class="nav-btn" data-tab="designers">Global Designers</button>
-        <button class="nav-btn" data-tab="tracking">Order Route Map</button>
-        <button class="nav-btn" data-tab="clearance">Clearance Archive</button>
-        <button class="nav-btn" data-tab="checkout">Bespoke Checkout</button>
-      </nav>
+    <div id="toast" class="hidden fixed top-5 right-5 z-50 bg-charcoal text-cream px-5 py-3 rounded shadow-2xl text-xs uppercase tracking-widest flex items-center gap-3 transition-opacity duration-300">
+        <span id="toast-message">Notification Message</span>
     </div>
-  </header>
 
-  <main class="container">
-
-    <section id="studio" class="tab-content active">
-      <div class="section-title">
-        <span class="subtitle">Gamified 3D Design Suite</span>
-        <h1>Draft Your Vision in 3D Real-Time</h1>
-        <p>Manipulate silhouettes, rotate textures in 360°, and use our internet AI vision engine to explain your design concept.</p>
-      </div>
-
-      <div class="grid-studio">
-        <div class="canvas-card">
-          <div class="canvas-header">
-            <span class="tag">3D Viewport • Live Render</span>
-            <div class="canvas-controls">
-              <button id="btn-rotate" title="Rotate 45 degrees">🔄</button>
-              <button id="btn-zoom-in" title="Zoom In">🔍+</button>
-              <button id="btn-zoom-out" title="Zoom Out">🔍-</button>
+    <header class="sticky top-0 z-40 bg-cream/90 backdrop-blur-md border-b border-[#E6DDD3] px-6 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="font-serif text-2xl tracking-[0.2em] font-light uppercase">Atelier Global</span>
+                <span class="bg-sage-light text-sage text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-full font-medium">Haute Couture</span>
             </div>
-          </div>
 
-          <div class="viewport">
-            <div id="dress-model-wrapper" class="dress-wrapper">
-              <img id="dress-image" src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=600&q=80" alt="3D Silhouette View">
-              <div id="color-overlay" class="color-overlay"></div>
-            </div>
-          </div>
-
-          <div class="palette-picker">
-            <div class="palette-header">
-              <span>Interactive Color Tint</span>
-              <span id="hex-code" class="mono">#6B4E3D</span>
-            </div>
-            <div class="palette-controls">
-              <input type="color" id="color-picker" value="#6B4E3D" aria-label="Select custom color">
-              <div class="swatches">
-                <button class="swatch" data-color="#6B4E3D" style="background: #6B4E3D;" aria-label="Mocha Brown"></button>
-                <button class="swatch" data-color="#E8C5C8" style="background: #E8C5C8;" aria-label="Blush Pink"></button>
-                <button class="swatch" data-color="#8AA089" style="background: #8AA089;" aria-label="Sage Green"></button>
-                <button class="swatch" data-color="#1C1A19" style="background: #1C1A19;" aria-label="Obsidian Black"></button>
-                <button class="swatch" data-color="#FDFBF7" style="background: #FDFBF7;" aria-label="Warm Cream"></button>
-              </div>
-            </div>
-          </div>
+            <nav class="flex flex-wrap justify-center gap-1" id="main-nav">
+                <button data-tab="studio" class="nav-btn active">3D Studio</button>
+                <button data-tab="fabrics" class="nav-btn">100+ Fabrics</button>
+                <button data-tab="embellishments" class="nav-btn">Embellishments</button>
+                <button data-tab="sizing" class="nav-btn">AI Size Fit</button>
+                <button data-tab="designers" class="nav-btn">Designers Chat</button>
+                <button data-tab="tracking" class="nav-btn">Route Map</button>
+                <button data-tab="clearance" class="nav-btn">Clearance</button>
+                <button data-tab="checkout" class="nav-btn">Commission</button>
+            </nav>
         </div>
+    </header>
 
-        <div class="sidebar-stack">
-          <div class="panel">
-            <span class="subtitle">Select Base Silhouette</span>
-            <div class="silhouette-grid">
-              <button class="silhouette-btn active" data-img="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=600&q=80">Architectural Column</button>
-              <button class="silhouette-btn" data-img="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&w=600&q=80">Asymmetric Pleated A-Line</button>
-              <button class="silhouette-btn" data-img="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80">Draped Satin Ballgown</button>
-              <button class="silhouette-btn" data-img="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=600&q=80">Minimalist Silk Slip</button>
+    <main class="max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex-1">
+
+        <section id="view-studio" class="tab-view active">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-xl p-5 shadow-sm space-y-6">
+                    
+                    <div class="flex border-b border-[#E6DDD3] pb-3 gap-2">
+                        <button id="sidebar-tab-1" data-sidebar-tab="I" class="sidebar-tab-btn active">I. Silhouette</button>
+                        <button id="sidebar-tab-2" data-sidebar-tab="II" class="sidebar-tab-btn">II. Textures</button>
+                        <button id="sidebar-tab-3" data-sidebar-tab="III" class="sidebar-tab-btn">III. Live Map</button>
+                    </div>
+
+                    <div id="sidebar-content-I" class="sidebar-content active space-y-5">
+                        <div>
+                            <label class="section-label">Base Silhouette</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button data-silhouette="a-line" class="option-btn active">A-Line</button>
+                                <button data-silhouette="column" class="option-btn">Column</button>
+                                <button data-silhouette="ballgown" class="option-btn">Ballgown</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="section-label">Neckline Cut</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button data-neckline="sweetheart" class="option-btn active">Sweetheart</button>
+                                <button data-neckline="v-neck" class="option-btn">V-Neck</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="section-label">Sleeve Style</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button data-sleeve="sleeveless" class="option-btn active">Sleeveless</button>
+                                <button data-sleeve="long" class="option-btn">Long Sleeve</button>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-[#E6DDD3]">
+                            <label class="section-label">Cinematic Camera Presets</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button data-cam="360" class="cam-btn active">1) 360° Rotate</button>
+                                <button data-cam="top" class="cam-btn">2) High-Angle Top</button>
+                                <button data-cam="front" class="cam-btn">3) Studio Front</button>
+                                <button data-cam="macro" class="cam-btn">4) Macro Close-up</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sidebar-content-II" class="sidebar-content hidden space-y-5">
+                        <div>
+                            <label class="section-label">Interactive Color Wheel</label>
+                            <div class="flex items-center gap-3 bg-cream p-2 rounded border border-[#E6DDD3]">
+                                <input type="color" id="fabric-color-picker" value="#6B4E3D" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent">
+                                <span id="fabric-color-hex" class="font-mono text-xs uppercase">#6B4E3D</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="section-label">Texture Finish Shaders</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button data-texture="Silk" class="texture-btn active">Mulberry Silk</button>
+                                <button data-texture="Satin" class="texture-btn">Duchess Satin</button>
+                                <button data-texture="Velvet" class="texture-btn">Lyons Velvet</button>
+                                <button data-texture="Lace" class="texture-btn">Chantilly Lace</button>
+                                <button data-texture="Leather" class="texture-btn">Fine Leather</button>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-[#E6DDD3]">
+                            <label class="section-label">✨ AI Internet Vision Search</label>
+                            <form id="ai-search-form" class="flex gap-2">
+                                <input type="text" id="ai-input" placeholder="e.g. 1920s corseted lace..." class="flex-1 px-3 py-2 text-xs bg-cream border border-[#E6DDD3] rounded focus:outline-none">
+                                <button type="submit" class="px-3 py-2 bg-charcoal text-white text-xs rounded">Search</button>
+                            </form>
+                            <div id="ai-results" class="grid grid-cols-3 gap-2 mt-3">
+                                <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=300&q=80" alt="Ref 1" class="w-full h-16 object-cover rounded border border-[#E6DDD3]">
+                                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=300&q=80" alt="Ref 2" class="w-full h-16 object-cover rounded border border-[#E6DDD3]">
+                                <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=300&q=80" alt="Ref 3" class="w-full h-16 object-cover rounded border border-[#E6DDD3]">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sidebar-content-III" class="sidebar-content hidden space-y-4">
+                        <label class="section-label">Digital Crafting Timeline</label>
+                        <div class="space-y-3 text-xs">
+                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded">
+                                <span class="font-medium">1. Digital 3D Modeling</span>
+                                <span class="text-[9px] uppercase px-2 py-0.5 rounded bg-sage-light text-sage">Active</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded">
+                                <span class="font-medium">2. Virtual Tailoring</span>
+                                <span class="text-[9px] uppercase px-2 py-0.5 rounded bg-gray-100 text-gray-400">Pending</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded">
+                                <span class="font-medium">3. Material Sourcing</span>
+                                <span class="text-[9px] uppercase px-2 py-0.5 rounded bg-gray-100 text-gray-400">Queued</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-cream border border-[#E6DDD3] rounded">
+                            <label class="section-label">Simulated Logistics Route</label>
+                            <div class="h-24 bg-sand rounded flex flex-col items-center justify-center relative border border-dashed border-taupe">
+                                <span class="text-[10px] uppercase tracking-widest text-taupe">Paris Studio ➔ NY Atelier</span>
+                                <span class="text-xs font-serif mt-1 text-charcoal">Estimated transit: 4 days</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="open-review-btn" class="w-full py-2.5 border border-charcoal text-charcoal text-xs uppercase tracking-widest rounded hover:bg-charcoal hover:text-white transition-all">
+                        ★ Rate Atelier Experience
+                    </button>
+                </div>
+
+                <div class="lg:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl h-[580px] relative overflow-hidden shadow-inner">
+                    <div class="absolute top-4 left-4 z-10 bg-cream/80 backdrop-blur-md px-3 py-1.5 rounded border border-[#E6DDD3] text-[10px] uppercase tracking-widest">
+                        Interactive 3D Viewport • Drag to Rotate
+                    </div>
+                    <div id="webgl-error" class="hidden absolute inset-0 bg-cream/95 z-20 flex flex-col items-center justify-center p-6 text-center">
+                        <p class="font-serif text-lg text-charcoal">3D Graphics Acceleration Unavailable</p>
+                        <p class="text-xs text-taupe mt-1">Please enable WebGL in your browser settings to view interactive models.</p>
+                    </div>
+                    <div id="three-canvas-container" class="w-full h-full"></div>
+                </div>
+
             </div>
-          </div>
+        </section>
 
-          <div class="panel">
-            <div class="panel-header">✨ AI Internet Vision Search</div>
-            <p class="small-text">Search Pinterest, TikTok, Instagram, and Google data to automatically pull and generate inspiration moodboards.</p>
-            <form id="ai-form" class="ai-input-group">
-              <input type="text" id="ai-query" placeholder="e.g. vintage 1920s corseted silk gown..." required maxlength="120">
-              <button type="submit" id="ai-submit-btn" class="btn-primary">Generate</button>
+        <section id="view-fabrics" class="tab-view hidden space-y-6">
+            <div class="text-center max-w-xl mx-auto">
+                <span class="section-label">Curated Master Textiles</span>
+                <h1 class="font-serif text-3xl my-1">Over 100+ Master Fabrics</h1>
+                <p class="text-xs text-taupe">Search and filter rare silks, laces, velvets, and organza options.</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-4 justify-between bg-sand p-4 rounded-xl border border-[#E6DDD3]">
+                <input type="text" id="fabric-search-input" placeholder="Search 100+ fabric names..." class="flex-1 px-4 py-2 bg-cream border border-[#E6DDD3] rounded text-xs">
+                <div class="flex gap-2 overflow-x-auto" id="fabric-cat-filters">
+                    <button data-cat="All" class="filter-btn active">All</button>
+                    <button data-cat="Silks" class="filter-btn">Silks</button>
+                    <button data-cat="Velvets" class="filter-btn">Velvets</button>
+                    <button data-cat="Laces" class="filter-btn">Laces</button>
+                    <button data-cat="Organza & Tulle" class="filter-btn">Organza & Tulle</button>
+                </div>
+            </div>
+
+            <div id="fabric-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-[500px] overflow-y-auto pr-2">
+                </div>
+        </section>
+
+        <section id="view-embellishments" class="tab-view hidden space-y-6">
+            <div class="text-center max-w-xl mx-auto">
+                <span class="section-label">Handcrafted Details</span>
+                <h1 class="font-serif text-3xl my-1">Embellishments & Sequences</h1>
+                <p class="text-xs text-taupe">Select custom hand-beading, gemstone accents, and intricate embroidery.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-sand p-5 border border-[#E6DDD3] rounded-xl space-y-3">
+                    <h3 class="font-serif text-lg">Crystal Beading</h3>
+                    <p class="text-xs text-taupe">Swarovski crystal clusters applied along bodice seams.</p>
+                    <button class="embellish-select-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded" data-name="Swarovski Beading">Select Beading</button>
+                </div>
+                <div class="bg-sand p-5 border border-[#E6DDD3] rounded-xl space-y-3">
+                    <h3 class="font-serif text-lg">Gold Thread Embroidery</h3>
+                    <p class="text-xs text-taupe">Hand-stitched metallic floral filigree along hemline.</p>
+                    <button class="embellish-select-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded" data-name="Gold Thread Embroidery">Select Embroidery</button>
+                </div>
+                <div class="bg-sand p-5 border border-[#E6DDD3] rounded-xl space-y-3">
+                    <h3 class="font-serif text-lg">Pearl Micro-Sequins</h3>
+                    <p class="text-xs text-taupe">Iridescent freshwater pearl encrusting on train.</p>
+                    <button class="embellish-select-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded" data-name="Pearl Micro-Sequins">Select Pearls</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-sizing" class="tab-view hidden max-w-2xl mx-auto space-y-6">
+            <div class="text-center">
+                <span class="section-label">Precision Fit Technology</span>
+                <h1 class="font-serif text-3xl my-1">Bespoke Size Analysis</h1>
+            </div>
+
+            <div class="bg-sand p-8 rounded-xl border border-[#E6DDD3] text-center space-y-4">
+                <h3 class="font-serif text-xl">Encrypted Camera Size Detector</h3>
+                <p class="text-xs text-taupe max-w-md mx-auto">
+                    Stand in front of your camera. Our AI detector analyzes body ratios to recommend exact bespoke sizing.
+                </p>
+
+                <div id="camera-box" class="w-full h-48 bg-cream border border-dashed border-taupe rounded-lg flex items-center justify-center">
+                    <span id="camera-status" class="text-xs text-taupe">Camera feed offline</span>
+                </div>
+
+                <button id="start-scan-btn" class="px-6 py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded">Start AI Camera Scan</button>
+                
+                <div id="scan-results" class="hidden p-4 bg-cream border border-sage rounded-lg text-left space-y-2">
+                    <span class="text-[10px] uppercase text-sage font-bold block">✓ Size Scan Complete</span>
+                    <p class="font-serif text-lg">Calculated Atelier Fit: Size US 4 (Bespoke S-1)</p>
+                    <p class="text-xs text-taupe">Bust: 34.5 in | Waist: 26.0 in | Hips: 37.2 in</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-designers" class="tab-view hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div class="md:col-span-5 space-y-3">
+                    <span class="section-label">Master Artisans</span>
+                    <div class="p-4 bg-sand border border-charcoal rounded-xl flex items-center gap-4 cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-12 h-12 rounded-full object-cover" alt="Elena">
+                        <div>
+                            <h4 class="font-serif text-base">Elena Vance-Amore</h4>
+                            <p class="text-xs text-taupe">Paris, France • Haute Couture Lead</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl p-5 flex flex-col h-[450px]">
+                    <div class="flex justify-between items-center pb-3 border-b border-[#E6DDD3]">
+                        <h4 class="font-serif text-sm">Elena Vance-Amore (Direct Line)</h4>
+                        <div class="flex gap-2">
+                            <button class="chat-call-btn text-xs px-2 py-1 bg-cream border rounded">📞 Call</button>
+                            <button class="chat-call-btn text-xs px-2 py-1 bg-cream border rounded">📹 FaceTime</button>
+                        </div>
+                    </div>
+
+                    <div id="chat-messages" class="flex-1 overflow-y-auto py-4 space-y-3">
+                        <div class="p-3 bg-cream border border-[#E6DDD3] rounded text-xs max-w-xs">
+                            Bonjour! I am reviewing your 3D drape selection. The mulberry silk choice will frame your design beautifully.
+                        </div>
+                    </div>
+
+                    <form id="chat-form" class="flex gap-2 pt-3 border-t border-[#E6DDD3]">
+                        <input type="text" id="chat-input" placeholder="Type message to designer..." class="flex-1 px-3 py-2 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+                        <button type="submit" class="px-4 py-2 bg-charcoal text-white text-xs rounded">Send</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-tracking" class="tab-view hidden max-w-3xl mx-auto space-y-6">
+            <div class="text-center">
+                <span class="section-label">Live Logistics Route</span>
+                <h1 class="font-serif text-3xl my-1">Waybill #ATG-8902-PARIS</h1>
+            </div>
+
+            <div class="bg-sand p-6 rounded-xl border border-[#E6DDD3] space-y-6">
+                <div class="h-32 bg-cream border border-dashed border-taupe rounded-lg flex items-center justify-around">
+                    <div class="text-center">
+                        <div class="w-3 h-3 bg-charcoal rounded-full mx-auto mb-1"></div>
+                        <span class="text-[10px] uppercase font-bold">Paris Studio</span>
+                    </div>
+                    <div class="h-0.5 bg-charcoal flex-1 mx-4 border-t border-dashed border-charcoal"></div>
+                    <div class="text-center">
+                        <div class="w-3 h-3 bg-sage rounded-full mx-auto mb-1 animate-pulse"></div>
+                        <span class="text-[10px] uppercase font-bold text-sage">Air Transit</span>
+                    </div>
+                    <div class="h-0.5 bg-gray-300 flex-1 mx-4"></div>
+                    <div class="text-center">
+                        <div class="w-3 h-3 bg-gray-300 rounded-full mx-auto mb-1"></div>
+                        <span class="text-[10px] uppercase font-bold text-gray-400">Destination</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-clearance" class="tab-view hidden space-y-6">
+            <div class="text-center">
+                <span class="section-label">Private Archive</span>
+                <h1 class="font-serif text-3xl my-1">Clearance Collection</h1>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-sand border border-[#E6DDD3] rounded-xl p-4 space-y-3">
+                    <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=600&q=80" class="w-full h-64 object-cover rounded-lg" alt="Rosé Silk Dress">
+                    <h4 class="font-serif text-lg">Rosé Silk Pleated Gown</h4>
+                    <div class="flex gap-3 items-center">
+                        <span class="text-xs line-through text-taupe">$2,400</span>
+                        <span class="font-serif text-xl text-charcoal">$890</span>
+                    </div>
+                    <button class="buy-clearance-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded">Acquire Piece</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-checkout" class="tab-view hidden max-w-2xl mx-auto space-y-6">
+            <div class="text-center">
+                <span class="section-label">Secure Commission</span>
+                <h1 class="font-serif text-3xl my-1">Checkout Gateway</h1>
+            </div>
+
+            <form id="checkout-form" class="bg-sand p-6 rounded-xl border border-[#E6DDD3] space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" placeholder="First Name" required class="p-3 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+                    <input type="text" placeholder="Last Name" required class="p-3 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+                </div>
+                <input type="email" placeholder="Email Address" required class="w-full p-3 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+                <input type="text" placeholder="Shipping Address" required class="w-full p-3 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+
+                <div class="pt-2">
+                    <label class="section-label">Payment Option</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" class="pay-method-btn active p-3 bg-charcoal text-white text-xs rounded">Credit Card</button>
+                        <button type="button" class="pay-method-btn p-3 bg-cream border border-[#E6DDD3] text-xs rounded">Apple Pay</button>
+                        <button type="button" class="pay-method-btn p-3 bg-cream border border-[#E6DDD3] text-xs rounded">Cash App</button>
+                    </div>
+                </div>
+
+                <input type="text" placeholder="Card Number (16 Digits)" required class="w-full p-3 bg-cream border border-[#E6DDD3] rounded text-xs focus:outline-none">
+
+                <button type="submit" class="w-full py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded mt-4">Place Custom Order</button>
             </form>
-            <div id="ai-error-msg" class="error-text hidden"></div>
-            <div id="ai-gallery" class="ai-gallery">
-              <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=400&q=80" alt="AI Concept 1">
-              <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400&q=80" alt="AI Concept 2">
-              <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=400&q=80" alt="AI Concept 3">
+        </section>
+
+    </main>
+
+    <div id="review-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-cream border border-[#E6DDD3] rounded-xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+            <button id="close-review-btn" class="absolute top-4 right-4 text-taupe text-lg">✕</button>
+
+            <div class="text-center">
+                <span class="section-label">Client Feedback</span>
+                <h3 class="font-serif text-2xl mt-1">Rate Your Design Session</h3>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <section id="fabrics" class="tab-content">
-      <div class="section-title">
-        <span class="subtitle">Textile Library</span>
-        <h1>Choose From Over 100+ Master Fabrics</h1>
-        <p>Browse curated recommendations, rare silks, organzas, velvets, and hand-beaded embellishments.</p>
-      </div>
-
-      <div class="filter-bar">
-        <input type="text" id="fabric-search" placeholder="Search 100+ fabric names (e.g. Mulberry Silk, Velvet...)" class="search-input" maxlength="50">
-        <div class="category-buttons">
-          <button class="filter-btn active" data-cat="All">All</button>
-          <button class="filter-btn" data-cat="Silks">Silks</button>
-          <button class="filter-btn" data-cat="Velvets">Velvets</button>
-          <button class="filter-btn" data-cat="Laces">Laces</button>
-          <button class="filter-btn" data-cat="Organza & Tulle">Organza & Tulle</button>
-        </div>
-      </div>
-
-      <div id="fabric-grid" class="fabric-grid">
-        </div>
-      <div id="no-fabrics-msg" class="empty-state-text hidden">No matching textiles found. Try clearing your search filter.</div>
-
-      <div class="embellishments-wrapper">
-        <div class="section-title">
-          <h2>Beading, Sequins & Hand Embroidery</h2>
-          <p>Select embellishment accents to be crafted by master artisans.</p>
-        </div>
-        <div class="embellishment-grid">
-          <div class="emb-card active" tabindex="0">
-            <span class="icon">✨</span>
-            <h4>Hand-Beaded Swarovski Crystals</h4>
-            <p>Light-reflecting precision crystal work along corset seams.</p>
-          </div>
-          <div class="emb-card" tabindex="0">
-            <span class="icon">🌟</span>
-            <h4>Micro Sequin Gradient Cascades</h4>
-            <p>Over 50,000 hand-sewn shimmering sequins forming ombre drapes.</p>
-          </div>
-          <div class="emb-card" tabindex="0">
-            <span class="icon">🧵</span>
-            <h4>Gold & Silver Thread Embroidery</h4>
-            <p>Heritage bullion stitching with gold leaf highlights.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="sizing" class="tab-content">
-      <div class="section-title">
-        <span class="subtitle">Precision Fit Technology</span>
-        <h1>Determine Your Bespoke Size</h1>
-      </div>
-
-      <div class="tab-toggle">
-        <button id="mode-ai-btn" class="toggle-btn active">AI Camera Body Detector</button>
-        <button id="mode-video-btn" class="toggle-btn">Video Measurement Guide</button>
-      </div>
-
-      <div id="ai-scanner-view" class="card-box text-center">
-        <div class="icon-circle">📷</div>
-        <h3>AI Camera Fit Analysis</h3>
-        <p class="small-text">Stand 5 feet away in fitting clothes. Our encrypted scanner analyzes silhouette contours to compute precise dress measurements.</p>
-        <button id="start-scan-btn" class="btn-primary large">Start Camera Scan</button>
-        
-        <div id="scan-results" class="results-box hidden">
-          <span class="badge">Scan Successful</span>
-          <p class="result-title">Bespoke Atelier Size 4 / US Small</p>
-          <div class="specs-grid">
-            <div>Bust: <strong>34.5 in (87.6 cm)</strong></div>
-            <div>Waist: <strong>26.0 in (66.0 cm)</strong></div>
-            <div>Hips: <strong>37.2 in (94.5 cm)</strong></div>
-            <div>Height: <strong>5 ft 8 in (173 cm)</strong></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="video-guide-view" class="card-box hidden">
-        <div class="video-placeholder">
-          <span class="play-icon">▶</span>
-          <p>Atelier Tutorial: Step-by-Step Measuring Tape Technique</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="designers" class="tab-content">
-      <div class="section-title">
-        <span class="subtitle">Direct Consultation</span>
-        <h1>Connect With Global Designers</h1>
-      </div>
-
-      <div class="grid-designers">
-        <div class="designer-list">
-          <div class="designer-card active" data-name="Elena Vance-Amore" data-loc="Paris, France" data-img="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" tabindex="0">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Elena Vance-Amore">
-            <div>
-              <span class="small-text">Paris, France</span>
-              <h3>Elena Vance-Amore</h3>
-              <p>Haute Couture & Sculptural Silks</p>
+            <div id="star-rating" class="flex justify-center gap-2 text-2xl cursor-pointer">
+                <span data-star="1" class="star text-taupe">★</span>
+                <span data-star="2" class="star text-taupe">★</span>
+                <span data-star="3" class="star text-taupe">★</span>
+                <span data-star="4" class="star text-taupe">★</span>
+                <span data-star="5" class="star text-charcoal">★</span>
             </div>
-          </div>
-          <div class="designer-card" data-name="Sora Takahashi" data-loc="Tokyo, Japan" data-img="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" tabindex="0">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" alt="Sora Takahashi">
-            <div>
-              <span class="small-text">Tokyo, Japan</span>
-              <h3>Sora Takahashi</h3>
-              <p>Avant-Garde Architectural Drapes</p>
-            </div>
-          </div>
+
+            <textarea id="review-text" rows="3" placeholder="Share your experience..." class="w-full p-3 text-xs bg-sand border border-[#E6DDD3] rounded focus:outline-none"></textarea>
+
+            <button id="submit-review-btn" class="w-full py-2.5 bg-charcoal text-white text-xs uppercase tracking-widest rounded">Submit Feedback</button>
         </div>
+    </div>
 
-        <div class="chat-card">
-          <div class="chat-header">
-            <div class="chat-user">
-              <img id="chat-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Designer Avatar">
-              <div>
-                <h4 id="chat-designer-name">Elena Vance-Amore</h4>
-                <p id="chat-designer-loc" class="small-text">Maison Vance • Paris, France</p>
-              </div>
-            </div>
-            <div class="chat-actions">
-              <button title="FaceTime Consultation">🎥</button>
-              <button title="Direct Call">📞</button>
-            </div>
-          </div>
+    <footer class="border-t border-[#E6DDD3] bg-cream py-6 px-6 text-center text-[10px] text-taupe uppercase tracking-widest space-y-1">
+        <p>Atelier Global — Paris • Tokyo • Milan • New York</p>
+        <p>© 2026 Atelier Global Inc. All Rights Reserved.</p>
+    </footer>
 
-          <div id="chat-messages" class="chat-body" role="log" aria-live="polite">
-            <div class="msg designer">
-              <p>Bonjour! I am reviewing your preliminary 3D drape for the silk gown. The mulberry silk fabric choice will sit beautifully on your shoulders.</p>
-              <span class="time">10:14 AM</span>
-            </div>
-          </div>
-
-          <form id="chat-form" class="chat-input-row">
-            <input type="text" id="chat-input" placeholder="Type message or ask about your dress design..." maxlength="500" required>
-            <button type="submit" class="btn-primary">Send</button>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <section id="tracking" class="tab-content">
-      <div class="section-title">
-        <span class="subtitle">Live Delivery Logistics</span>
-        <h1>Track Your Package</h1>
-        <p>Waybill Ref: #ATG-8902-PARIS-NY</p>
-      </div>
-
-      <div class="card-box">
-        <div class="map-view">
-          <div class="route-line"></div>
-          <div class="map-node node-start">Paris Atelier</div>
-          <div class="map-node node-active">In Flight Transit</div>
-          <div class="map-node node-end">New York Studio</div>
-        </div>
-
-        <div class="tracking-steps">
-          <div class="step completed">
-            <span class="status">Completed</span>
-            <h4>Hand-Stitching & Audit</h4>
-            <p>Maison Vance, Paris</p>
-          </div>
-          <div class="step active">
-            <span class="status">Active Status</span>
-            <h4>International Air Priority</h4>
-            <p>Flight AF-008</p>
-          </div>
-          <div class="step upcoming">
-            <span class="status">Upcoming</span>
-            <h4>White-Glove Delivery</h4>
-            <p>Destination Address</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="clearance" class="tab-content">
-      <div class="section-title">
-        <span class="subtitle">Private Sale</span>
-        <h1>Atelier Clearance Archive</h1>
-      </div>
-
-      <div class="clearance-grid">
-        <div class="clearance-card">
-          <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=600&q=80" alt="Rosé Silk Pleated Column Gown">
-          <h3>Rosé Silk Pleated Column</h3>
-          <div class="prices">
-            <span class="old">$2,400</span>
-            <span class="new">$890</span>
-          </div>
-          <button class="btn-primary full-width acquire-btn">Acquire Piece</button>
-        </div>
-        <div class="clearance-card">
-          <img src="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&w=600&q=80" alt="Obsidian Velvet Tailored Gown">
-          <h3>Obsidian Velvet Tailored Gown</h3>
-          <div class="prices">
-            <span class="old">$3,100</span>
-            <span class="new">$1,150</span>
-          </div>
-          <button class="btn-primary full-width acquire-btn">Acquire Piece</button>
-        </div>
-        <div class="clearance-card">
-          <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80" alt="Sage Leaf Chiffon Draped Slip">
-          <h3>Sage Leaf Chiffon Draped Slip</h3>
-          <div class="prices">
-            <span class="old">$1,850</span>
-            <span class="new">$620</span>
-          </div>
-          <button class="btn-primary full-width acquire-btn">Acquire Piece</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="checkout" class="tab-content">
-      <div class="section-title">
-        <span class="subtitle">Secure Commission</span>
-        <h1>Checkout & Payment Gateway</h1>
-      </div>
-
-      <div class="checkout-grid">
-        <form id="checkout-form" class="checkout-form panel" novalidate>
-          <h3>Contact & Delivery Address</h3>
-          <div class="form-row">
-            <div class="input-group">
-              <input type="text" id="first-name" placeholder="First Name" required>
-              <span class="field-error"></span>
-            </div>
-            <div class="input-group">
-              <input type="text" id="last-name" placeholder="Last Name" required>
-              <span class="field-error"></span>
-            </div>
-          </div>
-          <div class="input-group">
-            <input type="email" id="email" placeholder="Email Address (e.g., name@domain.com)" required>
-            <span class="field-error"></span>
-          </div>
-          <div class="input-group">
-            <input type="text" id="address" placeholder="Shipping Street Address" required>
-            <span class="field-error"></span>
-          </div>
-
-          <h3>Payment Option</h3>
-          <div class="payment-methods">
-            <button type="button" class="pay-btn active" data-method="card">Credit Card</button>
-            <button type="button" class="pay-btn" data-method="apple">Apple Pay</button>
-            <button type="button" class="pay-btn" data-method="cashapp">Cash App</button>
-          </div>
-
-          <div id="card-fields" class="card-fields-group">
-            <div class="input-group">
-              <input type="text" id="card-number" placeholder="Card Number (16 Digits)" maxlength="19" pattern="\d*">
-              <span class="field-error"></span>
-            </div>
-            <div class="form-row">
-              <div class="input-group">
-                <input type="text" id="card-exp" placeholder="MM/YY" maxlength="5">
-                <span class="field-error"></span>
-              </div>
-              <div class="input-group">
-                <input type="text" id="card-cvc" placeholder="CVC" maxlength="4">
-                <span class="field-error"></span>
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" id="submit-checkout-btn" class="btn-primary large full-width">Complete Commission</button>
-        </form>
-
-        <div class="panel summary-panel">
-          <h3>Commission Summary</h3>
-          <div class="summary-line">
-            <span>Selected Fabric:</span>
-            <strong id="summary-fabric">Mulberry Silk Charmeuse</strong>
-          </div>
-          <div class="summary-line">
-            <span>Embellishment:</span>
-            <strong id="summary-embellishment">Hand-Beaded Swarovski Crystals</strong>
-          </div>
-          <hr>
-          <div class="summary-line total">
-            <span>Total Deposit:</span>
-            <span>$1,450.00</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="reviews-section">
-      <div class="section-title">
-        <span class="subtitle">Client Satisfaction</span>
-        <h2>Leave an Atelier Review</h2>
-      </div>
-      <div class="review-box">
-        <div id="star-rating" class="stars" role="radiogroup" aria-label="Rating from 1 to 5 stars">
-          <span data-star="1" role="radio" aria-checked="false" tabindex="0">★</span>
-          <span data-star="2" role="radio" aria-checked="false" tabindex="0">★</span>
-          <span data-star="3" role="radio" aria-checked="false" tabindex="0">★</span>
-          <span data-star="4" role="radio" aria-checked="false" tabindex="0">★</span>
-          <span data-star="5" role="radio" aria-checked="true" class="active" tabindex="0">★</span>
-        </div>
-        <button id="submit-review-btn" class="btn-primary">Submit 5-Star Rating</button>
-      </div>
-    </section>
-
-  </main>
-
-  <footer>
-    <p class="brand-footer">ATELIER GLOBAL — PARIS • TOKYO • MILAN • NEW YORK</p>
-    <p class="copy">© 2026 Atelier Global Inc. All Rights Reserved.</p>
-  </footer>
-
-  <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

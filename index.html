@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atelier Global — Haute Couture Network</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <div class="brand">
+        <span class="logo">ATELIER GLOBAL</span>
+        <span class="badge">Haute Couture Network</span>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-tab="studio">3D Studio & Design</button>
+        <button class="nav-btn" data-tab="fabrics">100+ Fabrics & Jewels</button>
+        <button class="nav-btn" data-tab="sizing">AI Size Detector</button>
+        <button class="nav-btn" data-tab="designers">Global Designers</button>
+        <button class="nav-btn" data-tab="tracking">Order Route Map</button>
+        <button class="nav-btn" data-tab="clearance">Clearance Archive</button>
+        <button class="nav-btn" data-tab="checkout">Bespoke Checkout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section id="studio" class="tab-content active">
+      <div class="section-title">
+        <span class="subtitle">Gamified 3D Design Suite</span>
+        <h1>Draft Your Vision in 3D Real-Time</h1>
+        <p>Manipulate silhouettes, rotate textures in 360°, and use our internet AI vision engine to explain your design concept.</p>
+      </div>
+
+      <div class="grid-studio">
+        <div class="canvas-card">
+          <div class="canvas-header">
+            <span class="tag">3D Viewport • Live Render</span>
+            <div class="canvas-controls">
+              <button id="btn-rotate" title="Rotate">🔄</button>
+              <button id="btn-zoom-in" title="Zoom In">🔍+</button>
+              <button id="btn-zoom-out" title="Zoom Out">🔍-</button>
+            </div>
+          </div>
+
+          <div class="viewport">
+            <div id="dress-model-wrapper" class="dress-wrapper">
+              <img id="dress-image" src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=600&q=80" alt="3D Silhouette">
+              <div id="color-overlay" class="color-overlay"></div>
+            </div>
+          </div>
+
+          <div class="palette-picker">
+            <div class="palette-header">
+              <span>Interactive Color Tint</span>
+              <span id="hex-code" class="mono">#6B4E3D</span>
+            </div>
+            <div class="palette-controls">
+              <input type="color" id="color-picker" value="#6B4E3D">
+              <div class="swatches">
+                <button class="swatch" data-color="#6B4E3D" style="background: #6B4E3D;"></button>
+                <button class="swatch" data-color="#E8C5C8" style="background: #E8C5C8;"></button>
+                <button class="swatch" data-color="#8AA089" style="background: #8AA089;"></button>
+                <button class="swatch" data-color="#1C1A19" style="background: #1C1A19;"></button>
+                <button class="swatch" data-color="#FDFBF7" style="background: #FDFBF7;"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-stack">
+          <div class="panel">
+            <span class="subtitle">Select Base Silhouette</span>
+            <div class="silhouette-grid">
+              <button class="silhouette-btn active" data-img="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=600&q=80">Architectural Column</button>
+              <button class="silhouette-btn" data-img="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&w=600&q=80">Asymmetric Pleated A-Line</button>
+              <button class="silhouette-btn" data-img="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80">Draped Satin Ballgown</button>
+              <button class="silhouette-btn" data-img="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=600&q=80">Minimalist Silk Slip</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">✨ AI Internet Vision Search</div>
+            <p class="small-text">Search Pinterest, TikTok, Instagram, and Google data to automatically pull and generate inspiration moodboards.</p>
+            <form id="ai-form" class="ai-input-group">
+              <input type="text" id="ai-query" placeholder="e.g. vintage 1920s corseted silk gown..." required>
+              <button type="submit" class="btn-primary">Generate</button>
+            </form>
+            <div id="ai-gallery" class="ai-gallery">
+              <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=400&q=80" alt="AI Concept 1">
+              <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400&q=80" alt="AI Concept 2">
+              <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=400&q=80" alt="AI Concept 3">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="fabrics" class="tab-content">
+      <div class="section-title">
+        <span class="subtitle">Textile Library</span>
+        <h1>Choose From Over 100+ Master Fabrics</h1>
+        <p>Browse curated recommendations, rare silks, organzas, velvets, and hand-beaded embellishments.</p>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="fabric-search" placeholder="Search 100+ fabric names (e.g. Mulberry Silk, Velvet...)" class="search-input">
+        <div class="category-buttons">
+          <button class="filter-btn active" data-cat="All">All</button>
+          <button class="filter-btn" data-cat="Silks">Silks</button>
+          <button class="filter-btn" data-cat="Velvets">Velvets</button>
+          <button class="filter-btn" data-cat="Laces">Laces</button>
+          <button class="filter-btn" data-cat="Organza & Tulle">Organza & Tulle</button>
+        </div>
+      </div>
+
+      <div id="fabric-grid" class="fabric-grid">
+        </div>
+
+      <div class="embellishments-wrapper">
+        <div class="section-title">
+          <h2>Beading, Sequins & Hand Embroidery</h2>
+          <p>Select embellishment accents to be crafted by master artisans.</p>
+        </div>
+        <div class="embellishment-grid">
+          <div class="emb-card active">
+            <span class="icon">✨</span>
+            <h4>Hand-Beaded Swarovski Crystals</h4>
+            <p>Light-reflecting precision crystal work along corset seams.</p>
+          </div>
+          <div class="emb-card">
+            <span class="icon">🌟</span>
+            <h4>Micro Sequin Gradient Cascades</h4>
+            <p>Over 50,000 hand-sewn shimmering sequins forming ombre drapes.</p>
+          </div>
+          <div class="emb-card">
+            <span class="icon">🧵</span>
+            <h4>Gold & Silver Thread Embroidery</h4>
+            <p>Heritage bullion stitching with gold leaf highlights.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sizing" class="tab-content">
+      <div class="section-title">
+        <span class="subtitle">Precision Fit Technology</span>
+        <h1>Determine Your Bespoke Size</h1>
+      </div>
+
+      <div class="tab-toggle">
+        <button id="mode-ai-btn" class="toggle-btn active">AI Camera Body Detector</button>
+        <button id="mode-video-btn" class="toggle-btn">Video Measurement Guide</button>
+      </div>
+
+      <div id="ai-scanner-view" class="card-box text-center">
+        <div class="icon-circle">📷</div>
+        <h3>AI Camera Fit Analysis</h3>
+        <p class="small-text">Stand 5 feet away in fitting clothes. Our encrypted scanner analyzes silhouette contours to compute precise dress measurements.</p>
+        <button id="start-scan-btn" class="btn-primary large">Start Camera Scan</button>
+        
+        <div id="scan-results" class="results-box hidden">
+          <span class="badge">Scan Successful</span>
+          <p class="result-title">Bespoke Atelier Size 4 / US Small</p>
+          <div class="specs-grid">
+            <div>Bust: <strong>34.5 in (87.6 cm)</strong></div>
+            <div>Waist: <strong>26.0 in (66.0 cm)</strong></div>
+            <div>Hips: <strong>37.2 in (94.5 cm)</strong></div>
+            <div>Height: <strong>5 ft 8 in (173 cm)</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="video-guide-view" class="card-box hidden">
+        <div class="video-placeholder">
+          <span class="play-icon">▶</span>
+          <p>Atelier Tutorial: Step-by-Step Measuring Tape Technique</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="designers" class="tab-content">
+      <div class="section-title">
+        <span class="subtitle">Direct Consultation</span>
+        <h1>Connect With Global Designers</h1>
+      </div>
+
+      <div class="grid-designers">
+        <div class="designer-list">
+          <div class="designer-card active" data-name="Elena Vance-Amore" data-loc="Paris, France" data-img="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Elena">
+            <div>
+              <span class="small-text">Paris, France</span>
+              <h3>Elena Vance-Amore</h3>
+              <p>Haute Couture & Sculptural Silks</p>
+            </div>
+          </div>
+          <div class="designer-card" data-name="Sora Takahashi" data-loc="Tokyo, Japan" data-img="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" alt="Sora">
+            <div>
+              <span class="small-text">Tokyo, Japan</span>
+              <h3>Sora Takahashi</h3>
+              <p>Avant-Garde Architectural Drapes</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-card">
+          <div class="chat-header">
+            <div class="chat-user">
+              <img id="chat-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Avatar">
+              <div>
+                <h4 id="chat-designer-name">Elena Vance-Amore</h4>
+                <p id="chat-designer-loc" class="small-text">Maison Vance • Paris, France</p>
+              </div>
+            </div>
+            <div class="chat-actions">
+              <button title="FaceTime">🎥</button>
+              <button title="Call">📞</button>
+            </div>
+          </div>
+
+          <div id="chat-messages" class="chat-body">
+            <div class="msg designer">
+              <p>Bonjour! I am reviewing your preliminary 3D drape for the silk gown. The mulberry silk fabric choice will sit beautifully on your shoulders.</p>
+              <span class="time">10:14 AM</span>
+            </div>
+          </div>
+
+          <form id="chat-form" class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="Type message or ask about your dress design..." required>
+            <button type="submit" class="btn-primary">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="tracking" class="tab-content">
+      <div class="section-title">
+        <span class="subtitle">Live Delivery Logistics</span>
+        <h1>Track Your Package</h1>
+        <p>Waybill Ref: #ATG-8902-PARIS-NY</p>
+      </div>
+
+      <div class="card-box">
+        <div class="map-view">
+          <div class="route-line"></div>
+          <div class="map-node node-start">Paris Atelier</div>
+          <div class="map-node node-active">In Flight Transit</div>
+          <div class="map-node node-end">New York Studio</div>
+        </div>
+
+        <div class="tracking-steps">
+          <div class="step completed">
+            <span class="status">Completed</span>
+            <h4>Hand-Stitching & Audit</h4>
+            <p>Maison Vance, Paris</p>
+          </div>
+          <div class="step active">
+            <span class="status">Active Status</span>
+            <h4>International Air Priority</h4>
+            <p>Flight AF-008</p>
+          </div>
+          <div class="step upcoming">
+            <span class="status">Upcoming</span>
+            <h4>White-Glove Delivery</h4>
+            <p>Destination Address</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="clearance" class="tab-content">
+      <div class="section-title">
+        <span class="subtitle">Private Sale</span>
+        <h1>Atelier Clearance Archive</h1>
+      </div>
+
+      <div class="clearance-grid">
+        <div class="clearance-card">
+          <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=600&q=80" alt="Dress">
+          <h3>Rosé Silk Pleated Column</h3>
+          <div class="prices">
+            <span class="old">$2,400</span>
+            <span class="new">$890</span>
+          </div>
+          <button class="btn-primary full-width">Acquire Piece</button>
+        </div>
+        <div class="clearance-card">
+          <img src="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&w=600&q=80" alt="Dress">
+          <h3>Obsidian Velvet Tailored Gown</h3>
+          <div class="prices">
+            <span class="old">$3,100</span>
+            <span class="new">$1,150</span>
+          </div>
+          <button class="btn-primary full-width">Acquire Piece</button>
+        </div>
+        <div class="clearance-card">
+          <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80" alt="Dress">
+          <h3>Sage Leaf Chiffon Draped Slip</h3>
+          <div class="prices">
+            <span class="old">$1,850</span>
+            <span class="new">$620</span>
+          </div>
+          <button class="btn-primary full-width">Acquire Piece</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="checkout" class="tab-content">
+      <div class="section-title">
+        <span class="subtitle">Secure Commission</span>
+        <h1>Checkout & Payment Gateway</h1>
+      </div>
+
+      <div class="checkout-grid">
+        <form class="checkout-form panel">
+          <h3>Contact & Delivery Address</h3>
+          <div class="form-row">
+            <input type="text" placeholder="First Name" required>
+            <input type="text" placeholder="Last Name" required>
+          </div>
+          <input type="email" placeholder="Email Address" required>
+          <input type="text" placeholder="Shipping Street Address" required>
+
+          <h3>Payment Option</h3>
+          <div class="payment-methods">
+            <button type="button" class="pay-btn active">Credit Card</button>
+            <button type="button" class="pay-btn">Apple Pay</button>
+            <button type="button" class="pay-btn">Cash App</button>
+          </div>
+
+          <button type="submit" class="btn-primary large full-width">Complete Commission</button>
+        </form>
+
+        <div class="panel summary-panel">
+          <h3>Commission Summary</h3>
+          <div class="summary-line">
+            <span>Selected Fabric:</span>
+            <strong>Mulberry Silk Charmeuse</strong>
+          </div>
+          <div class="summary-line">
+            <span>Embellishment:</span>
+            <strong>Swarovski Crystals</strong>
+          </div>
+          <hr>
+          <div class="summary-line total">
+            <span>Total Deposit:</span>
+            <span>$1,450.00</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="reviews-section">
+      <div class="section-title">
+        <span class="subtitle">Client Satisfaction</span>
+        <h2>Leave an Atelier Review</h2>
+      </div>
+      <div class="review-box">
+        <div id="star-rating" class="stars">
+          <span data-star="1">★</span>
+          <span data-star="2">★</span>
+          <span data-star="3">★</span>
+          <span data-star="4">★</span>
+          <span data-star="5" class="active">★</span>
+        </div>
+        <button id="submit-review-btn" class="btn-primary">Submit 5-Star Rating</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p class="brand-footer">ATELIER GLOBAL — PARIS • TOKYO • MILAN • NEW YORK</p>
+    <p class="copy">© 2026 Atelier Global Inc. All Rights Reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

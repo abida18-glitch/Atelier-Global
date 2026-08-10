@@ -1,5 +1,5 @@
 /* --- Design Tokens & Variables --- */
-:root {
+/* :root {
   --color-bg: #FFFFFF;
   --color-text-primary: #1A1A1A;
   --color-accent-brown: #5C4033;
@@ -9,10 +9,10 @@
   --transition-smooth: 300ms ease-in-out;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-sans: 'Inter', sans-serif;
-}
+} */
 
 /* --- Global Reset & Base Styles --- */
-* {
+/* * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -24,10 +24,10 @@ body {
   font-family: var(--font-sans);
   min-height: 100vh;
   padding: 2rem;
-}
+} */
 
 /* --- Navigation --- */
-.navbar {
+/* .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,10 +55,10 @@ body {
 
 .nav-links a:hover {
   color: var(--color-accent-brown);
-}
+} */
 
 /* --- Layout Grid --- */
-.container {
+/* .container {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
@@ -68,10 +68,10 @@ body {
   .container {
     grid-template-columns: 2fr 1fr;
   }
-}
+} */
 
 /* --- Interactive Viewport --- */
-.viewport-card {
+/* .viewport-card {
   background-color: var(--color-neutral-grey);
   border-radius: 8px;
   height: 550px;
@@ -112,10 +112,10 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.15em;
   opacity: 0.6;
-}
+} */
 
 /* --- Control Panel --- */
-.controls-card {
+/* .controls-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -141,10 +141,10 @@ body {
   letter-spacing: 0.15em;
   font-weight: 500;
   margin-bottom: 0.75rem;
-}
+} */
 
 /* --- Color Swatches --- */
-.color-palette {
+/* .color-palette {
   display: flex;
   gap: 0.75rem;
   margin-bottom: 1rem;
@@ -188,10 +188,10 @@ body {
 
 .hex-input-group input:focus {
   border-color: var(--color-accent-brown);
-}
+} */
 
 /* --- Buttons --- */
-.button-group {
+/* .button-group {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -239,4 +239,129 @@ body {
 .checkout-wrapper {
   padding-top: 1rem;
   border-top: 1px solid var(--color-neutral-grey);
+} */
+
+/* --- Design Tokens & Variables --- */
+:root {
+  --color-bg: #FDFBF7;
+  --color-sand: #F5F0EB;
+  --color-text-primary: #3A2E2B;
+  --color-taupe: #8C7A6B;
+  --color-sage: #4A6B53;
+  --color-sage-light: #E8EFE9;
+  --color-border: #E6DDD3;
+  --transition-smooth: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --font-serif: 'Didot', 'Bodoni MT', 'Cinzel', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* --- Global Reset & Base Styles --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+/* --- Distinct Rounded Bubble Navigation Buttons --- */
+.nav-btn {
+  padding: 0.55rem 1.15rem;
+  border-radius: 9999px; /* Rounded pill / bubble shape */
+  font-size: 0.725rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-taupe);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-smooth);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.nav-btn:hover {
+  background-color: #ffffff;
+  color: var(--color-text-primary);
+  border-color: var(--color-taupe);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.nav-btn.active {
+  background-color: var(--color-text-primary) !important;
+  color: var(--color-bg) !important;
+  border-color: var(--color-text-primary) !important;
+  box-shadow: 0 4px 12px rgba(58, 46, 43, 0.22);
+}
+
+/* --- General Control Buttons & Swatches --- */
+.section-label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-taupe);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.avatar-option-btn,
+.avatar-pose-btn,
+.option-btn,
+.texture-btn,
+.cam-btn,
+.filter-btn,
+.sidebar-tab-btn {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  transition: all var(--transition-smooth);
+  cursor: pointer;
+}
+
+.avatar-option-btn:hover,
+.avatar-pose-btn:hover,
+.option-btn:hover,
+.texture-btn:hover,
+.cam-btn:hover,
+.filter-btn:hover,
+.sidebar-tab-btn:hover {
+  border-color: var(--color-taupe);
+}
+
+.avatar-option-btn.active,
+.avatar-pose-btn.active,
+.option-btn.active,
+.texture-btn.active,
+.cam-btn.active,
+.filter-btn.active,
+.sidebar-tab-btn.active {
+  background-color: var(--color-text-primary);
+  color: var(--color-bg);
+  border-color: var(--color-text-primary);
+}
+
+.skin-btn {
+  transition: transform var(--transition-smooth), border-color var(--transition-smooth);
+}
+
+.skin-btn:hover {
+  transform: scale(1.06);
+}
+
+.skin-btn.active {
+  border-color: var(--color-text-primary) !important;
+  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-text-primary);
 }

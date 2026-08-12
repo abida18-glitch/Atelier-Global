@@ -35,448 +35,470 @@
 </head>
 <body class="bg-cream text-charcoal font-sans antialiased flex flex-col min-h-screen">
 
-    <div id="toast" class="hidden fixed top-5 right-5 z-50 bg-charcoal text-cream px-5 py-3 rounded shadow-2xl text-xs uppercase tracking-widest flex items-center gap-3 transition-opacity duration-300">
-        <span id="toast-message">Notification</span>
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden bg-charcoal text-cream px-5 py-3 rounded-xl shadow-2xl text-xs tracking-wider transition-all duration-300">
+        <span id="toast-message">Notification message</span>
     </div>
 
-    <header class="sticky top-0 z-40 bg-cream/90 backdrop-blur-md border-b border-[#E6DDD3] px-6 py-4">
-        <div class="max-w-7xl mx-auto flex flex-col xl:flex-row justify-between items-center gap-5">
-            <div class="flex items-center gap-3">
-                <span class="font-serif text-2xl tracking-[0.2em] font-light uppercase">Atelier Global</span>
-                <span class="bg-sage-light text-sage text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-full font-medium">Haute Couture</span>
-            </div>
+    <header class="navbar bg-cream/90 backdrop-blur-md sticky top-0 z-40 border-b border-[#E6DDD3] px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <span class="font-serif text-xl tracking-widest font-semibold uppercase">Atelier Global</span>
+            <span class="text-[9px] uppercase tracking-widest bg-sand px-2 py-0.5 rounded text-taupe border border-[#E6DDD3]">Bespoke Studio</span>
+        </div>
 
-            <nav class="flex flex-wrap justify-center gap-3 overflow-x-auto w-full xl:w-auto p-2 bg-sand/60 rounded-full border border-[#E6DDD3]/70" id="main-nav">
-                <button data-tab="doll" class="nav-btn active">3D Doll Customizer</button>
-                <button data-tab="studio" class="nav-btn">3D Dress Designer</button>
-                <button data-tab="fabrics" class="nav-btn">100+ Fabrics</button>
-                <button data-tab="embellishments" class="nav-btn">Embellishments</button>
-                <button data-tab="sizing" class="nav-btn">AI Size Fit</button>
-                <button data-tab="designers" class="nav-btn">Designers Chat</button>
-                <button data-tab="tracking" class="nav-btn">Route Map</button>
-                <button data-tab="clearance" class="nav-btn">Clearance</button>
-                <button data-tab="checkout" class="nav-btn">Commission</button>
-            </nav>
+        <nav id="main-nav" class="hidden lg:flex items-center space-x-1">
+            <button data-tab="doll" class="nav-btn active px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-all hover:bg-sand">3D Fitting</button>
+            <button data-tab="fabrics" class="nav-btn px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-all hover:bg-sand">Fabrics</button>
+            <button data-tab="embellishments" class="nav-btn px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-all hover:bg-sand">Embellishments</button>
+            <button data-tab="ai-size" class="nav-btn px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-all hover:bg-sand">AI Size Fit</button>
+            <button data-tab="commission" class="nav-btn px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-all hover:bg-sand">Commission</button>
+            <button data-tab="checkout" class="nav-btn px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-all hover:bg-sand">Checkout</button>
+            <button data-tab="tracking" class="nav-btn px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-all hover:bg-sand">Live Tracking</button>
+            <button data-tab="clearance" class="nav-btn px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-all hover:bg-sand">Clearance</button>
+            <button data-tab="chat" class="nav-btn px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-all hover:bg-sand">AI Chat</button>
+        </nav>
+
+        <div class="flex items-center space-x-3">
+            <button id="nav-auth-status" class="text-xs uppercase tracking-wider px-3 py-1.5 bg-sand rounded-lg border border-[#E6DDD3] hover:border-charcoal transition-all">Sign In</button>
         </div>
     </header>
 
-    <main class="max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex-1">
+    <main class="flex-grow p-6 max-w-7xl mx-auto w-full">
 
         <section id="view-doll" class="tab-view active space-y-6">
-            <div class="text-center max-w-xl mx-auto">
-                <span class="section-label">Interactive Avatar Studio</span>
-                <h1 class="font-serif text-3xl my-1">Customize Your 3D Doll Model</h1>
-                <p class="text-xs text-taupe">Rotate 360°, zoom in/out, modify body frame, skin shade, height, and display pose prior to tailoring your dress.</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-xl p-5 shadow-sm space-y-5">
-                    <div>
-                        <label class="section-label">Doll Body Proportions</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button data-avatar-type="petite" class="avatar-option-btn active">Petite</button>
-                            <button data-avatar-type="classic" class="avatar-option-btn">Classic</button>
-                            <button data-avatar-type="curvy" class="avatar-option-btn">Curvy</button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="section-label">Skin Tone Palette</label>
-                        <div class="grid grid-cols-5 gap-2">
-                            <button data-avatar-skin="#F5D0C5" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#F5D0C5] active"></button>
-                            <button data-avatar-skin="#E0AC69" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#E0AC69]"></button>
-                            <button data-avatar-skin="#C68642" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#C68642]"></button>
-                            <button data-avatar-skin="#8D5524" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#8D5524]"></button>
-                            <button data-avatar-skin="#3C2011" class="skin-btn rounded-lg h-9 border border-[#E6DDD3] bg-[#3C2011]"></button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="section-label">Height Scaling</label>
-                        <input type="range" id="avatar-height-slider" min="0.8" max="1.2" step="0.05" value="1.0" class="w-full accent-charcoal cursor-pointer">
-                    </div>
-
-                    <div>
-                        <label class="section-label">Studio Stance</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button data-avatar-pose="runway" class="avatar-pose-btn active">Runway Pose</button>
-                            <button data-avatar-pose="poseA" class="avatar-pose-btn">A-Pose Stance</button>
-                        </div>
-                    </div>
-
-                    <button id="go-to-design-btn" class="w-full py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded-lg mt-4 hover:bg-taupe transition-all">
-                        Proceed to Dress Designer ➔
-                    </button>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="section-label">Interactive Virtual Studio</span>
+                    <h1 class="font-serif text-3xl">Parametric 3D Mannequin & Dress Customizer</h1>
+                    <p class="text-xs text-taupe mt-1">Sculpt body proportions and preview dynamic crimson dress overlays in realtime 3D space.</p>
                 </div>
-
-                <div class="lg:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl h-[540px] relative overflow-hidden shadow-inner">
-                    <div class="absolute top-4 left-4 z-10 bg-cream/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-[#E6DDD3] text-[10px] uppercase tracking-widest">
-                        3D Interactive Doll • Drag to Rotate 360° • Scroll to Zoom
-                    </div>
-                    <div id="doll-canvas-container" class="w-full h-full"></div>
+                <div class="flex items-center space-x-2">
+                    <button id="reset-cam-btn" class="px-3 py-2 bg-sand border border-[#E6DDD3] text-[10px] uppercase rounded-lg hover:border-charcoal">Reset View</button>
                 </div>
             </div>
-        </section>
 
-        <section id="view-studio" class="tab-view hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-xl p-5 shadow-sm space-y-6">
-                    <div class="flex border-b border-[#E6DDD3] pb-3 gap-2">
-                        <button id="sidebar-tab-1" data-sidebar-tab="I" class="sidebar-tab-btn active">I. Silhouette</button>
-                        <button id="sidebar-tab-2" data-sidebar-tab="II" class="sidebar-tab-btn">II. Textures & AI</button>
-                        <!-- <button id="sidebar-tab-3" data-sidebar-tab="III" class="sidebar-tab-btn">III. Live Map</button> -->
-                    </div>
-
-                    <div id="sidebar-content-I" class="sidebar-content active space-y-5">
-                        <div>
-                            <label class="section-label">Base Silhouette</label>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button data-silhouette="a-line" class="option-btn active">A-Line</button>
-                                <button data-silhouette="column" class="option-btn">Column</button>
-                                <button data-silhouette="ballgown" class="option-btn">Ballgown</button>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-8 bg-sand border border-[#E6DDD3] rounded-2xl overflow-hidden relative h-[520px] shadow-sm flex items-center justify-center" id="doll-canvas-container">
+                    <div class="absolute top-4 right-4 bg-cream/90 backdrop-blur-md p-4 rounded-xl border border-[#E6DDD3] shadow-lg w-72 space-y-3 z-10">
+                        <h4 class="font-serif text-xs font-semibold uppercase tracking-wider border-b border-[#E6DDD3] pb-1.5">Mannequin Sculptor</h4>
+                        <div class="space-y-2 text-[11px]">
+                            <div>
+                                <div class="flex justify-between text-taupe mb-1"><span>Total Height</span><span id="val-height">1.00x</span></div>
+                                <input type="range" id="slider-height" min="0.8" max="1.2" step="0.01" value="1.0" class="w-full accent-charcoal">
                             </div>
-                        </div>
-
-                        <div>
-                            <label class="section-label">Neckline Cut</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button data-neckline="sweetheart" class="option-btn active">Sweetheart</button>
-                                <button data-neckline="v-neck" class="option-btn">V-Neck</button>
+                            <div>
+                                <div class="flex justify-between text-taupe mb-1"><span>Bust Circumference</span><span id="val-bust">1.00x</span></div>
+                                <input type="range" id="slider-bust" min="0.8" max="1.4" step="0.01" value="1.0" class="w-full accent-charcoal">
                             </div>
-                        </div>
-
-                        <div>
-                            <label class="section-label">Sleeve Style</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button data-sleeve="sleeveless" class="option-btn active">Sleeveless</button>
-                                <button data-sleeve="long" class="option-btn">Long Sleeve</button>
+                            <div>
+                                <div class="flex justify-between text-taupe mb-1"><span>Waist Circumference</span><span id="val-waist">1.00x</span></div>
+                                <input type="range" id="slider-waist" min="0.7" max="1.3" step="0.01" value="1.0" class="w-full accent-charcoal">
                             </div>
-                        </div>
-
-                        <div class="pt-2 border-t border-[#E6DDD3]">
-                            <label class="section-label">Cinematic Camera Presets</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button data-cam="360" class="cam-btn active">1) 360° Rotate</button>
-                                <button data-cam="top" class="cam-btn">2) High-Angle Top</button>
-                                <button data-cam="front" class="cam-btn">3) Studio Front</button>
-                                <button data-cam="macro" class="cam-btn">4) Macro Close-up</button>
+                            <div>
+                                <div class="flex justify-between text-taupe mb-1"><span>Hips Circumference</span><span id="val-hips">1.00x</span></div>
+                                <input type="range" id="slider-hips" min="0.8" max="1.4" step="0.01" value="1.0" class="w-full accent-charcoal">
                             </div>
                         </div>
                     </div>
-
-                    <div id="sidebar-content-II" class="sidebar-content hidden space-y-5">
-                        <div>
-                            <label class="section-label">Interactive Color Wheel Picker</label>
-                            <div class="flex items-center gap-3 bg-cream p-2.5 rounded-lg border border-[#E6DDD3]">
-                                <input type="color" id="fabric-color-picker" value="#6B4E3D" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent">
-                                <span id="fabric-color-hex" class="font-mono text-xs uppercase">#6B4E3D</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="section-label">3D Shader Texture Finish</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button data-texture="Silk" class="texture-btn active">Mulberry Silk</button>
-                                <button data-texture="Satin" class="texture-btn">Duchess Satin</button>
-                                <button data-texture="Velvet" class="texture-btn">Lyons Velvet</button>
-                                <button data-texture="Lace" class="texture-btn">Chantilly Lace</button>
-                                <button data-texture="Leather" class="texture-btn">Fine Leather</button>
-                            </div>
-                        </div>
-
-                        <div class="pt-4 border-t border-[#E6DDD3] space-y-3">
-                            <div class="flex items-center justify-between">
-                                <label class="section-label">✨ AI Dress Generator & Pinterest Engine</label>
-                                <span class="text-[9px] bg-charcoal text-white px-2 py-0.5 rounded-full uppercase">Live AI API</span>
-                            </div>
-                            <p class="text-[11px] text-taupe">Type a prompt to synthesize custom dress concepts or crawl Pinterest/Web trends in real-time.</p>
-
-                            <div class="flex flex-wrap gap-1.5" id="ai-preset-tags">
-                                <button type="button" class="preset-tag-btn" data-prompt="1920s corseted silk gown with gold lace">Vintage Silk</button>
-                                <button type="button" class="preset-tag-btn" data-prompt="royal emerald green velvet ballgown photoshoot">Royal Ballgown</button>
-                                <button type="button" class="preset-tag-btn" data-prompt="minimalist boho lace bridal dress with train">Boho Lace</button>
-                                <button type="button" class="preset-tag-btn" data-prompt="gothic black satin gown floral embellishments">Gothic Satin</button>
-                            </div>
-
-                            <form id="ai-search-form" class="space-y-2">
-                                <div class="flex gap-2">
-                                    <input type="text" id="ai-input" placeholder="e.g. Burgundy corseted silk gown with pearl beads..." class="flex-1 px-3 py-2 text-xs bg-cream border border-[#E6DDD3] rounded-lg focus:outline-none focus:border-charcoal">
-                                    <button type="submit" id="ai-generate-btn" class="px-4 py-2 bg-charcoal text-white text-xs rounded-lg hover:bg-taupe transition-colors flex items-center gap-1">
-                                        <span id="ai-btn-text">Generate</span>
-                                    </button>
-                                </div>
-
-                                <div class="flex gap-2 text-[10px]">
-                                    <label class="flex items-center gap-1 text-taupe cursor-pointer">
-                                        <input type="radio" name="ai-source" value="ai" checked class="accent-charcoal"> AI Image Synthesizer
-                                    </label>
-                                    <label class="flex items-center gap-1 text-taupe cursor-pointer">
-                                        <input type="radio" name="ai-source" value="pinterest" class="accent-charcoal"> Pinterest & Web Crawl
-                                    </label>
-                                </div>
-                            </form>
-
-                            <div id="ai-results-wrapper" class="relative min-h-[120px] bg-cream/60 rounded-xl p-2 border border-[#E6DDD3]/80">
-                                <div id="ai-loading-spinner" class="hidden absolute inset-0 bg-cream/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-xl">
-                                    <div class="w-6 h-6 border-2 border-charcoal border-t-transparent rounded-full animate-spin"></div>
-                                    <span class="text-[10px] text-taupe uppercase tracking-widest mt-2">Generating Dress Art...</span>
-                                </div>
-
-                                <div id="ai-results" class="grid grid-cols-3 gap-2">
-                                    <div class="group relative rounded-lg overflow-hidden border border-[#E6DDD3] cursor-pointer">
-                                        <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=400&q=80" alt="Ref 1" class="w-full h-24 object-cover group-hover:scale-105 transition-transform">
-                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <button class="apply-color-btn text-[9px] bg-cream text-charcoal px-2 py-1 rounded font-medium shadow" data-color="#3A2E2B">Apply Color</button>
-                                        </div>
-                                    </div>
-                                    <div class="group relative rounded-lg overflow-hidden border border-[#E6DDD3] cursor-pointer">
-                                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400&q=80" alt="Ref 2" class="w-full h-24 object-cover group-hover:scale-105 transition-transform">
-                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <button class="apply-color-btn text-[9px] bg-cream text-charcoal px-2 py-1 rounded font-medium shadow" data-color="#E8C5C8">Apply Color</button>
-                                        </div>
-                                    </div>
-                                    <div class="group relative rounded-lg overflow-hidden border border-[#E6DDD3] cursor-pointer">
-                                        <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=400&q=80" alt="Ref 3" class="w-full h-24 object-cover group-hover:scale-105 transition-transform">
-                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <button class="apply-color-btn text-[9px] bg-cream text-charcoal px-2 py-1 rounded font-medium shadow" data-color="#4A6B53">Apply Color</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="sidebar-content-III" class="sidebar-content hidden space-y-4">
-                        <label class="section-label">Digital Crafting Timeline</label>
-                        <div class="space-y-3 text-xs">
-                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded-lg">
-                                <span class="font-medium">1. 3D Digital Modeling</span>
-                                <span class="text-[9px] uppercase px-2.5 py-0.5 rounded-full bg-sage-light text-sage font-medium">Active</span>
-                            </div>
-                            <div class="flex items-center justify-between p-2.5 bg-cream border border-[#E6DDD3] rounded-lg">
-                                <span class="font-medium">2. Virtual Pattern Tailoring</span>
-                                <span class="text-[9px] uppercase px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-400 font-medium">Pending</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button id="open-review-btn" class="w-full py-2.5 border border-charcoal text-charcoal text-xs uppercase tracking-widest rounded-lg hover:bg-charcoal hover:text-white transition-all">
-                        ★ Rate Atelier Experience
-                    </button>
                 </div>
 
-                <div class="lg:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl h-[580px] relative overflow-hidden shadow-inner">
-                    <div class="absolute top-4 left-4 z-10 bg-cream/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-[#E6DDD3] text-[10px] uppercase tracking-widest">
-                        Interactive 3D Viewport • Drag to Rotate 360° • Zoom Supported
+                <div class="lg:col-span-4 bg-sand border border-[#E6DDD3] rounded-2xl p-6 space-y-5 overflow-y-auto max-h-[520px]">
+                    <h3 class="font-serif text-sm font-semibold uppercase tracking-wider border-b border-[#E6DDD3] pb-2">Garment Architectural Detail</h3>
+                    
+                    <div class="space-y-4 text-xs">
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1.5">Silhouette Style</label>
+                            <div class="grid grid-cols-3 gap-1.5">
+                                <button data-silhouette="a-line" class="option-btn active p-2 rounded border border-[#E6DDD3] bg-cream text-center text-[10px]">A-Line</button>
+                                <button data-silhouette="ballgown" class="option-btn p-2 rounded border border-[#E6DDD3] bg-cream text-center text-[10px]">Ballgown</button>
+                                <button data-silhouette="column" class="option-btn p-2 rounded border border-[#E6DDD3] bg-cream text-center text-[10px]">Column</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1.5">Neckline Contour</label>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <button data-neckline="sweetheart" class="option-btn active p-2 rounded border border-[#E6DDD3] bg-cream text-center text-[10px]">Sweetheart</button>
+                                <button data-neckline="v-neck" class="option-btn p-2 rounded border border-[#E6DDD3] bg-cream text-center text-[10px]">V-Neck</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1.5">Sleeve Structure</label>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <button data-sleeve="sleeveless" class="option-btn active p-2 rounded border border-[#E6DDD3] bg-cream text-center text-[10px]">Sleeveless</button>
+                                <button data-sleeve="long" class="option-btn p-2 rounded border border-[#E6DDD3] bg-cream text-center text-[10px]">Long Sleeve</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1.5">Fabric Shade & Tint</label>
+                            <div class="flex items-center space-x-3">
+                                <input type="color" id="fabric-color-picker" value="#990033" class="w-10 h-10 rounded border border-[#E6DDD3] cursor-pointer bg-transparent">
+                                <span id="fabric-color-hex" class="text-xs font-mono">#990033</span>
+                            </div>
+                        </div>
+
+                        <button id="proceed-fabrics-btn" class="w-full py-3 bg-charcoal text-cream uppercase text-[10px] tracking-[0.2em] rounded-xl hover:bg-taupe transition-all">
+                            Proceed to Fabric Selection &rarr;
+                        </button>
                     </div>
-                    <div id="webgl-error" class="hidden absolute inset-0 bg-cream/95 z-20 flex flex-col items-center justify-center p-6 text-center">
-                        <p class="font-serif text-lg text-charcoal">3D Acceleration Unavailable</p>
-                        <p class="text-xs text-taupe mt-1">Please ensure WebGL is enabled in your browser settings.</p>
-                    </div>
-                    <div id="three-canvas-container" class="w-full h-full"></div>
                 </div>
             </div>
         </section>
 
         <section id="view-fabrics" class="tab-view hidden space-y-6">
-            <div class="text-center max-w-xl mx-auto">
-                <span class="section-label">Curated Master Textiles</span>
-                <h1 class="font-serif text-3xl my-1">Over 100+ Master Fabrics</h1>
-                <p class="text-xs text-taupe">Search, filter, and choose from over 100 rare silks, laces, velvets, and organza weaves.</p>
+            <div class="text-center max-w-xl mx-auto space-y-2">
+                <span class="section-label">Textile Vault</span>
+                <h1 class="font-serif text-3xl">100+ Couture Fabrics & Swatches</h1>
+                <p class="text-xs text-taupe">Inspect high-grade silk, velvet, lace, and tulle. Filter by classification and select exact yard requirements for your commission.</p>
             </div>
-            <div class="flex flex-col md:flex-row gap-4 justify-between bg-sand p-4 rounded-xl border border-[#E6DDD3]">
-                <input type="text" id="fabric-search-input" placeholder="Search 100+ fabric names..." class="flex-1 px-4 py-2 bg-cream border border-[#E6DDD3] rounded-lg text-xs focus:outline-none">
-                <div class="flex gap-2 overflow-x-auto" id="fabric-cat-filters">
-                    <button data-cat="All" class="filter-btn active">All</button>
-                    <button data-cat="Silks" class="filter-btn">Silks</button>
-                    <button data-cat="Velvets" class="filter-btn">Velvets</button>
-                    <button data-cat="Laces" class="filter-btn">Laces</button>
-                    <button data-cat="Organza & Tulle" class="filter-btn">Organza & Tulle</button>
+
+            <div class="flex flex-col md:flex-row gap-3 justify-between items-center bg-sand p-4 rounded-xl border border-[#E6DDD3]">
+                <input type="text" id="fabric-search-input" placeholder="Search fabrics by name..." class="w-full md:w-80 p-2.5 bg-cream border border-[#E6DDD3] rounded-lg text-xs focus:outline-none focus:border-charcoal">
+                
+                <div id="fabric-cat-filters" class="flex flex-wrap gap-1.5">
+                    <button data-cat="All" class="filter-btn active px-3 py-1.5 bg-charcoal text-cream text-[10px] uppercase tracking-wider rounded-lg">All</button>
+                    <button data-cat="Silks" class="filter-btn px-3 py-1.5 bg-cream border border-[#E6DDD3] text-[10px] uppercase tracking-wider rounded-lg">Silks</button>
+                    <button data-cat="Velvets" class="filter-btn px-3 py-1.5 bg-cream border border-[#E6DDD3] text-[10px] uppercase tracking-wider rounded-lg">Velvets</button>
+                    <button data-cat="Laces" class="filter-btn px-3 py-1.5 bg-cream border border-[#E6DDD3] text-[10px] uppercase tracking-wider rounded-lg">Laces</button>
+                    <button data-cat="Organza & Tulle" class="filter-btn px-3 py-1.5 bg-cream border border-[#E6DDD3] text-[10px] uppercase tracking-wider rounded-lg">Organza</button>
                 </div>
             </div>
-            <div id="fabric-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-[500px] overflow-y-auto pr-2"></div>
+
+            <div class="bg-sand p-6 rounded-2xl border border-[#E6DDD3] flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <h4 class="font-serif text-sm font-semibold">Have a reference fabric photograph or swatch?</h4>
+                    <p class="text-xs text-taupe">Upload a direct gallery photo or capture via camera with notes for our sourcing team.</p>
+                </div>
+                <div class="flex items-center space-x-3 w-full md:w-auto">
+                    <input type="file" id="custom-fabric-upload" accept="image/*" class="hidden">
+                    <button onclick="document.getElementById('custom-fabric-upload').click()" class="px-4 py-2.5 bg-cream border border-[#E6DDD3] text-xs uppercase tracking-wider rounded-lg hover:border-charcoal">Upload Swatch</button>
+                    <input type="text" id="custom-fabric-note" placeholder="Describe weave/color..." class="p-2.5 bg-cream border border-[#E6DDD3] rounded-lg text-xs w-48 focus:outline-none">
+                    <button id="submit-custom-fabric" class="px-4 py-2.5 bg-charcoal text-cream text-xs uppercase tracking-wider rounded-lg">Submit</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="fabric-grid"></div>
         </section>
 
         <section id="view-embellishments" class="tab-view hidden space-y-6">
-            <div class="text-center max-w-xl mx-auto">
-                <span class="section-label">Handcrafted Artisanship</span>
-                <h1 class="font-serif text-3xl my-1">Embellishments & Sequences</h1>
+            <div class="text-center max-w-xl mx-auto space-y-2">
+                <span class="section-label">Ornamentation Library</span>
+                <h1 class="font-serif text-3xl">100+ Haute Couture Embellishments</h1>
+                <p class="text-xs text-taupe">Browse handcrafted pearls, Swarovski crystals, metallic bullion threads, and lace appliqués.</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-sand p-5 border border-[#E6DDD3] rounded-xl space-y-3">
-                    <h3 class="font-serif text-lg">Swarovski Beading</h3>
-                    <button class="embellish-select-btn w-full py-2 bg-charcoal text-white text-xs uppercase tracking-widest rounded-lg" data-name="Swarovski Beading">Select Beading</button>
+
+            <div class="flex flex-col md:flex-row gap-3 justify-between items-center bg-sand p-4 rounded-xl border border-[#E6DDD3]">
+                <input type="text" id="embellish-search-input" placeholder="Search embellishments..." class="w-full md:w-80 p-2.5 bg-cream border border-[#E6DDD3] rounded-lg text-xs focus:outline-none focus:border-charcoal">
+                <div id="embellish-cat-filters" class="flex flex-wrap gap-1.5">
+                    <button data-cat="All" class="filter-btn active px-3 py-1.5 bg-charcoal text-cream text-[10px] uppercase tracking-wider rounded-lg">All</button>
+                    <button data-cat="Pearls" class="filter-btn px-3 py-1.5 bg-cream border border-[#E6DDD3] text-[10px] uppercase tracking-wider rounded-lg">Pearls</button>
+                    <button data-cat="Crystals" class="filter-btn px-3 py-1.5 bg-cream border border-[#E6DDD3] text-[10px] uppercase tracking-wider rounded-lg">Crystals</button>
+                    <button data-cat="Threads" class="filter-btn px-3 py-1.5 bg-cream border border-[#E6DDD3] text-[10px] uppercase tracking-wider rounded-lg">Threads</button>
                 </div>
             </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="embellish-grid"></div>
         </section>
 
-        <section id="view-sizing" class="tab-view hidden max-w-2xl mx-auto space-y-6">
-            <div class="text-center">
-                <span class="section-label">Precision Fit Technology</span>
-                <h1 class="font-serif text-3xl my-1">AI Size & Fit Detection</h1>
+        <section id="view-ai-size" class="tab-view hidden space-y-6">
+            <div class="text-center max-w-xl mx-auto space-y-2">
+                <span class="section-label">Precision Biometric Engine</span>
+                <h1 class="font-serif text-3xl">AI Size Fit & Camera Scanner</h1>
+                <p class="text-xs text-taupe">Use our computer vision camera sensor or follow our master tailor measurement charts to guarantee zero-alteration fitting.</p>
             </div>
-            <div class="bg-sand p-8 rounded-xl border border-[#E6DDD3] text-center space-y-4">
-                <div id="camera-box" class="w-full h-48 bg-cream border border-dashed border-taupe rounded-lg flex items-center justify-center p-4">
-                    <span id="camera-status" class="text-xs text-taupe">Camera feed offline</span>
-                </div>
-                <button id="start-scan-btn" class="px-6 py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded-lg">Start AI Camera Scan</button>
-                <div id="scan-results" class="hidden p-4 bg-cream border border-sage rounded-lg text-left space-y-2">
-                    <p class="font-serif text-lg text-charcoal">Calculated Fit: Size US 4</p>
-                </div>
-            </div>
-        </section>
 
-        <section id="view-designers" class="tab-view hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                <div class="md:col-span-5 space-y-3">
-                    <span class="section-label">Master Artisans Showcase</span>
-                    <div class="p-4 bg-sand border border-charcoal rounded-xl flex items-center gap-4">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-12 h-12 rounded-full object-cover" alt="Elena">
-                        <div>
-                            <h4 class="font-serif text-base">Elena Vance-Amore</h4>
-                            <p class="text-xs text-taupe">Paris, France • Lead Designer</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-sand border border-[#E6DDD3] rounded-2xl p-6 space-y-4 flex flex-col items-center justify-center text-center">
+                    <div class="w-full h-64 bg-charcoal/5 rounded-xl border-2 border-dashed border-[#E6DDD3] flex flex-col items-center justify-center relative overflow-hidden" id="camera-viewport-box">
+                        <video id="webcam-feed" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden"></video>
+                        <div id="camera-placeholder-text" class="space-y-2 p-4">
+                            <span class="text-2xl">📷</span>
+                            <h4 class="font-serif text-sm font-semibold">AI Camera Vision Offline</h4>
+                            <p class="text-[11px] text-taupe">Activate webcam to perform live skeletal proportion mapping.</p>
                         </div>
                     </div>
-                </div>
-                <div class="md:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl p-5 flex flex-col h-[450px]">
-                    <div id="chat-messages" class="flex-1 overflow-y-auto py-4 space-y-3">
-                        <div class="p-3 bg-cream border border-[#E6DDD3] rounded-lg text-xs max-w-xs">Bonjour! Reviewing your 3D drape selection.</div>
+                    <div class="flex space-x-3 w-full">
+                        <button id="start-camera-btn" class="flex-1 py-3 bg-charcoal text-cream text-xs uppercase tracking-wider rounded-lg hover:bg-taupe transition-all">Turn On Camera</button>
+                        <button id="capture-scan-btn" class="flex-1 py-3 bg-sage text-cream text-xs uppercase tracking-wider rounded-lg hidden">Run AI Scan</button>
                     </div>
-                    <form id="chat-form" class="flex gap-2 pt-3 border-t border-[#E6DDD3]">
-                        <input type="text" id="chat-input" placeholder="Type message..." class="flex-1 px-3 py-2 bg-cream border border-[#E6DDD3] rounded-lg text-xs focus:outline-none">
-                        <button type="submit" class="px-4 py-2 bg-charcoal text-white text-xs rounded-lg">Send</button>
-                    </form>
                 </div>
+
+                <div class="bg-sand border border-[#E6DDD3] rounded-2xl p-6 space-y-4">
+                    <h3 class="font-serif text-sm font-semibold uppercase tracking-wider border-b border-[#E6DDD3] pb-2">Biometric Measurements</h3>
+                    <div class="space-y-3 text-xs">
+                        <div class="flex justify-between p-3 bg-cream border border-[#E6DDD3] rounded-lg">
+                            <span class="text-taupe">Bust Span</span>
+                            <span id="bio-bust" class="font-mono font-semibold">34.5 in</span>
+                        </div>
+                        <div class="flex justify-between p-3 bg-cream border border-[#E6DDD3] rounded-lg">
+                            <span class="text-taupe">Natural Waist</span>
+                            <span id="bio-waist" class="font-mono font-semibold">26.0 in</span>
+                        </div>
+                        <div class="flex justify-between p-3 bg-cream border border-[#E6DDD3] rounded-lg">
+                            <span class="text-taupe">Hip Circumference</span>
+                            <span id="bio-hip" class="font-mono font-semibold">37.0 in</span>
+                        </div>
+                        <div class="flex justify-between p-3 bg-cream border border-[#E6DDD3] rounded-lg">
+                            <span class="text-taupe">Recommended Size Profile</span>
+                            <span id="bio-size" class="font-mono font-semibold text-sage">FR 36 / US 4</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-taupe leading-relaxed">Our AI camera measures silhouette contours with sub-millimeter precision. Certified by European Haute Couture Guild standards.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-commission" class="tab-view hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="section-label">Global Master Network</span>
+                    <h1 class="font-serif text-3xl">Commission an International Designer</h1>
+                    <p class="text-xs text-taupe mt-1">Search master pattern makers across Paris, Milan, Tokyo, and New York.</p>
+                </div>
+                <button id="open-designer-signup-btn" class="px-4 py-2.5 bg-charcoal text-cream text-xs uppercase tracking-wider rounded-xl">Register as Designer</button>
+            </div>
+
+            <div class="flex gap-3 bg-sand p-4 rounded-xl border border-[#E6DDD3]">
+                <input type="text" id="designer-search-input" placeholder="Search by designer name, country (e.g. Paris), or specialty..." class="w-full p-2.5 bg-cream border border-[#E6DDD3] rounded-lg text-xs focus:outline-none focus:border-charcoal">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="designer-grid"></div>
+        </section>
+
+        <section id="view-checkout" class="tab-view hidden space-y-6 max-w-3xl mx-auto">
+            <div class="text-center space-y-2">
+                <span class="section-label">Secure Transaction</span>
+                <h1 class="font-serif text-3xl">Haute Couture Checkout</h1>
+                <p class="text-xs text-taupe">Review your selected dress specifications, fabric yardage, embellishments, and apply VIP discount coupons.</p>
+            </div>
+
+            <div class="bg-sand border border-[#E6DDD3] rounded-2xl p-6 md:p-8 space-y-6">
+                <div class="space-y-3 border-b border-[#E6DDD3] pb-6">
+                    <h3 class="font-serif text-xs font-semibold uppercase tracking-wider text-taupe">Cart Summary</h3>
+                    <div id="checkout-cart-items" class="space-y-2 text-xs">
+                        </div>
+                    <div class="flex justify-between font-serif text-base font-bold pt-3 border-t border-[#E6DDD3]">
+                        <span>Total Commission Investment</span>
+                        <span id="checkout-total-price">$3,450.00</span>
+                    </div>
+                </div>
+
+                <form id="checkout-form" class="space-y-4 text-xs">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Full Name</label>
+                            <input type="text" required placeholder="Elena Rostova" class="w-full p-3 bg-cream border border-[#E6DDD3] rounded-lg focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Contact Phone</label>
+                            <input type="tel" required placeholder="+1 (555) 019-2834" class="w-full p-3 bg-cream border border-[#E6DDD3] rounded-lg focus:outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Delivery Address (White Glove)</label>
+                        <input type="text" required placeholder="740 Park Avenue, Apt 12B, New York, NY" class="w-full p-3 bg-cream border border-[#E6DDD3] rounded-lg focus:outline-none">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Payment Method</label>
+                            <select class="w-full p-3 bg-cream border border-[#E6DDD3] rounded-lg focus:outline-none">
+                                <option>Credit Card (Visa / Mastercard / Amex)</option>
+                                <option>Debit Card</option>
+                                <option>Wire Transfer (Swiss Private Bank)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Coupon Code</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="coupon-input" placeholder="ATELIERVIP" class="w-full p-3 bg-cream border border-[#E6DDD3] rounded-lg uppercase tracking-wider focus:outline-none">
+                                <button type="button" id="apply-coupon-btn" class="px-4 bg-charcoal text-cream uppercase rounded-lg">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-4 bg-charcoal text-cream uppercase text-xs tracking-[0.2em] rounded-xl hover:bg-taupe transition-all">
+                        Authorize Secure Commission Payment
+                    </button>
+                </form>
             </div>
         </section>
 
         <section id="view-tracking" class="tab-view hidden space-y-6">
             <div class="text-center max-w-xl mx-auto space-y-2">
-                <span class="section-label">Global Haute Couture Shipping</span>
-                <h1 class="font-serif text-3xl">Live Logistics & Route Map</h1>
-                <p class="text-xs text-taupe">Enter your waybill code to inspect realtime transit milestones, courier status, and interactive Google Map location.</p>
+                <span class="section-label">Global Logistics Radar</span>
+                <h1 class="font-serif text-3xl">Live Shipment Tracking</h1>
+                <p class="text-xs text-taupe">Track your handcrafted garment package in real-time across international transit hubs using waybill codes.</p>
             </div>
 
-            <div class="bg-sand p-5 rounded-xl border border-[#E6DDD3] space-y-3">
-                <form id="tracking-form" class="flex flex-col sm:flex-row gap-3">
-                    <input type="text" id="tracking-input" value="ATG-8902-PARIS" placeholder="Enter Waybill # (e.g. ATG-8902-PARIS)" class="flex-1 px-4 py-2.5 bg-cream border border-[#E6DDD3] rounded-lg text-xs focus:outline-none focus:border-charcoal uppercase font-mono tracking-wider">
-                    <button type="submit" class="px-6 py-2.5 bg-charcoal text-white text-xs uppercase tracking-widest rounded-lg hover:bg-taupe transition-colors">
-                        Track Shipment
-                    </button>
+            <div class="bg-sand p-6 rounded-2xl border border-[#E6DDD3] max-w-2xl mx-auto space-y-4">
+                <form id="tracking-form" class="flex gap-2">
+                    <input type="text" id="tracking-input" placeholder="Enter Waybill Code (e.g. ATG-8902-PARIS)" class="w-full p-3 bg-cream border border-[#E6DDD3] rounded-lg uppercase tracking-wider text-xs focus:outline-none focus:border-charcoal">
+                    <button type="submit" class="px-6 py-3 bg-charcoal text-cream text-xs uppercase tracking-wider rounded-lg">Track</button>
                 </form>
-
-                <div class="flex items-center gap-2 text-[11px] text-taupe pt-1">
-                    <span>Quick Sample Waybills:</span>
-                    <button class="quick-waybill-btn text-xs font-mono text-charcoal underline hover:text-taupe" data-waybill="ATG-8902-PARIS">ATG-8902-PARIS</button> •
-                    <button class="quick-waybill-btn text-xs font-mono text-charcoal underline hover:text-taupe" data-waybill="ATG-1042-MILAN">ATG-1042-MILAN</button> •
-                    <button class="quick-waybill-btn text-xs font-mono text-charcoal underline hover:text-taupe" data-waybill="ATG-5521-NY">ATG-5521-NY</button>
+                <div class="flex flex-wrap gap-2 text-[10px]">
+                    <span class="text-taupe">Sample Waybills:</span>
+                    <button class="quick-waybill-btn underline font-mono" data-waybill="ATG-8902-PARIS">ATG-8902-PARIS</button>
+                    <button class="quick-waybill-btn underline font-mono" data-waybill="ATG-1042-MILAN">ATG-1042-MILAN</button>
+                    <button class="quick-waybill-btn underline font-mono" data-waybill="ATG-5521-NY">ATG-5521-NY</button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
-                <div class="lg:col-span-7 bg-sand border border-[#E6DDD3] rounded-xl overflow-hidden shadow-sm flex flex-col h-[480px]">
-                    <div class="p-3 bg-cream border-b border-[#E6DDD3] flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span id="map-waybill-title" class="font-mono text-xs uppercase font-medium">Waybill #ATG-8902-PARIS</span>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-5xl mx-auto">
+                <div class="lg:col-span-7 bg-sand border border-[#E6DDD3] rounded-2xl overflow-hidden h-[400px] relative">
+                    <iframe id="google-map-iframe" class="w-full h-full border-0" src="https://maps.google.com/maps?q=Paris+France&t=&z=12&ie=UTF8&iwloc=&output=embed" allowfullscreen></iframe>
+                </div>
+                <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-2xl p-6 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center border-b border-[#E6DDD3] pb-2">
+                            <h4 id="map-waybill-title" class="font-serif text-sm font-semibold">Waybill #ATG-8902-PARIS</h4>
+                            <span id="map-location-badge" class="px-2 py-0.5 bg-sage-light text-sage text-[9px] uppercase tracking-wider rounded font-semibold">In Transit</span>
                         </div>
-                        <span id="map-location-badge" class="text-[10px] bg-sage-light text-sage font-medium px-2.5 py-0.5 rounded-full uppercase tracking-wider">In Transit — Paris Hub</span>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between"><span class="text-taupe">Origin Atelier:</span> <span id="info-origin">Rue Saint-Honoré, Paris</span></div>
+                            <div class="flex justify-between"><span class="text-taupe">Destination:</span> <span id="info-destination">5th Ave, New York, NY</span></div>
+                            <div class="flex justify-between"><span class="text-taupe">Estimated Arrival:</span> <span id="info-eta" class="font-semibold">Oct 28, 2026</span></div>
+                            <div class="flex justify-between"><span class="text-taupe">Courier Service:</span> <span id="info-courier">DHL Haute Express</span></div>
+                        </div>
                     </div>
-
-                    <div class="flex-1 w-full relative bg-sand">
-                        <iframe id="google-map-iframe" 
-                            class="w-full h-full border-0" 
-                            loading="lazy" 
-                            allowfullscreen 
-                            referrerpolicy="no-referrer-when-downgrade" 
-                            src="https://maps.google.com/maps?q=Charles+de+Gaulle+Airport+Paris&t=&z=11&ie=UTF8&iwloc=&output=embed">
-                        </iframe>
+                    <div class="space-y-2">
+                        <span class="text-[10px] uppercase tracking-wider text-taupe block">Recent Checkpoints</span>
+                        <div id="checkpoints-list" class="space-y-2 text-[11px]">
+                            </div>
                     </div>
                 </div>
-
-                <div class="lg:col-span-5 bg-sand border border-[#E6DDD3] rounded-xl p-5 space-y-5 shadow-sm">
-                    <div>
-                        <span class="section-label">Consignment Details</span>
-                        <div class="bg-cream p-3 rounded-lg border border-[#E6DDD3] space-y-1.5 text-xs">
-                            <div class="flex justify-between">
-                                <span class="text-taupe">Origin Atelier:</span>
-                                <span id="info-origin" class="font-medium">Rue Saint-Honoré, Paris</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-taupe">Destination:</span>
-                                <span id="info-destination" class="font-medium">5th Ave, New York, NY</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-taupe">Est. Delivery:</span>
-                                <span id="info-eta" class="font-medium text-sage">Oct 28, 2026</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-taupe">Courier Partner:</span>
-                                <span id="info-courier" class="font-medium">DHL Haute Express</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <span class="section-label">Shipping Stage</span>
-                        <div class="grid grid-cols-4 gap-1 mt-1 text-center">
-                            <div class="step-box active p-1.5 bg-charcoal text-cream rounded text-[9px] uppercase tracking-wider font-medium">Confirmed</div>
-                            <div class="step-box active p-1.5 bg-charcoal text-cream rounded text-[9px] uppercase tracking-wider font-medium">Tailored</div>
-                            <div class="step-box active p-1.5 bg-charcoal text-cream rounded text-[9px] uppercase tracking-wider font-medium">In Transit</div>
-                            <div class="step-box p-1.5 bg-cream border border-[#E6DDD3] text-taupe rounded text-[9px] uppercase tracking-wider font-medium">Delivered</div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <span class="section-label">Live Checkpoints Log</span>
-                        <div id="checkpoints-list" class="space-y-2.5 max-h-[190px] overflow-y-auto pr-1 text-xs">
-                            <div class="p-2.5 bg-cream rounded-lg border border-[#E6DDD3] space-y-0.5">
-                                <div class="flex justify-between text-[10px] text-taupe">
-                                    <span>Oct 24, 14:20 GMT</span>
-                                    <span class="text-sage font-medium">Paris, France</span>
-                                </div>
-                                <p class="font-medium">Cleared export customs & loaded on flight AF022.</p>
-                            </div>
-                            <div class="p-2.5 bg-cream rounded-lg border border-[#E6DDD3] space-y-0.5">
-                                <div class="flex justify-between text-[10px] text-taupe">
-                                    <span>Oct 23, 09:15 GMT</span>
-                                    <span class="text-sage font-medium">Paris Atelier</span>
-                                </div>
-                                <p class="font-medium">Handcrafted dress inspected and packed in luxury garment vault.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </section>
 
         <section id="view-clearance" class="tab-view hidden space-y-6">
-            <div class="text-center">
-                <span class="section-label">Private Archive</span>
-                <h1 class="font-serif text-3xl my-1">Clearance Collection</h1>
+            <div class="text-center max-w-xl mx-auto space-y-2">
+                <span class="section-label">Archive Vault Clearance</span>
+                <h1 class="font-serif text-3xl">Exclusive Runway Samples & Archive Dresses</h1>
+                <p class="text-xs text-taupe">Acquire rare couture masterpieces instantly or request custom biometric adjustments by our master tailors.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="clearance-grid"></div>
+        </section>
+
+        <section id="view-chat" class="tab-view hidden space-y-6">
+            <div class="text-center max-w-xl mx-auto space-y-2">
+                <span class="section-label">Virtual Concierge & AI Assistant</span>
+                <h1 class="font-serif text-3xl">Atelier AI Master Chat & Calendar</h1>
+                <p class="text-xs text-taupe">Communicate realtime pattern updates, schedule FaceTime / audio consultations with master designers abroad, and track deadlines.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-5xl mx-auto">
+                <div class="lg:col-span-8 bg-sand border border-[#E6DDD3] rounded-2xl p-6 flex flex-col justify-between h-[500px]">
+                    <div class="flex justify-between items-center border-b border-[#E6DDD3] pb-3">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2.5 h-2.5 bg-sage rounded-full animate-pulse"></div>
+                            <span class="font-serif text-xs font-semibold">Atelier Master AI Concierge</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="call-facetime-btn" class="px-2.5 py-1 bg-cream border border-[#E6DDD3] text-[10px] uppercase rounded hover:border-charcoal">📹 FaceTime</button>
+                            <button id="call-audio-btn" class="px-2.5 py-1 bg-cream border border-[#E6DDD3] text-[10px] uppercase rounded hover:border-charcoal">📞 Call</button>
+                        </div>
+                    </div>
+
+                    <div id="chat-messages" class="flex-grow overflow-y-auto space-y-3 py-4 text-xs">
+                        <div class="p-3 bg-cream border border-[#E6DDD3] rounded-lg max-w-md">
+                            Bonjour! I am your Atelier AI Concierge. How may I assist your custom dress design today? You can request pattern updates or schedule a consultation with our master tailors in Paris or Milan.
+                        </div>
+                    </div>
+
+                    <form id="chat-form" class="flex gap-2 pt-3 border-t border-[#E6DDD3]">
+                        <input type="text" id="chat-input" placeholder="Ask about dress updates, fabrics, or call scheduling..." class="w-full p-3 bg-cream border border-[#E6DDD3] rounded-lg text-xs focus:outline-none focus:border-charcoal">
+                        <button type="submit" class="px-5 bg-charcoal text-cream text-xs uppercase rounded-lg">Send</button>
+                    </form>
+                </div>
+
+                <div class="lg:col-span-4 bg-sand border border-[#E6DDD3] rounded-2xl p-6 space-y-4">
+                    <h3 class="font-serif text-sm font-semibold uppercase tracking-wider border-b border-[#E6DDD3] pb-2">Master Deadline Calendar</h3>
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 bg-cream border border-[#E6DDD3] rounded-lg space-y-1">
+                            <div class="flex justify-between text-[10px] text-taupe"><span>October 28, 2026</span><span class="text-sage font-semibold">Fitted</span></div>
+                            <p class="font-medium">Primary Muslin Fitting (Paris Atelier)</p>
+                        </div>
+                        <div class="p-3 bg-cream border border-[#E6DDD3] rounded-lg space-y-1">
+                            <div class="flex justify-between text-[10px] text-taupe"><span>November 12, 2026</span><span class="text-taupe">Scheduled</span></div>
+                            <p class="font-medium">Hand Embroidery Inspection (Milan)</p>
+                        </div>
+                        <div class="p-3 bg-cream border border-[#E6DDD3] rounded-lg space-y-1">
+                            <div class="flex justify-between text-[10px] text-taupe"><span>December 01, 2026</span><span class="text-taupe">Upcoming</span></div>
+                            <p class="font-medium">White Glove Courier Dispatch</p>
+                        </div>
+                    </div>
+                    <button id="schedule-call-modal-btn" class="w-full py-2.5 bg-cream border border-[#E6DDD3] text-xs uppercase tracking-wider rounded-lg hover:border-charcoal">Schedule Designer Call</button>
+                </div>
             </div>
         </section>
 
-        <section id="view-checkout" class="tab-view hidden max-w-2xl mx-auto space-y-6">
-            <div class="text-center">
-                <span class="section-label">Secure Commission</span>
-                <h1 class="font-serif text-3xl my-1">Checkout Gateway</h1>
-            </div>
-            <form id="checkout-form" class="bg-sand p-6 rounded-xl border border-[#E6DDD3] space-y-4">
-                <input type="text" placeholder="Full Name" required class="w-full p-3 bg-cream border border-[#E6DDD3] rounded-lg text-xs">
-                <button type="submit" class="w-full py-3 bg-charcoal text-white text-xs uppercase tracking-widest rounded-lg">Place Order</button>
-            </form>
-        </section>
     </main>
 
-    <div id="review-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-cream border border-[#E6DDD3] rounded-xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
-            <button id="close-review-btn" class="absolute top-4 right-4 text-taupe text-lg">✕</button>
-            <h3 class="font-serif text-2xl text-center">Rate Your Atelier Session</h3>
-            <textarea id="review-text" rows="3" placeholder="Share your experience..." class="w-full p-3 text-xs bg-sand border border-[#E6DDD3] rounded-lg"></textarea>
-            <button id="submit-review-btn" class="w-full py-2.5 bg-charcoal text-white text-xs uppercase tracking-widest rounded-lg">Submit</button>
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-charcoal/60 backdrop-blur-sm flex items-center justify-center hidden">
+        <div class="bg-cream border border-[#E6DDD3] rounded-2xl p-8 max-w-md w-full mx-4 space-y-6 relative shadow-2xl">
+            <button id="close-auth-modal" class="absolute top-4 right-4 text-taupe hover:text-charcoal text-lg font-bold">×</button>
+            <div class="text-center space-y-1">
+                <span class="section-label">VIP Client Portal</span>
+                <h2 id="auth-modal-title" class="font-serif text-2xl">Atelier Client Sign In</h2>
+                <p class="text-xs text-taupe">Access saved bespoke silhouettes and order history.</p>
+            </div>
+
+            <form id="auth-form" class="space-y-4 text-xs">
+                <div id="auth-name-field" class="hidden">
+                    <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Full Name</label>
+                    <input type="text" id="auth-name" placeholder="Elena Rostova" class="w-full p-3 bg-sand border border-[#E6DDD3] rounded-lg focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Email or Phone Number</label>
+                    <input type="text" id="auth-email-phone" required placeholder="couture@atelier.com or +15550192834" class="w-full p-3 bg-sand border border-[#E6DDD3] rounded-lg focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Password</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••••••" class="w-full p-3 bg-sand border border-[#E6DDD3] rounded-lg focus:outline-none">
+                </div>
+                <button type="submit" id="auth-submit-btn" class="w-full py-3.5 bg-charcoal text-cream uppercase tracking-[0.2em] rounded-xl hover:bg-taupe transition-all">
+                    Sign In To Atelier
+                </button>
+            </form>
+
+            <div class="text-center">
+                <button id="toggle-auth-mode" class="text-[11px] text-taupe underline hover:text-charcoal">Need an account? Create VIP Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="designer-modal" class="fixed inset-0 z-50 bg-charcoal/60 backdrop-blur-sm flex items-center justify-center hidden">
+        <div class="bg-cream border border-[#E6DDD3] rounded-2xl p-8 max-w-lg w-full mx-4 space-y-6 relative shadow-2xl">
+            <button id="close-designer-modal" class="absolute top-4 right-4 text-taupe hover:text-charcoal text-lg font-bold">×</button>
+            <div class="text-center space-y-1">
+                <span class="section-label">Master Artisan Network</span>
+                <h2 class="font-serif text-2xl">Register as Atelier Designer</h2>
+                <p class="text-xs text-taupe">Showcase your haute couture studio to international clients.</p>
+            </div>
+
+            <form id="designer-signup-form" class="space-y-3 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Designer / Atelier Name</label>
+                        <input type="text" required id="reg-des-name" placeholder="Maison Vianney" class="w-full p-3 bg-sand border border-[#E6DDD3] rounded-lg focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">City / Country</label>
+                        <input type="text" required id="reg-des-loc" placeholder="Paris, France" class="w-full p-3 bg-sand border border-[#E6DDD3] rounded-lg focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Specialty & Pricing Scale</label>
+                    <input type="text" required id="reg-des-spec" placeholder="Bridal & Evening Gowns ($3,500+)" class="w-full p-3 bg-sand border border-[#E6DDD3] rounded-lg focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase tracking-wider text-taupe mb-1">Studio Image URL</label>
+                    <input type="url" required id="reg-des-img" placeholder="https://images.unsplash.com/..." class="w-full p-3 bg-sand border border-[#E6DDD3] rounded-lg focus:outline-none">
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-charcoal text-cream uppercase tracking-[0.2em] rounded-xl hover:bg-taupe transition-all">
+                    Publish Designer Profile
+                </button>
+            </form>
         </div>
     </div>
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maison de la Cour | Royal Bespoke Tailoring</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Leaflet CSS for Interactive Map -->
+    <!-- Leaflet CSS for Live Interactive Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 </head>
 <body>
@@ -273,79 +273,43 @@
 
         <!-- Live Courier Tracker Section -->
         <section id="tracker" class="section">
-            <h2>Live Royal Courier & Package Tracker</h2>
-            <p class="search-desc" style="text-align: center;">Real-time GPS dispatch map tracking your bespoke delivery transit.</p>
+            <h2>Live Royal Courier Tracking</h2>
+            <p class="section-subtitle">Real-time GPS tracking and transit telemetry for your custom couture package.</p>
 
             <div class="tracker-container">
                 <div class="tracker-sidebar">
-                    <h3>Dispatch Status & Details</h3>
-                    <div class="tracker-status-box">
-                        <p><strong>Tracking Number:</strong> <span style="font-family: monospace; color: var(--gold-accent);">MDC-8892-PARIS</span></p>
-                        <p><strong>Courier Service:</strong> Royal Armored Express</p>
-                        <p><strong>Current Status:</strong> <span id="live-status-text" style="color: #2e7d32; font-weight: 600;">In Transit - Out for Delivery</span></p>
-                        <p><strong>Estimated Arrival:</strong> Today by 2:00 PM</p>
-                        <p><strong>Destination:</strong> Grand Palace Chambers</p>
+                    <h3>Tracking Code Lookup</h3>
+                    <p class="search-desc">Enter your tracking code or select a sample active order.</p>
+
+                    <div class="control-group">
+                        <label>Tracking Code</label>
+                        <div class="tracking-input-row">
+                            <input type="text" id="tracking-code-input" placeholder="e.g. ROYAL-9821-PARIS" value="ROYAL-9821-PARIS">
+                            <button id="track-code-btn" class="primary-btn">Track</button>
+                        </div>
                     </div>
 
                     <div class="control-group" style="margin-top: 1.5rem;">
-                        <label>Simulate Transit Stage</label>
-                        <select id="transit-sim-select">
-                            <option value="atelier">1. Dispatched from Paris Atelier</option>
-                            <option value="transit" selected>2. In Transit (Cross-Country Express)</option>
-                            <option value="delivery">3. Out for Final Delivery</option>
-                            <option value="arrived">4. Delivered & Hand-Signed</option>
-                        </select>
+                        <label>Sample Active Shipments</label>
+                        <div class="sample-codes-grid">
+                            <button type="button" class="sample-code-chip" data-code="ROYAL-9821-PARIS">ROYAL-9821-PARIS (Paris to London)</button>
+                            <button type="button" class="sample-code-chip" data-code="COURT-4432-MILAN">COURT-4432-MILAN (Milan to Geneva)</button>
+                        </div>
                     </div>
-                    <button id="update-sim-btn" class="primary-btn" style="margin-top: 0.5rem;">Update Tracking State</button>
+
+                    <div class="shipment-status-card" id="shipment-status-card">
+                        <h4>Active Shipment Details</h4>
+                        <p><strong>Status:</strong> <span id="ship-status-text" style="color: var(--gold-accent);">In Transit (Live GPS)</span></p>
+                        <p><strong>Courier Name:</strong> <span id="ship-courier-name">Jean-Luc Moreau (Secure Armored Transit)</span></p>
+                        <p><strong>Estimated Arrival:</strong> <span id="ship-eta">Today, 4:45 PM</span></p>
+                        <p><strong>Route:</strong> <span id="ship-route">Atelier Vault Paris → Private Residence London</span></p>
+                    </div>
                 </div>
 
                 <div class="tracker-map-pane">
-                    <div id="royal-leaflet-map" class="royal-leaflet-map"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Royal Checkout Section -->
-        <section id="checkout" class="section">
-            <h2>Royal Checkout & Commission Summary</h2>
-            <p class="section-subtitle">Finalize your bespoke investment and secure white-glove delivery arrangements.</p>
-
-            <div class="checkout-container">
-                <div class="checkout-form-pane">
-                    <h3>Bespoke Commission Details</h3>
-                    
-                    <div class="control-group">
-                        <label>Full Name / Title</label>
-                        <input type="text" id="chk-name" placeholder="e.g. Her Grace, Duchess of Lancaster">
-                    </div>
-
-                    <div class="control-group">
-                        <label>Palace / Residence Delivery Address</label>
-                        <input type="text" id="chk-address" placeholder="e.g. 14 Imperial Boulevard, Suite 400">
-                    </div>
-
-                    <div class="control-group">
-                        <label>Payment Method</label>
-                        <select id="chk-payment">
-                            <option value="Black Card">Royal Sovereign Black Card</option>
-                            <option value="Wire Transfer">Secure International Wire Transfer</option>
-                            <option value="Escrow">Atelier Escrow Deposit</option>
-                        </select>
-                    </div>
-
-                    <button id="submit-checkout-btn" class="primary-btn">Finalize Royal Commission</button>
-                </div>
-
-                <div class="checkout-summary-pane">
-                    <h3>Investment Summary</h3>
-                    <div class="checkout-receipt-box">
-                        <p><strong>Selected Atelier:</strong> <span id="rec-atelier">Maison Elie Saab</span></p>
-                        <p><strong>Fabric Specification:</strong> <span id="rec-fabric">Imperial Pure Silk</span></p>
-                        <p><strong>Estimated Crafting:</strong> <span id="rec-time">14 Business Days</span></p>
-                        <p><strong>White-Glove Delivery:</strong> <span style="color: #2e7d32;">Complimentary</span></p>
-                        <hr style="border:0; border-top: 1px solid var(--border-color); margin: 1rem 0;">
-                        <p style="font-size: 1.15rem; font-weight: 700; color: var(--accent-color);">Total Investment: <span style="color: var(--gold-accent);">$18,000.00 USD</span></p>
-                    </div>
+                    <h3>Live Interactive Route Map</h3>
+                    <p class="search-desc">Watch your royal package move in real time across the map.</p>
+                    <div id="royal-map" class="royal-map"></div>
                 </div>
             </div>
         </section>
@@ -363,8 +327,55 @@
         </div>
     </div>
 
-    <!-- Leaflet JS for Interactive Map -->
+    <!-- Leaflet JS for Live Interactive Map -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="app.js"></script>
+    <section class="checkout-grid">
+  <!-- Left Side: Information -->
+  <form id="royal-checkout-form">
+    <div class="form-section">
+      <h3>Contact Information</h3>
+      <input type="text" placeholder="Full Name" required>
+      <input type="tel" placeholder="(000) 000-0000" pattern="[0-9]{10}" required>
+      <input type="email" placeholder="Email Address" required>
+      
+      <div class="address-grid">
+        <input type="text" placeholder="Street Address" class="full-width" required>
+        <input type="text" placeholder="Unit #">
+        <input type="text" placeholder="City" required>
+        <input type="text" placeholder="Country" required>
+        <input type="text" placeholder="Zip Code" required>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Payment Method</h3>
+      <select id="bank-provider" required>
+        <option value="">Select Bank Provider</option>
+        <option value="apple">Apple Bank</option>
+        <option value="chase">Chase Bank</option>
+        <option value="td">TD Bank</option>
+      </select>
+      <input type="text" placeholder="Card Number" maxlength="16" required>
+      <div class="payment-row">
+        <input type="text" placeholder="MM/YY">
+        <input type="text" placeholder="CVC" maxlength="3">
+      </div>
+    </div>
+  </form>
+
+  <!-- Right Side: Summary -->
+  <aside class="summary-box">
+    <h3>Order Summary</h3>
+    <div class="summary-line"><span>Base Price</span> <span>$100.00</span></div>
+    <div class="summary-line"><span>Customization</span> <span>$50.00</span></div>
+    <hr>
+    <div class="summary-line total"><span>Total</span> <span id="final-total">$150.00</span></div>
+    
+    <input type="text" id="coupon-code" placeholder="Coupon Code">
+    <button type="button" onclick="applyCoupon()">Apply</button>
+    <button type="submit" form="royal-checkout-form" class="submit-btn">Confirm & Pay</button>
+  </aside>
+</section>
 </body>
 </html>

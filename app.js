@@ -12,10 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetSection = document.getElementById(targetId);
             if (targetSection) {
                 targetSection.classList.add('active');
-                // If tracker tab is opened, invalidateLeaflet map size to render correctly
-                if (targetId === 'tracker' && window.royalMap) {
+                
+                // If tracker tab is opened, invalidate map size to render correctly
+                if (targetId === 'tracker' && window.royalMapInstance) {
                     setTimeout(() => {
-                        window.royalMap.invalidateSize();
+                        window.royalMapInstance.invalidateSize();
                     }, 200);
                 }
             }
@@ -211,9 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const fabric = fabricElement ? fabricElement.value : 'Standard Fabric';
             const neckline = necklineElement ? necklineElement.value : 'Standard Neckline';
-
-            // Update checkout summary values
-            document.getElementById('rec-fabric').textContent = fabric;
 
             showRoyalModal('Configuration Saved', `Selected Color Hex: ${selectedColor}\nFabric: ${fabric}\nNeckline: ${neckline}`);
         });
@@ -414,16 +412,14 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             
             showRoyalModal(designer.name, '', `
-                <button class="primary-btn" onclick="selectDesignerAndSchedule('${designer.name}', ${designer.basePrice})">Schedule Consultation with ${designer.leadDesigner}</button>
+                <button class="primary-btn" onclick="selectDesignerAndSchedule('${designer.name}')">Schedule Consultation with ${designer.leadDesigner}</button>
             `, profileContent);
         }
     }
 
-    // Direct auto-saving & tab-switching from Designer Profile to Scheduler
-    window.selectDesignerAndSchedule = function(houseName, basePrice) {
+    window.selectDesignerAndSchedule = function(houseName) {
         document.getElementById('royal-modal-overlay').classList.add('hidden');
         
-        // Switch active tab to scheduler
         navButtons.forEach(b => b.classList.remove('active'));
         sections.forEach(s => s.classList.remove('active'));
         
@@ -432,20 +428,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (schedulerBtn) schedulerBtn.classList.add('active');
         if (schedulerSection) schedulerSection.classList.add('active');
 
-        // Pre-select designer in dropdown
         const selectEl = document.getElementById('schedule-couturier-select');
         if (selectEl) {
             selectEl.value = houseName;
         }
 
-        // Update checkout summary values
-        document.getElementById('rec-atelier').textContent = houseName;
-        document.querySelector('.checkout-receipt-box span[style*="gold-accent"]').textContent = `$${basePrice.toLocaleString()}.00 USD`;
-
         updateBookedSlotsDisplay();
     }
 
-    // Shared database storing active bookings
     let scheduledBookingsRegistry = JSON.parse(localStorage.getItem('royal_bookings')) || {
         "Maison Elie Saab": { "2026-06-10": ["10:00 AM", "02:00 PM"] },
         "Atelier Dior Couture": { "2026-06-11": ["11:30 AM", "04:15 PM"] }
@@ -535,103 +525,120 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Leaflet Interactive Map Initialization
+    // --- Live Leaflet Map & Courier Tracking Implementation ---
+    const shipmentsDatabase = {
+        "ROYAL-9821-PARIS": {
+            courier: "Jean-Luc Moreau (Secure Armored Transit)",
+            eta: "Today, 4:45 PM",
+            route: "Atelier Vault Paris → Private Residence London",
+            status: "In Transit (Live GPS)",
+            startCoords: [48.8566, 2.3522], // Paris
+            endCoords: [51.5074, -0.1278],   // London
+            currentCoords: [50.1500, 1.1000]   // English Channel midway
+        },
+        "COURT-4432-MILAN": {
+            courier: "Matteo Rossi (Express Alpine Courier)",
+            eta: "Tomorrow, 10:00 AM",
+            route: "Armani Privé Milan → Villa Geneva",
+            status: "Clearing Customs Checkpoint",
+            startCoords: [45.4642, 9.1900],   // Milan
+            endCoords: [46.2044, 6.1432],    // Geneva
+            currentCoords: [45.9000, 7.8000]   // Alps midway
+        }
+    };
+
     let royalMap = null;
-    let courierMarker = null;
+    let packageMarker = null;
     let routePolyline = null;
 
-    // Simulated coordinates (Paris Atelier to Grand Palace / Destination)
-    const atelierCoords = [48.8566, 2.3522]; // Paris
-    const transitCoords = [49.5050, 3.2500]; // En route
-    const deliveryCoords = [50.8503, 4.3517]; // Delivery hub / Palace (Brussels area)
+    function initRoyalMap(start, current, end) {
+        const mapContainer = document.getElementById('royal-map');
+        if (!mapContainer) return;
 
-    function initLeafletMap() {
-        const mapContainer = document.getElementById('royal-leaflet-map');
-        if (!mapContainer || royalMap) return;
+        if (!royalMap) {
+            royalMap = L.map('royal-map', { zoomControl: true }).setView(current, 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(royalMap);
+        } else {
+            royalMap.setView(current, 6);
+        }
 
-        royalMap = L.map('royal-leaflet-map', {
-            zoomControl: true,
-            attributionControl: false
-        }).setView(transitCoords, 7);
+        // Clear existing markers/polylines
+        if (packageMarker) royalMap.removeLayer(packageMarker);
+        if (routePolyline) royalMap.removeLayer(routePolyline);
 
-        // CartoDB Positron elegant clean map tiles matching luxury aesthetic
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19
-        }).addTo(royalMap);
+        // Draw Route Line
+        routePolyline = L.polyline([start, end], { color: '#1b263b', weight: 3, dashArray: '5, 5' }).addTo(royalMap);
 
-        // Add start and destination markers
-        L.marker(atelierCoords).addTo(royalMap).bindPopup('<b>Paris Atelier</b><br>Origin Dispatch Point');
-        L.marker(deliveryCoords).addTo(royalMap).bindPopup('<b>Grand Palace Chambers</b><br>Final Destination');
-
-        // Draw route line
-        const latLngs = [atelierCoords, transitCoords, deliveryCoords];
-        routePolyline = L.polyline(latLngs, { color: '#c5a059', weight: 4, opacity: 0.8 }).addTo(royalMap);
-
-        // Courier icon
-        const courierIcon = L.divIcon({
-            className: 'custom-courier-pin',
-            html: '<div style="background:#1b263b; color:#c5a059; border:2px solid #c5a059; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.3);">🛡️</div>',
-            iconSize: [32, 32],
-            iconAnchor: [16, 16]
+        // Custom Package HTML Icon
+        const packageIcon = L.divIcon({
+            className: '',
+            html: '<div class="custom-package-marker" style="width: 36px; height: 36px;">📦</div>',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
         });
 
-        courierMarker = L.marker(transitCoords, { icon: courierIcon }).addTo(royalMap).bindPopup('<b>Armored Express Vehicle #4</b><br>Secure Bespoke Transit');
+        packageMarker = L.marker(current, { icon: packageIcon }).addTo(royalMap);
+        packageMarker.bindPopup("<b>Bespoke Couture Package</b><br>Live GPS Active").openPopup();
 
         royalMap.fitBounds(routePolyline.getBounds(), { padding: [40, 40] });
-        window.royalMap = royalMap;
     }
 
-    initLeafletMap();
+    // Initialize default map on load
+    const defaultShipment = shipmentsDatabase["ROYAL-9821-PARIS"];
+    setTimeout(() => {
+        initRoyalMap(defaultShipment.startCoords, defaultShipment.currentCoords, defaultShipment.endCoords);
+    }, 300);
 
-    // Map Simulation Stage Updater
-    const updateSimBtn = document.getElementById('update-sim-btn');
-    const transitSimSelect = document.getElementById('transit-sim-select');
-    const liveStatusText = document.getElementById('live-status-text');
+    const trackCodeBtn = document.getElementById('track-code-btn');
+    const trackingCodeInput = document.getElementById('tracking-code-input');
+    const sampleCodeChips = document.querySelectorAll('.sample-code-chip');
 
-    if (updateSimBtn) {
-        updateSimBtn.addEventListener('click', () => {
-            const stage = transitSimSelect.value;
-            if (!royalMap || !courierMarker) return;
+    function lookupShipment(code) {
+        const cleanCode = code.trim().toUpperCase();
+        const shipment = shipmentsDatabase[cleanCode];
 
-            if (stage === 'atelier') {
-                courierMarker.setLatLng(atelierCoords);
-                royalMap.setView(atelierCoords, 9);
-                liveStatusText.textContent = 'Dispatched from Paris Atelier';
-                liveStatusText.style.color = '#1b263b';
-            } else if (stage === 'transit') {
-                courierMarker.setLatLng(transitCoords);
-                royalMap.setView(transitCoords, 8);
-                liveStatusText.textContent = 'In Transit - Cross-Country Express';
-                liveStatusText.style.color = '#2e7d32';
-            } else if (stage === 'delivery') {
-                courierMarker.setLatLng(deliveryCoords);
-                royalMap.setView(deliveryCoords, 10);
-                liveStatusText.textContent = 'Out for Final Delivery';
-                liveStatusText.style.color = '#c5a059';
-            } else if (stage === 'arrived') {
-                courierMarker.setLatLng(deliveryCoords);
-                royalMap.setView(deliveryCoords, 12);
-                liveStatusText.textContent = 'Delivered & Hand-Signed';
-                liveStatusText.style.color = '#1b263b';
-                showRoyalModal('Delivery Complete', 'Your royal bespoke package has been successfully delivered and signed for at the Grand Palace Chambers.');
-            }
+        if (shipment) {
+            if (trackingCodeInput) trackingCodeInput.value = cleanCode;
+            
+            document.getElementById('ship-status-text').textContent = shipment.status;
+            document.getElementById('ship-courier-name').textContent = shipment.courier;
+            document.getElementById('ship-eta').textContent = shipment.eta;
+            document.getElementById('ship-route').textContent = shipment.route;
+
+            initRoyalMap(shipment.startCoords, shipment.currentCoords, shipment.endCoords);
+            showRoyalModal('Tracking Success', `Shipment telemetry located for tracking code: ${cleanCode}`);
+        } else {
+            showRoyalModal('Tracking Code Not Found', `No active royal courier entry matches code "${cleanCode}". Please try sample codes like ROYAL-9821-PARIS or COURT-4432-MILAN.`);
+        }
+    }
+
+    if (trackCodeBtn) {
+        trackCodeBtn.addEventListener('click', () => {
+            if (trackingCodeInput) lookupShipment(trackingCodeInput.value);
         });
     }
 
-    // Checkout finalization handler
-    const submitCheckoutBtn = document.getElementById('submit-checkout-btn');
-    if (submitCheckoutBtn) {
-        submitCheckoutBtn.addEventListener('click', () => {
-            const name = document.getElementById('chk-name').value.trim();
-            const address = document.getElementById('chk-address').value.trim();
-            const payment = document.getElementById('chk-payment').value;
-
-            if (!name || !address) {
-                showRoyalModal('Incomplete Details', 'Please enter your full name/title and destination delivery address.');
-                return;
-            }
-
-            showRoyalModal('Commission Confirmed', `Thank you, ${name}. Your commission has been secured via ${payment}.\n\nWhite-glove armored delivery to "${address}" is now active on the Live Courier Tracker.`);
+    sampleCodeChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const code = chip.getAttribute('data-code');
+            lookupShipment(code);
         });
-    }
+    });
+    function applyCoupon() {
+  const code = document.getElementById('coupon-code').value;
+  if (code === "ROYAL10") {
+    document.getElementById('final-total').innerText = "$135.00";
+    alert("Coupon applied!");
+  } else {
+    alert("Invalid code.");
+  }
+}
+
+document.getElementById('royal-checkout-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  alert("Processing your secure Royal payment...");
+});
 });

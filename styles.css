@@ -107,7 +107,7 @@ main {
     align-items: start;
 }
 
-.options-pane h3, .search-engine-pane h3, .couturier-filters-pane h3, .couturier-results-pane h3, .scheduler-form-pane h3, .scheduler-summary-pane h3, .tracker-sidebar h3, .tracker-map-pane h3, .checkout-form-pane h3, .checkout-summary-pane h3 {
+.options-pane h3, .search-engine-pane h3, .couturier-filters-pane h3, .couturier-results-pane h3, .scheduler-form-pane h3, .scheduler-summary-pane h3, .tracker-sidebar h3, .tracker-map-pane h3 {
     font-size: 1.2rem;
     font-weight: 500;
     color: var(--accent-color);
@@ -286,7 +286,7 @@ main {
     margin-bottom: 1rem;
 }
 
-.options-pane label, .couturier-filters-pane label, .scheduler-form-pane label, .tracker-sidebar label, .checkout-form-pane label {
+.options-pane label, .couturier-filters-pane label, .scheduler-form-pane label, .tracker-sidebar label {
     display: block;
     margin-bottom: 0.3rem;
     font-size: 0.8rem;
@@ -296,7 +296,7 @@ main {
     color: var(--accent-color);
 }
 
-.options-pane select, .couturier-filters-pane select, .couturier-filters-pane input[type="text"], .couturier-filters-pane input[type="number"], .scheduler-form-pane select, .scheduler-date-field, .tracker-sidebar select, .checkout-form-pane input, .checkout-form-pane select {
+.options-pane select, .couturier-filters-pane select, .couturier-filters-pane input[type="text"], .couturier-filters-pane input[type="number"], .scheduler-form-pane select, .scheduler-date-field, .tracking-input-row input {
     width: 100%;
     padding: 0.65rem;
     border: 1px solid var(--border-color);
@@ -309,7 +309,7 @@ main {
     transition: border-color 0.2s;
 }
 
-.options-pane select:focus, .couturier-filters-pane select:focus, .couturier-filters-pane input:focus, .scheduler-form-pane select:focus, .scheduler-date-field:focus, .tracker-sidebar select:focus, .checkout-form-pane input:focus, .checkout-form-pane select:focus {
+.options-pane select:focus, .couturier-filters-pane select:focus, .couturier-filters-pane input:focus, .scheduler-form-pane select:focus, .scheduler-date-field:focus, .tracking-input-row input:focus {
     border-color: var(--gold-accent);
 }
 
@@ -515,12 +515,12 @@ main {
     padding-bottom: 0.3rem;
 }
 
-/* Live Courier Tracker Layout */
+/* Live Courier Tracker Styles */
 .tracker-container {
     display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 2rem;
-    align-items: stretch;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
 }
 
 .tracker-sidebar {
@@ -528,63 +528,93 @@ main {
     border: 1px solid var(--border-color);
     padding: 1.5rem;
     border-radius: 2px;
+}
+
+.tracking-input-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tracking-input-row input {
+    flex-grow: 1;
+}
+
+.tracking-input-row button {
+    width: auto;
+    padding: 0.65rem 1.25rem;
+}
+
+.sample-codes-grid {
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
 }
 
-.tracker-status-box {
+.sample-code-chip {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 1rem;
+    color: var(--accent-color);
+    padding: 0.6rem;
+    font-family: inherit;
+    font-size: 0.85rem;
     border-radius: 2px;
-    margin-top: 0.5rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
 }
 
-.tracker-status-box p {
+.sample-code-chip:hover {
+    border-color: var(--gold-accent);
+    background: #f4f1ea;
+}
+
+.shipment-status-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 1.25rem;
+    border-radius: 2px;
+    margin-top: 1.5rem;
+}
+
+.shipment-status-card h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.1rem;
+    color: var(--accent-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.3rem;
+}
+
+.shipment-status-card p {
     margin: 0.4rem 0;
     font-size: 0.9rem;
 }
 
 .tracker-map-pane {
-    border: 1px solid var(--border-color);
-    border-radius: 2px;
-    overflow: hidden;
-    background: var(--card-bg);
-    min-height: 380px;
-}
-
-.royal-leaflet-map {
-    width: 100%;
-    height: 100%;
-    min-height: 380px;
-    z-index: 10;
-}
-
-/* Royal Checkout Container */
-.checkout-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
-}
-
-.checkout-form-pane, .checkout-summary-pane {
     background: var(--input-bg);
     border: 1px solid var(--border-color);
     padding: 1.5rem;
     border-radius: 2px;
 }
 
-.checkout-receipt-box {
-    background: var(--card-bg);
+.royal-map {
+    width: 100%;
+    height: 380px;
     border: 1px solid var(--border-color);
-    padding: 1.5rem;
     border-radius: 2px;
+    background: #eae6df;
 }
 
-.checkout-receipt-box p {
-    margin: 0.5rem 0;
-    font-size: 0.95rem;
+/* Custom Map Package Marker */
+.custom-package-marker {
+    background: var(--accent-color);
+    border: 2px solid var(--gold-accent);
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .primary-btn {
@@ -758,5 +788,16 @@ main {
     0% { transform: scale(0.95); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
+.checkout-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; max-width: 1000px; margin: 40px auto; }
+.form-section { margin-bottom: 30px; }
+.address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.full-width { grid-column: span 2; }
+.payment-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
+.summary-box { background: #f9f9f9; padding: 25px; border-radius: 8px; height: fit-content; border: 1px solid #e0e0e0; }
+.summary-line { display: flex; justify-content: space-between; margin: 10px 0; }
+.total { font-size: 1.25rem; font-weight: bold; }
+
+input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+.submit-btn { width: 100%; padding: 15px; background: #000; color: #fff; border: none; margin-top: 20px; cursor: pointer; }
 .hidden { display: none; }

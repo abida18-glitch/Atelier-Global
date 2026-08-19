@@ -3,379 +3,1618 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maison de la Cour | Royal Bespoke Tailoring</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Leaflet CSS for Live Interactive Map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <title>Altier Global | Haute Couture & Custom Atelier</title>
+    <style>
+        :root {
+            --bg-color: #fcfbf9;
+            --card-bg: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --accent: #c5a059;
+            --accent-light: #f4ecdf;
+            --border: #e2ded8;
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* --- AUTH OVERLAY --- */
+        #auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(252, 251, 29, 0.98);
+            background: rgba(252, 251, 249, 0.96);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            padding: 3rem;
+            width: 100%;
+            max-width: 440px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            text-align: center;
+        }
+
+        .auth-card h2 {
+            font-weight: 300;
+            font-size: 1.6rem;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .auth-tab.active {
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .auth-form {
+            display: none;
+            flex-direction: column;
+            gap: 1.2rem;
+            text-align: left;
+        }
+
+        .auth-form.active {
+            display: flex;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .input-group label {
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .input-group input, .input-group select {
+            padding: 0.9rem;
+            border: 1px solid var(--border);
+            background: var(--bg-color);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: #fff;
+            padding: 1rem;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: var(--transition);
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+        }
+
+        /* --- SURVEY MODAL --- */
+        #survey-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-color);
+            z-index: 1900;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .survey-card {
+            background: var(--card-bg);
+            padding: 3rem;
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+
+        .survey-card h3 {
+            font-weight: 300;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .survey-step {
+            display: none;
+        }
+
+        .survey-step.active {
+            display: block;
+        }
+
+        .survey-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .survey-option-box {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg-color);
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .survey-option-box:hover, .survey-option-box.selected {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        /* --- MAIN APP LAYOUT --- */
+        #main-app {
+            display: none;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        nav {
+            display: flex;
+            gap: 1.8rem;
+            overflow-x: auto;
+        }
+
+        .nav-link {
+            background: none;
+            border: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-primary);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 3rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- TAB 1: CUSTOMIZE --- */
+        .customize-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .search-engine-bar {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .chip-btn {
+            background: none;
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+        }
+
+        .chip-btn.active, .chip-btn:hover {
+            background: var(--text-primary);
+            color: #fff;
+            border-color: var(--text-primary);
+        }
+
+        .upload-dropbox {
+            border: 2px dashed var(--border);
+            padding: 2rem;
+            text-align: center;
+            background: var(--card-bg);
+            cursor: pointer;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        .upload-dropbox:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .dress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 1.5rem;
+            max-height: 700px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .dress-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dress-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.04);
+        }
+
+        .dress-card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+
+        .dress-card-info {
+            padding: 1rem;
+        }
+
+        .dress-card-info h4 {
+            font-size: 0.85rem;
+            font-weight: 400;
+            margin-bottom: 0.2rem;
+        }
+
+        .dress-card-info span {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* --- TAB 2: SIZING --- */
+        .sizing-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .sizing-card {
+            background: var(--card-bg);
+            padding: 3rem;
+            border: 1px solid var(--border);
+        }
+
+        .sizing-card h3 {
+            font-weight: 300;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .camera-viewport {
+            width: 100%;
+            height: 320px;
+            background: #111;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .unit-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .unit-btn {
+            padding: 0.4rem 1rem;
+            border: 1px solid var(--border);
+            background: none;
+            cursor: pointer;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .unit-btn.active {
+            background: var(--text-primary);
+            color: #fff;
+        }
+
+        /* --- TAB 3: YOUR ORDER --- */
+        .order-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 3rem;
+        }
+
+        .order-card {
+            background: var(--card-bg);
+            padding: 3rem;
+            border: 1px solid var(--border);
+        }
+
+        .order-card h3 {
+            font-weight: 300;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .order-reference-preview {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .order-reference-preview img {
+            width: 90px;
+            height: 120px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
+        .measurements-dossier {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            margin-top: 1.5rem;
+        }
+
+        /* --- TAB 4: EXPLORE DESIGNERS --- */
+        .designers-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .designers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .designer-grid-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .designer-grid-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.04);
+        }
+
+        .designer-grid-card img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+        }
+
+        .designer-grid-card-info {
+            padding: 1.5rem;
+        }
+
+        /* Designer Mini Profile Modal */
+        #designer-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1800;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .designer-modal-card {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 750px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 3rem;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .designer-modal-header {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .designer-modal-header img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+        }
+
+        .designer-portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .designer-portfolio-grid img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
+        /* --- TAB 5: CONSULTATION --- */
+        .consultation-layout {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 3rem;
+        }
+
+        .consultation-card {
+            background: var(--card-bg);
+            padding: 3rem;
+            border: 1px solid var(--border);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .cal-day {
+            padding: 0.8rem 0.4rem;
+            border: 1px solid var(--border);
+            background: var(--bg-color);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cal-day:hover, .cal-day.selected {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .time-slots {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .time-chip {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg-color);
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .time-chip.selected {
+            background: var(--text-primary);
+            color: #fff;
+            border-color: var(--text-primary);
+        }
+
+        /* FaceTime Video Simulator Modal */
+        #facetime-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #0f0f0f;
+            z-index: 2500;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 3rem;
+            color: #fff;
+        }
+
+        .facetime-screen {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .facetime-designer-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            max-height: 70vh;
+            border-radius: 12px;
+            opacity: 0.9;
+        }
+
+        .facetime-user-pip {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 160px;
+            height: 120px;
+            background: #333;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .facetime-controls {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .ft-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            transition: var(--transition);
+        }
+
+        .ft-btn.end-call {
+            background: #ff3b30;
+        }
+
+        /* --- TAB 6: CHECKOUT --- */
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 3rem;
+        }
+
+        .checkout-card {
+            background: var(--card-bg);
+            padding: 3rem;
+            border: 1px solid var(--border);
+        }
+
+        .receipt-box {
+            background: var(--bg-color);
+            padding: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .coupon-banner {
+            background: var(--accent-light);
+            border: 1px dashed var(--accent);
+            padding: 1rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        /* --- TAB 7: TRACK PACKAGE --- */
+        .tracker-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .map-simulator {
+            width: 100%;
+            height: 400px;
+            background: #e8e6e1;
+            border: 1px solid var(--border);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .map-pin {
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            border: 3px solid #fff;
+            border-radius: 50%;
+            position: absolute;
+            transition: all 1s linear;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">Maison de la Cour</div>
-        <nav>
-            <button class="nav-btn active" data-target="customizer">Atelier Customizer</button>
-            <button class="nav-btn" data-target="designers">Royal Couturiers</button>
-            <button class="nav-btn" data-target="scheduler">Concierge & Scheduling</button>
-            <button class="nav-btn" data-target="tracker">Live Courier Tracker</button>
-            <button class="nav-btn" data-target="checkout">Royal Checkout</button>
-        </nav>
-    </header>
-
-    <main>
-        <!-- Customizer Section -->
-        <section id="customizer" class="section active">
-            <h2>The Bespoke Atelier Customizer</h2>
-            <p class="section-subtitle">Select your curated design specifications and reference inspirations.</p>
-            
-            <div class="customizer-container">
-                <div class="options-pane">
-                    <h3>Design Elements & Categories</h3>
-                    
-                    <div class="control-group">
-                        <label>Fabric</label>
-                        <select id="opt-fabric">
-                            <option value="Imperial Silk">Imperial Pure Silk</option>
-                            <option value="Court Velvet">Royal Court Velvet</option>
-                            <option value="Chantilly Lace">French Chantilly Lace</option>
-                            <option value="Duchess Satin">Duchess Satin</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label>Color Wheel Selection</label>
-                        <div class="color-wheel-wrapper">
-                            <input type="color" id="opt-color-wheel" value="#c5a059">
-                            <span id="color-hex-label">#C5A059 (Royal Gold)</span>
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <label>Embellishment</label>
-                        <select id="opt-embellishment">
-                            <option value="Crystal Beading">Hand-stitched Crystal Beading</option>
-                            <option value="Gold Thread Embroidery">Gold Thread Filigree Embroidery</option>
-                            <option value="Pearl Applique">Freshwater Pearl Applique</option>
-                            <option value="Minimalist Clean">Minimalist Clean Finish</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label>Neckline</label>
-                        <select id="opt-neckline">
-                            <option value="Sweetheart">Sweetheart Curve</option>
-                            <option value="Illusion High Neck">Illusion High Neck</option>
-                            <option value="Off-the-Shoulder">Off-the-Shoulder Drapery</option>
-                            <option value="V-Neck">Classic Deep V-Neck</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label>Skirt Style</label>
-                        <select id="opt-skirt">
-                            <option value="A-Line">Structured A-Line</option>
-                            <option value="Ballgown Tiered">Full Imperial Ballgown</option>
-                            <option value="Trumpet">Slender Trumpet</option>
-                            <option value="Pleated Flow">Cascading Pleated Flow</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label>Sleeves</label>
-                        <select id="opt-sleeves">
-                            <option value="Long Lace">Full-Length Lace Sleeves</option>
-                            <option value="Cap Sleeves">Delicate Cap Sleeves</option>
-                            <option value="Bishop Sleeves">Voluminous Bishop Sleeves</option>
-                            <option value="Sleeveless">Sleeveless Grandeur</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label>Length & Train</label>
-                        <select id="opt-length">
-                            <option value="Cathedral Train">Full Floor-Length with Cathedral Train</option>
-                            <option value="Court Train">Sweeping Court Train</option>
-                            <option value="Waltz Length">Graceful Waltz Length</option>
-                            <option value="Floor Length No Train">Clean Floor Length</option>
-                        </select>
-                    </div>
-
-                    <button id="save-design-btn" class="primary-btn">Preserve Configuration</button>
-                </div>
-
-                <div class="search-engine-pane">
-                    <h3>Dress Inspiration Image Search</h3>
-                    <p class="search-desc">Browse archival looks or capture/upload reference photos.</p>
-                    
-                    <div class="image-search-bar">
-                        <input type="text" id="image-search-input" placeholder="Search reference styles...">
-                        <button id="image-search-btn" class="primary-btn">Search</button>
-                    </div>
-
-                    <div class="visual-upload-row">
-                        <input type="file" id="camera-capture-input" accept="image/*" capture="environment" class="hidden">
-                        <button id="trigger-camera-btn" class="icon-action-btn" title="Open Camera">
-                            <span class="btn-icon">📷</span>
-                            <span class="btn-text">Camera</span>
-                        </button>
-
-                        <input type="file" id="gallery-upload-input" accept="image/*" class="hidden">
-                        <button id="trigger-gallery-btn" class="icon-action-btn" title="Upload from Gallery">
-                            <span class="btn-icon">🖼️</span>
-                            <span class="btn-text">Gallery</span>
-                        </button>
-                    </div>
-
-                    <div id="live-camera-container" class="hidden live-camera-wrapper">
-                        <video id="camera-stream-video" autoplay playsinline></video>
-                        <canvas id="camera-snapshot-canvas" class="hidden"></canvas>
-                        <div class="camera-action-overlay">
-                            <button id="capture-snapshot-btn" class="primary-btn">📸 Snap Photo & Detect Dress</button>
-                            <button id="close-camera-btn" class="secondary-cancel-btn">Cancel</button>
-                        </div>
-                    </div>
-
-                    <div id="image-search-results" class="image-results-grid">
-                        <div class="inspiration-card selectable-thumb" data-title="Imperial Silk A-Line">
-                            <img src="https://images.unsplash.com/photo-1594552072238-b8a3da72ae8a?auto=format&fit=crop&w=400&q=80" alt="Imperial Silk A-Line Dress" class="result-real-img">
-                            <span>Imperial Silk A-Line</span>
-                        </div>
-                        <div class="inspiration-card selectable-thumb" data-title="Chantilly Lace Masterpiece">
-                            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400&q=80" alt="Chantilly Lace Masterpiece" class="result-real-img">
-                            <span>Chantilly Lace Gown</span>
-                        </div>
-                    </div>
-                </div>
+    <!-- AUTHENTICATION OVERLAY -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2>Altier Global Atelier</h2>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</button>
+                <button class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
             </div>
-        </section>
 
-        <!-- Royal Couturiers Directory Section -->
-        <section id="designers" class="section">
-            <h2>Global Royal Couturiers Directory</h2>
-            <p class="section-subtitle">Discover legendary fashion houses and master artisans from around the world.</p>
-            
-            <div class="couturiers-directory-container">
-                <div class="couturier-filters-pane">
-                    <h3>Atelier Search & Filters</h3>
-                    
-                    <div class="control-group">
-                        <label>Search Designer or House</label>
-                        <input type="text" id="couturier-search-input" placeholder="e.g. Elie Saab, Dior, Akris...">
-                    </div>
-
-                    <div class="control-group">
-                        <label>Filter by Country</label>
-                        <select id="filter-country">
-                            <option value="all">All Countries</option>
-                            <option value="France">France</option>
-                            <option value="Lebanon">Lebanon</option>
-                            <option value="Switzerland">Switzerland</option>
-                            <option value="United Kingdom">United Kingdom</option>
-                            <option value="Italy">Italy</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label>Or Enter Address / Location</label>
-                        <input type="text" id="filter-address" placeholder="e.g. Paris, France or London">
-                    </div>
-
-                    <div class="control-group">
-                        <label>Max Price Threshold ($ USD)</label>
-                        <input type="number" id="filter-max-price" placeholder="e.g. 25000" min="0" step="500">
-                    </div>
-
-                    <div class="control-group">
-                        <label>Filter by Aesthetic Style</label>
-                        <select id="filter-style">
-                            <option value="all">All Styles</option>
-                            <option value="Imperial Ballgown">Imperial Ballgown & Grandeur</option>
-                            <option value="Avant-Garde">Avant-Garde & Modernist</option>
-                            <option value="Classic Tailoring">Classic Structural Tailoring</option>
-                            <option value="Romantic Filigree">Romantic Lace & Filigree</option>
-                        </select>
-                    </div>
-
-                    <button id="apply-couturier-filters" class="primary-btn">Apply Directory Filters</button>
+            <!-- Sign In Form -->
+            <div id="form-signin" class="auth-form active">
+                <div class="input-group">
+                    <label>Email or Phone Number</label>
+                    <input type="text" id="signin-id" placeholder="name@domain.com or phone">
                 </div>
-
-                <div class="couturier-results-pane">
-                    <h3>Curated Couturier Results & Recommendations</h3>
-                    <p class="search-desc">Click any master artisan card to inspect their complete mini profile.</p>
-                    
-                    <div id="couturiers-grid" class="couturiers-grid"></div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="signin-pass" placeholder="••••••••">
                 </div>
+                <button class="btn-primary" onclick="handleSignIn()">Sign In</button>
             </div>
-        </section>
 
-        <!-- Concierge & Scheduling Section -->
-        <section id="scheduler" class="section">
-            <h2>Royal Concierge & Consultation Scheduling</h2>
-            <p class="section-subtitle">Secure a direct virtual consultation, FaceTime call, or texting session with your chosen master house.</p>
-
-            <div class="scheduler-container">
-                <div class="scheduler-form-pane">
-                    <h3>Appointment Parameters</h3>
-
-                    <div class="control-group">
-                        <label>Select Chosen Couturier House</label>
-                        <select id="schedule-couturier-select">
-                            <option value="Maison Elie Saab">Maison Elie Saab (Beirut / Paris)</option>
-                            <option value="Atelier Dior Couture">Atelier Dior Couture (Paris, France)</option>
-                            <option value="Akris Grand Maison">Akris Grand Maison (St. Gallen, Switzerland)</option>
-                            <option value="Alexander McQueen Atelier">Alexander McQueen Atelier (London, UK)</option>
-                            <option value="Armani Privé">Armani Privé (Milan, Italy)</option>
-                            <option value="Alaïa House">Alaïa House (Paris, France)</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label>Communication Channel</label>
-                        <select id="schedule-channel-select">
-                            <option value="FaceTime">FaceTime</option>
-                            <option value="Call">Call</option>
-                            <option value="Texting">Texting</option>
-                            <option value="In-person walk-in">In-person walk-in</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label>Select Consultation Date</label>
-                        <input type="date" id="schedule-date-input" class="scheduler-date-field">
-                    </div>
-
-                    <div class="control-group">
-                        <label>Available Time Slots (Local Atelier Time)</label>
-                        <div id="time-slots-grid" class="time-slots-grid">
-                            <button type="button" class="time-slot-btn" data-time="10:00 AM">10:00 AM</button>
-                            <button type="button" class="time-slot-btn" data-time="11:30 AM">11:30 AM</button>
-                            <button type="button" class="time-slot-btn" data-time="02:00 PM">02:00 PM</button>
-                            <button type="button" class="time-slot-btn" data-time="04:15 PM">04:15 PM</button>
-                            <button type="button" class="time-slot-btn" data-time="06:00 PM">06:00 PM</button>
-                        </div>
-                    </div>
-
-                    <button id="confirm-booking-btn" class="primary-btn">Confirm & Book Consultation</button>
+            <!-- Sign Up Form (Step 1: ID) -->
+            <div id="form-signup-1" class="auth-form">
+                <div class="input-group">
+                    <label>Email or Phone Number</label>
+                    <input type="text" id="signup-id" placeholder="name@domain.com or phone">
                 </div>
-
-                <div class="scheduler-summary-pane">
-                    <h3>Active Concierge Summary</h3>
-                    <p class="search-desc">Your scheduled appointments and priority communication channels.</p>
-                    
-                    <div id="booking-summary-card" class="booking-summary-card">
-                        <div class="summary-placeholder">
-                            <p>No active consultations scheduled yet.</p>
-                            <span>Complete the booking form on the left to reserve your appointment slot.</span>
-                        </div>
-                    </div>
-                </div>
+                <button class="btn-primary" onclick="sendConfirmationCode()">Send Confirmation Code</button>
             </div>
-        </section>
 
-        <!-- Live Courier Tracker Section -->
-        <section id="tracker" class="section">
-            <h2>Live Royal Courier Tracking</h2>
-            <p class="section-subtitle">Real-time GPS tracking and transit telemetry for your custom couture package.</p>
-
-            <div class="tracker-container">
-                <div class="tracker-sidebar">
-                    <h3>Tracking Code Lookup</h3>
-                    <p class="search-desc">Enter your tracking code or select a sample active order.</p>
-
-                    <div class="control-group">
-                        <label>Tracking Code</label>
-                        <div class="tracking-input-row">
-                            <input type="text" id="tracking-code-input" placeholder="e.g. ROYAL-9821-PARIS" value="ROYAL-9821-PARIS">
-                            <button id="track-code-btn" class="primary-btn">Track</button>
-                        </div>
-                    </div>
-
-                    <div class="control-group" style="margin-top: 1.5rem;">
-                        <label>Sample Active Shipments</label>
-                        <div class="sample-codes-grid">
-                            <button type="button" class="sample-code-chip" data-code="ROYAL-9821-PARIS">ROYAL-9821-PARIS (Paris to London)</button>
-                            <button type="button" class="sample-code-chip" data-code="COURT-4432-MILAN">COURT-4432-MILAN (Milan to Geneva)</button>
-                        </div>
-                    </div>
-
-                    <div class="shipment-status-card" id="shipment-status-card">
-                        <h4>Active Shipment Details</h4>
-                        <p><strong>Status:</strong> <span id="ship-status-text" style="color: var(--gold-accent);">In Transit (Live GPS)</span></p>
-                        <p><strong>Courier Name:</strong> <span id="ship-courier-name">Jean-Luc Moreau (Secure Armored Transit)</span></p>
-                        <p><strong>Estimated Arrival:</strong> <span id="ship-eta">Today, 4:45 PM</span></p>
-                        <p><strong>Route:</strong> <span id="ship-route">Atelier Vault Paris → Private Residence London</span></p>
-                    </div>
+            <!-- Sign Up Form (Step 2: Code Verification) -->
+            <div id="form-signup-2" class="auth-form" style="display:none;">
+                <p style="font-size:0.8rem; color:var(--text-secondary);">Enter the 4-digit verification code sent to your device.</p>
+                <div class="input-group">
+                    <label>Confirmation Code</label>
+                    <input type="text" id="signup-code" placeholder="1234">
                 </div>
-
-                <div class="tracker-map-pane">
-                    <h3>Live Interactive Route Map</h3>
-                    <p class="search-desc">Watch your royal package move in real time across the map.</p>
-                    <div id="royal-map" class="royal-map"></div>
-                </div>
+                <button class="btn-primary" onclick="verifyCodeToPassword()">Verify Code</button>
             </div>
-        </section>
-    </main>
 
-    <!-- Global Modal Overlay -->
-    <div id="royal-modal-overlay" class="modal-overlay hidden">
-        <div id="royal-modal-card-wrapper" class="royal-modal-card-wrapper">
-            <button id="royal-modal-exit-btn" class="modal-exit-btn" onclick="document.getElementById('royal-modal-overlay').classList.add('hidden')">✕</button>
-            <div id="royal-modal-scrollable-body" class="royal-modal-scrollable-body">
-                <h3 id="royal-modal-title">Notice</h3>
-                <div id="royal-modal-message"></div>
-                <div id="royal-modal-actions"></div>
+            <!-- Sign Up Form (Step 3: Create Password) -->
+            <div id="form-signup-3" class="auth-form" style="display:none;">
+                <div class="input-group">
+                    <label>Create Secure Password</label>
+                    <input type="password" id="signup-pass" placeholder="At least 7 chars with letters & numbers">
+                </div>
+                <button class="btn-primary" onclick="completeSignUp()">Complete Account</button>
             </div>
         </div>
     </div>
 
-    <!-- Leaflet JS for Live Interactive Map -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="app.js"></script>
-    <section class="checkout-grid">
-  <!-- Left Side: Information -->
-  <form id="royal-checkout-form">
-    <div class="form-section">
-      <h3>Contact Information</h3>
-      <input type="text" placeholder="Full Name" required>
-      <input type="tel" placeholder="(000) 000-0000" pattern="[0-9]{10}" required>
-      <input type="email" placeholder="Email Address" required>
-      
-      <div class="address-grid">
-        <input type="text" placeholder="Street Address" class="full-width" required>
-        <input type="text" placeholder="Unit #">
-        <input type="text" placeholder="City" required>
-        <input type="text" placeholder="Country" required>
-        <input type="text" placeholder="Zip Code" required>
-      </div>
+    <!-- SURVEY MODAL (New User Onboarding) -->
+    <div id="survey-overlay">
+        <div class="survey-card">
+            <div id="survey-step-1" class="survey-step active">
+                <h3>Let’s get started</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">What primary occasion are you shopping for?</p>
+                <div class="survey-options-grid">
+                    <div class="survey-option-box" onclick="selectSurveyChoice(this, 'occasion', 'Wedding')">Wedding Gown</div>
+                    <div class="survey-option-box" onclick="selectSurveyChoice(this, 'occasion', 'Prom')">Prom & Evening Formal</div>
+                    <div class="survey-option-box" onclick="selectSurveyChoice(this, 'occasion', 'Party')">Cocktail Party</div>
+                    <div class="survey-option-box" onclick="selectSurveyChoice(this, 'occasion', 'Gala')">Red Carpet Gala</div>
+                </div>
+                <button class="btn-primary" style="width:100%;" onclick="nextSurveyStep(2)">Continue</button>
+            </div>
+
+            <div id="survey-step-2" class="survey-step">
+                <h3>Style Preferences</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">What silhouette style speaks to you most?</p>
+                <div class="survey-options-grid">
+                    <div class="survey-option-box" onclick="selectSurveyChoice(this, 'style', 'Ball Gown')">Ball Gown & Princess</div>
+                    <div class="survey-option-box" onclick="selectSurveyChoice(this, 'style', 'Mermaid')">Sleek Mermaid & Fitted</div>
+                    <div class="survey-option-box" onclick="selectSurveyChoice(this, 'style', 'Minimalist')">Minimalist Modern Shift</div>
+                    <div class="survey-option-box" onclick="selectSurveyChoice(this, 'style', 'Corset Lace')">Romantic Corset & Lace</div>
+                </div>
+                <button class="btn-primary" style="width:100%;" onclick="finishSurvey()">Save & Enter Atelier</button>
+            </div>
+        </div>
     </div>
 
-    <div class="form-section">
-      <h3>Payment Method</h3>
-      <select id="bank-provider" required>
-        <option value="">Select Bank Provider</option>
-        <option value="apple">Apple Bank</option>
-        <option value="chase">Chase Bank</option>
-        <option value="td">TD Bank</option>
-      </select>
-      <input type="text" placeholder="Card Number" maxlength="16" required>
-      <div class="payment-row">
-        <input type="text" placeholder="MM/YY">
-        <input type="text" placeholder="CVC" maxlength="3">
-      </div>
+    <!-- DESIGNER MINI PROFILE MODAL -->
+    <div id="designer-modal" onclick="closeDesignerModal(event)">
+        <div class="designer-modal-card" onclick="event.stopPropagation()">
+            <div class="designer-modal-header">
+                <img id="modal-ds-headshot" src="" alt="Designer">
+                <div>
+                    <h2 id="modal-ds-name" style="font-weight:300; font-size:1.6rem; margin-bottom:0.5rem;"></h2>
+                    <p id="modal-ds-address" style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:0.3rem;"></p>
+                    <p id="modal-ds-contact" style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:0.3rem;"></p>
+                    <p id="modal-ds-price" style="color:var(--accent); font-size:0.9rem; font-weight:500;"></p>
+                </div>
+            </div>
+            <p style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary);">Signature Collection Works</p>
+            <div class="designer-portfolio-grid" id="modal-ds-portfolio"></div>
+            <button class="btn-primary" style="width:100%; margin-top:2rem;" onclick="selectDesignerAndRedirect()">Select Designer & Schedule Consultation</button>
+        </div>
     </div>
-  </form>
 
-  <!-- Right Side: Summary -->
-  <aside class="summary-box">
-    <h3>Order Summary</h3>
-    <div class="summary-line"><span>Base Price</span> <span>$100.00</span></div>
-    <div class="summary-line"><span>Customization</span> <span>$50.00</span></div>
-    <hr>
-    <div class="summary-line total"><span>Total</span> <span id="final-total">$150.00</span></div>
-    
-    <input type="text" id="coupon-code" placeholder="Coupon Code">
-    <button type="button" onclick="applyCoupon()">Apply</button>
-    <button type="submit" form="royal-checkout-form" class="submit-btn">Confirm & Pay</button>
-  </aside>
-</section>
+    <!-- FACETIME SIMULATOR MODAL -->
+    <div id="facetime-modal">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>FaceTime Live Atelier Consultation</h3>
+            <span id="ft-timer" style="font-family:monospace; font-size:1.1rem; color:var(--accent);">00:00</span>
+        </div>
+        <div class="facetime-screen">
+            <img id="ft-designer-img" src="" class="facetime-designer-video" alt="Designer Live">
+            <video id="ft-user-video" class="facetime-user-pip" autoplay muted playsinline></video>
+        </div>
+        <div class="facetime-controls">
+            <button class="ft-btn" onclick="toggleAudioMute()">🎤</button>
+            <button class="ft-btn end-call" onclick="endFaceTimeCall()">📞</button>
+            <button class="ft-btn" onclick="toggleVideoCamera()">📷</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP WEBSITE -->
+    <div id="main-app">
+        <header>
+            <div class="logo">Altier Global</div>
+            <nav>
+                <button class="nav-link active" onclick="switchTab('customize')">Customize</button>
+                <button class="nav-link" onclick="switchTab('sizing')">Sizing</button>
+                <button class="nav-link" onclick="switchTab('orders')">Your Order</button>
+                <button class="nav-link" onclick="switchTab('designers')">Explore Designers</button>
+                <button class="nav-link" onclick="switchTab('consultation')">Consultation</button>
+                <button class="nav-link" onclick="switchTab('checkout')">Checkout</button>
+                <button class="nav-link" onclick="switchTab('tracker')">Track Package</button>
+            </nav>
+        </header>
+
+        <!-- TAB 1: CUSTOMIZE -->
+        <section id="tab-customize" class="tab-content active">
+            <div class="customize-layout">
+                <div>
+                    <h2 style="font-weight: 300; font-size: 1.8rem; margin-bottom: 1.5rem;">Reference Search Engine</h2>
+                    <input type="text" class="search-engine-bar" id="dress-search-input" placeholder="Search by occasion (wedding, prom), design, color..." oninput="filterDressCatalog()">
+                    
+                    <div class="filter-row">
+                        <button class="chip-btn active" onclick="filterByOccasion('all', this)">All Occasions</button>
+                        <button class="chip-btn" onclick="filterByOccasion('wedding', this)">Wedding</button>
+                        <button class="chip-btn" onclick="filterByOccasion('prom', this)">Prom</button>
+                        <button class="chip-btn" onclick="filterByOccasion('party', this)">Party</button>
+                    </div>
+
+                    <div class="upload-dropbox" onclick="document.getElementById('file-upload-input').click()">
+                        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:0.8rem; color:var(--text-secondary);"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                        <p style="font-size:0.9rem; font-weight:400;">Upload custom reference pictures</p>
+                        <span style="font-size:0.75rem; color:var(--text-secondary); display:block; margin-top:0.3rem;">PNG, JPG or WEBP up to 25MB</span>
+                        <input type="file" id="file-upload-input" style="display:none;" accept="image/*" onchange="handleUserImageUpload(event)">
+                    </div>
+
+                    <p style="font-size:0.85rem; color:var(--text-secondary);" id="customize-results-count">Showing verified master reference dresses.</p>
+                </div>
+                <div>
+                    <div class="dress-grid" id="dress-grid-box"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: SIZING -->
+        <section id="tab-sizing" class="tab-content">
+            <div class="sizing-layout">
+                <!-- AI Body Scanner Column -->
+                <div class="sizing-card">
+                    <h3>AI Body Scanner</h3>
+                    <div class="camera-viewport">
+                        <video id="webcam-live-feed" autoplay playsinline style="width:100%; height:100%; object-fit:cover; position:absolute; display:none;"></video>
+                        <div id="camera-placeholder-ui" style="text-align:center; padding:2rem;">
+                            <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:1rem; opacity:0.8;"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
+                            <p style="font-size:0.9rem; font-weight:300;">Activate Camera for Body Geometry Scan</p>
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="width:100%;" onclick="runAiBodyScanner()">Initialize AI Body Scan</button>
+                </div>
+
+                <!-- Manual Measurements Column -->
+                <div class="sizing-card">
+                    <h3>Manual Measurements</h3>
+                    <div class="unit-selector">
+                        <button class="unit-btn active" id="btn-unit-in" onclick="setMeasurementUnit('in')">Inches</button>
+                        <button class="unit-btn" id="btn-unit-cm" onclick="setMeasurementUnit('cm')">Centimeters</button>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:1rem;">
+                        <div class="input-group">
+                            <label>Height</label>
+                            <input type="number" id="input-height" placeholder="e.g. 66">
+                        </div>
+                        <div class="input-group">
+                            <label>Waist</label>
+                            <input type="number" id="input-waist" placeholder="e.g. 26">
+                        </div>
+                        <div class="input-group">
+                            <label>Bust</label>
+                            <input type="number" id="input-bust" placeholder="e.g. 34">
+                        </div>
+                        <div class="input-group">
+                            <label>Hips</label>
+                            <input type="number" id="input-hips" placeholder="e.g. 38">
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="width:100%; margin-top:1.5rem;" onclick="saveMeasurementsToOrder()">Save & Store in "Your Order"</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: YOUR ORDER -->
+        <section id="tab-orders" class="tab-content">
+            <div class="order-layout">
+                <div class="order-card">
+                    <h3>Custom Order Specification Dossier</h3>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:2rem;">Modify any parameters to finalize your unique haute couture commission.</p>
+                    
+                    <div class="order-reference-preview">
+                        <img id="order-preview-img" src="https://cdn-5.stacees.co.uk/static/2025/1/nav/brides/wedding-plus.jpg" alt="Selected Dress">
+                        <div>
+                            <h4 id="order-preview-title" style="font-weight:400; margin-bottom:0.3rem;">Plus Royal Lace Ballgown</h4>
+                            <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase;" id="order-preview-tag">Wedding Occasion</span>
+                        </div>
+                    </div>
+
+                    <div class="specs-grid">
+                        <div class="input-group">
+                            <label>Length</label>
+                            <input type="text" id="ord-length" value="Full length">
+                        </div>
+                        <div class="input-group">
+                            <label>Skirt</label>
+                            <input type="text" id="ord-skirt" value="Ball Gown">
+                        </div>
+                        <div class="input-group">
+                            <label>Sleeves</label>
+                            <input type="text" id="ord-sleeves" value="Off-shoulder full sleeves">
+                        </div>
+                        <div class="input-group">
+                            <label>Neckline</label>
+                            <input type="text" id="ord-neckline" value="V-line">
+                        </div>
+                        <div class="input-group">
+                            <label>Color</label>
+                            <input type="text" id="ord-color" value="Ivory">
+                        </div>
+                        <div class="input-group">
+                            <label>Fabric</label>
+                            <input type="text" id="ord-fabric" value="Silk & Lace">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="alert('Order specifications successfully updated.')">Update Order Details</button>
+                </div>
+
+                <div class="order-card">
+                    <h3>Synchronized Sizing Dossier</h3>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">Recorded measurements from the Sizing tab.</p>
+                    
+                    <div class="measurements-dossier">
+                        <h4 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem;">Unit System: <span id="summary-unit-name">Inches</span></h4>
+                        <div style="display:flex; flex-direction:column; gap:0.8rem; font-size:0.95rem;">
+                            <div><strong>Height:</strong> <span id="summary-h">Not provided</span></div>
+                            <div><strong>Waist:</strong> <span id="summary-w">Not provided</span></div>
+                            <div><strong>Bust:</strong> <span id="summary-b">Not provided</span></div>
+                            <div><strong>Hips:</strong> <span id="summary-hp">Not provided</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: EXPLORE DESIGNERS -->
+        <section id="tab-designers" class="tab-content">
+            <div style="margin-bottom:2.5rem;">
+                <h2 style="font-weight: 300; font-size: 1.8rem; margin-bottom: 0.5rem;">Global Master Couturiers</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Browse world-renowned designers specializing in custom creations.</p>
+            </div>
+
+            <div style="display:flex; gap:1rem; margin-bottom:2rem; flex-wrap:wrap;">
+                <input type="text" class="search-engine-bar" id="designer-search-input" placeholder="Search by city/address, price range ($$$, luxury), style..." oninput="filterDesignerCatalog()" style="max-width:400px; margin-bottom:0;">
+                <button class="chip-btn active" onclick="filterDesignerCity('all', this)">All Regions</button>
+                <button class="chip-btn" onclick="filterDesignerCity('Paris', this)">Paris</button>
+                <button class="chip-btn" onclick="filterDesignerCity('London', this)">London</button>
+                <button class="chip-btn" onclick="filterDesignerCity('New York', this)">New York</button>
+            </div>
+
+            <div class="designers-grid" id="designer-grid-box"></div>
+        </section>
+
+        <!-- TAB 5: CONSULTATION -->
+        <section id="tab-consultation" class="tab-content">
+            <div class="consultation-layout">
+                <div class="consultation-card">
+                    <h3 id="selected-ds-title">Consultation with Madame Genevieve Dupont</h3>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:2rem;">Select an available meeting date and time slot below.</p>
+                    
+                    <div style="margin-bottom:1.5rem;">
+                        <label style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-secondary); display:block; margin-bottom:0.5rem;">Select Date (August 2026)</label>
+                        <div class="calendar-grid" id="cal-days-container"></div>
+                    </div>
+
+                    <label style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-secondary); display:block; margin-bottom:0.5rem;">Available Time Slots</label>
+                    <div class="time-slots" id="time-slots-container">
+                        <div class="time-chip" onclick="selectTimeSlot(this)">10:00 AM EST</div>
+                        <div class="time-chip" onclick="selectTimeSlot(this)">01:30 PM EST</div>
+                        <div class="time-chip" onclick="selectTimeSlot(this)">04:00 PM EST</div>
+                        <div class="time-chip" onclick="selectTimeSlot(this)">06:30 PM EST</div>
+                    </div>
+
+                    <button class="btn-primary" style="width:100%;" onclick="confirmConsultationSchedule()">Confirm Meeting Schedule</button>
+                </div>
+
+                <div class="consultation-card">
+                    <h3>Direct Communication Suite</h3>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:2rem;">Connect instantly with your assigned master designer.</p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:1.2rem;">
+                        <button class="btn-primary" onclick="initiatePhoneCall()">📞 Call Designer Office</button>
+                        <button class="btn-primary" style="background:#fff; color:var(--text-primary); border:1px solid var(--border);" onclick="initiateTextChat()">💬 Send Secure Atelier Text</button>
+                        <button class="btn-primary" style="background:#2ecc71; color:#fff;" onclick="launchFaceTimeCall()">📹 Launch FaceTime Live Session</button>
+                    </div>
+
+                    <div id="text-chat-box" style="display:none; margin-top:2rem; border:1px solid var(--border); padding:1rem; background:var(--bg-color);">
+                        <p style="font-size:0.8rem; text-transform:uppercase; color:var(--text-secondary); margin-bottom:0.5rem;">Secure Chat Channel</p>
+                        <div id="chat-messages" style="height:120px; overflow-y:auto; background:#fff; border:1px solid var(--border); padding:0.8rem; margin-bottom:0.8rem; font-size:0.85rem;">
+                            <p style="color:var(--text-secondary);">Designer: Hello! I am reviewing your order specs. How can I help?</p>
+                        </div>
+                        <div style="display:flex; gap:0.5rem;">
+                            <input type="text" id="chat-input-msg" placeholder="Type message..." style="flex:1; padding:0.5rem; border:1px solid var(--border); font-size:0.85rem;">
+                            <button class="btn-primary" style="margin-top:0; padding:0.5rem 1rem;" onclick="sendChatMessage()">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: CHECKOUT -->
+        <section id="tab-checkout" class="tab-content">
+            <div class="checkout-layout">
+                <div class="checkout-card">
+                    <h3>Royal Secure Checkout</h3>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:2rem;">Enter shipping details and payment particulars.</p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:1rem;">
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            <input type="text" id="chk-name" placeholder="Victoria Windsor">
+                        </div>
+                        <div class="input-group">
+                            <label>Contact Email or Phone</label>
+                            <input type="text" id="chk-contact" placeholder="victoria@domain.com">
+                        </div>
+                        <div class="input-group">
+                            <label>Delivery Address</label>
+                            <input type="text" id="chk-address" placeholder="742 Evergreen Terrace, Suite 4B">
+                        </div>
+                        <div class="input-group">
+                            <label>Payment Information (Credit Card)</label>
+                            <input type="text" id="chk-payment" placeholder="4532 •••• •••• 8892">
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="width:100%; margin-top:2rem;" onclick="processCheckoutOrder()">Complete Secure Commission Payment</button>
+                </div>
+
+                <div class="checkout-card">
+                    <h3>Commission Summary & Receipt</h3>
+                    <div class="receipt-box" id="receipt-content-box">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; font-size:0.9rem;">
+                            <span>Custom Haute Couture Gown</span>
+                            <span>$3,450.00</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; font-size:0.9rem;">
+                            <span>Global Express Courier</span>
+                            <span>$150.00</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:1.2rem; font-size:0.9rem; padding-bottom:1.2rem; border-bottom:1px solid var(--border);">
+                            <span>Atelier Fitting Guarantee</span>
+                            <span>Included</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-weight:500; font-size:1.1rem; margin-bottom:1.5rem;">
+                            <span>Total</span>
+                            <span id="receipt-total-amt">$3,600.00</span>
+                        </div>
+                    </div>
+
+                    <div class="coupon-banner">
+                        <p style="font-size:0.85rem; font-weight:500; margin-bottom:0.3rem;">Special Welcome Coupon Code</p>
+                        <code style="font-size:1.1rem; letter-spacing:0.1em; font-weight:bold; color:var(--accent);">ROYAL2026</code>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.3rem;">Apply code at checkout to enjoy 15% complimentary atelier credit.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 7: TRACK PACKAGE -->
+        <section id="tab-tracker" class="tab-content">
+            <div class="tracker-layout">
+                <div class="checkout-card">
+                    <h3>Live Global Package Tracker</h3>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:2rem;">Enter your package tracking code for real-time telemetry.</p>
+                    
+                    <div class="input-group" style="margin-bottom:1.5rem;">
+                        <label>Tracking Code</label>
+                        <input type="text" id="tracking-code-input" value="ALT-9821-PARIS">
+                    </div>
+                    <button class="btn-primary" style="width:100%; margin-bottom:2rem;" onclick="lookupTrackingPackage()">Sync Live Location</button>
+
+                    <div style="background:var(--bg-color); padding:1.5rem; border:1px solid var(--border);">
+                        <p style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary); margin-bottom:0.5rem;">Status Telemetry</p>
+                        <p id="tracking-status-text" style="font-size:1rem; font-weight:400; margin-bottom:0.3rem;">Package in transit: Leaving Paris Atelier Hub.</p>
+                        <span id="tracking-eta-text" style="font-size:0.85rem; color:var(--accent);">Estimated Delivery: 3 business days</span>
+                    </div>
+                </div>
+
+                <div class="checkout-card">
+                    <h3>Live Courier Radar Map</h3>
+                    <div class="map-simulator" id="map-radar-viewport">
+                        <div style="position:absolute; top:20px; left:20px; font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase;">Satellite Grid: Active</div>
+                        <div class="map-pin" id="map-moving-pin" style="top:50%; left:40%;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // --- DATA CATALOGS ---
+        const dressCatalog = [
+            { url: "https://cdn-5.stacees.co.uk/static/2025/1/nav/brides/wedding-plus.jpg", title: "Plus Royal Lace Ballgown", occasion: "wedding", tag: "Stacees Atelier" },
+            { url: "https://naamanatbridal.com/wp-content/uploads/2023/10/8-1-scaled.jpg", title: "Naama Anat Sculpted Gown", occasion: "wedding", tag: "Naama Anat" },
+            { url: "https://greenweddingshoes.com/wp-content/uploads/2023/07/timeless-off-the-shoulder-elegant-wedding-dresses-with-high-leg-slit-thumb.jpg", title: "Off-the-Shoulder Slit Gown", occasion: "wedding", tag: "Green Wedding" },
+            { url: "https://www.abcfashion.net/cdn/shop/products/glitter-print-mermaid-dress-by-cinderella-divine-j810-long-formal-dresses-cinderella-divine-2-smoky-blue-815190.jpg?v=1696790391&width=900", title: "Cinderella Divine Smoky Blue", occasion: "prom", tag: "ABC Fashion" },
+            { url: "https://www.abcfashion.net/cdn/shop/files/A1369_PARIS--BLUE_1.jpg?v=1734640057&width=900", title: "Paris Blue Evening Gown", occasion: "party", tag: "ABC Fashion" },
+            { url: "https://www.sherrihill.com/cdn/shop/files/6728e31b7b89b_1410x.jpg?v=1731040405", title: "Sherri Hill Couture Edition", occasion: "prom", tag: "Sherri Hill" },
+            { url: "https://www.oliviabottega.com/cdn/shop/products/RoyalLaceOff-The-ShoulderSparklyWeddingdressMeryem-2_dafb69fa-8141-42f6-b246-b2074b5c60ff.jpg", title: "Olivia Bottega Royal Meryem", occasion: "wedding", tag: "Olivia Bottega" },
+            { url: "https://wonanyc.com/wp-content/uploads/2025/04/eva-lendel-venus-wedding-dress-monroe-3-edited-1024x1536.jpg", title: "Eva Lendel Venus Monroe", occasion: "wedding", tag: "Wona NYC" }
+        ];
+
+        const designersCatalog = [
+            {
+                name: "Madame Genevieve Dupont",
+                city: "Paris",
+                address: "14 Place Vendôme, Paris, France",
+                contact: "+33 1 42 68 55 00 | g.dupont@altier.com",
+                price: "$$$$ (Luxury Haute Couture)",
+                headshot: "https://cdn-5.stacees.co.uk/static/2025/1/nav/brides/wedding-plus.jpg",
+                works: [
+                    "https://naamanatbridal.com/wp-content/uploads/2023/10/8-1-scaled.jpg",
+                    "https://greenweddingshoes.com/wp-content/uploads/2023/07/timeless-off-the-shoulder-elegant-wedding-dresses-with-high-leg-slit-thumb.jpg",
+                    "https://www.oliviabottega.com/cdn/shop/products/RoyalLaceOff-The-ShoulderSparklyWeddingdressMeryem-2_dafb69fa-8141-42f6-b246-b2074b5c60ff.jpg",
+                    "https://wonanyc.com/wp-content/uploads/2025/04/eva-lendel-venus-wedding-dress-monroe-3-edited-1024x1536.jpg"
+                ]
+            },
+            {
+                name: "Lord Alistair Sterling",
+                city: "London",
+                address: "88 Mount Street, Mayfair, London, UK",
+                contact: "+44 20 7946 0912 | a.sterling@altier.com",
+                price: "$$$ (Designer Custom)",
+                headshot: "https://cdn0.hitched.co.uk/article/5818/original/1280/png/128185-suzanne-neville-corset-lace-wellesley-wedding-dress.jpeg",
+                works: [
+                    "https://www.abcfashion.net/cdn/shop/products/glitter-print-mermaid-dress-by-cinderella-divine-j810-long-formal-dresses-cinderella-divine-2-smoky-blue-815190.jpg?v=1696790391&width=900",
+                    "https://www.abcfashion.net/cdn/shop/files/A1369_PARIS--BLUE_1.jpg?v=1734640057&width=900",
+                    "https://www.sherrihill.com/cdn/shop/files/6728e31b7b89b_1410x.jpg?v=1731040405",
+                    "https://cdn-5.stacees.co.uk/static/2025/1/nav/brides/wedding-plus.jpg"
+                ]
+            },
+            {
+                name: "Elena Rostova Studio",
+                city: "New York",
+                address: "550 Madison Ave, New York, NY, USA",
+                contact: "+1 212 555 0198 | e.rostova@altier.com",
+                price: "$$$$ (Bespoke Red Carpet)",
+                headshot: "https://www.newyorkdress.com/cdn/shop/files/Ladivine-CD803_NAVY_1db4b47f-4e7b-46f0-b573-a74bb0068eda.jpg?v=1753886508",
+                works: [
+                    "https://www.newyorkdress.com/cdn/shop/files/Ladivine-CD803_NAVY_1db4b47f-4e7b-46f0-b573-a74bb0068eda.jpg?v=1753886508",
+                    "https://www.thedressoutlet.com/cdn/shop/files/cd803_dusty-blue_front.jpg?v=1757774873",
+                    "https://naamanatbridal.com/wp-content/uploads/2023/10/8-1-scaled.jpg",
+                    "https://wonanyc.com/wp-content/uploads/2025/04/eva-lendel-venus-wedding-dress-monroe-3-edited-1024x1536.jpg"
+                ]
+            }
+        ];
+
+        let selectedActiveDesigner = designersCatalog[0];
+        let userMeasurementUnit = 'in';
+        let surveyDataCollected = { occasion: '', style: '' };
+        let activeCallTimerInterval = null;
+        let callSecondsCount = 0;
+
+        // --- AUTHENTICATION FLOW ---
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            if(tab === 'signin') {
+                document.querySelectorAll('.auth-tab')[0].classList.add('active');
+                document.getElementById('form-signin').classList.add('active');
+            } else {
+                document.querySelectorAll('.auth-tab')[1].classList.add('active');
+                document.getElementById('form-signup-1').classList.add('active');
+            }
+        }
+
+        function handleSignIn() {
+            const id = document.getElementById('signin-id').value;
+            const pass = document.getElementById('signin-pass').value;
+            if(!id || !pass) { alert('Please fill in sign in credentials.'); return; }
+            alert('Welcome back to Altier Global!');
+            closeAuthOverlay(false);
+        }
+
+        function sendConfirmationCode() {
+            const id = document.getElementById('signup-id').value;
+            if(!id) { alert('Please enter email or phone number.'); return; }
+            alert('Confirmation code sent successfully! (Simulated code: 1234)');
+            document.getElementById('form-signup-1').style.display = 'none';
+            document.getElementById('form-signup-2').style.display = 'flex';
+        }
+
+        function verifyCodeToPassword() {
+            const code = document.getElementById('signup-code').value;
+            if(code !== '1234') { alert('Invalid confirmation code. Try 1234.'); return; }
+            document.getElementById('form-signup-2').style.display = 'none';
+            document.getElementById('form-signup-3').style.display = 'flex';
+        }
+
+        function completeSignUp() {
+            const pass = document.getElementById('signup-pass').value;
+            if(pass.length < 7 || !/[a-zA-Z]/.test(pass) || !/[0-9]/.test(pass)) {
+                alert('Password must be at least 7 characters with letters and numbers.');
+                return;
+            }
+            alert('Account created successfully!');
+            closeAuthOverlay(true);
+        }
+
+        function closeAuthOverlay(isNew) {
+            document.getElementById('auth-overlay').style.display = 'none';
+            if(isNew) {
+                document.getElementById('survey-overlay').style.display = 'flex';
+            } else {
+                document.getElementById('main-app').style.display = 'flex';
+                initApplication();
+            }
+        }
+
+        // --- SURVEY FLOW ---
+        function selectSurveyChoice(el, category, val) {
+            el.parentElement.querySelectorAll('.survey-option-box').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            surveyDataCollected[category] = val;
+        }
+
+        function nextSurveyStep(stepNum) {
+            document.querySelectorAll('.survey-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('survey-step-' + stepNum).classList.add('active');
+        }
+
+        function finishSurvey() {
+            document.getElementById('survey-overlay').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            initApplication();
+        }
+
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        // --- INITIALIZATION ---
+        function initApplication() {
+            renderDressCatalog(dressCatalog);
+            renderDesignerCatalog(designersCatalog);
+            buildCalendarDays();
+        }
+
+        // --- TAB 1: CUSTOMIZE & SEARCH ENGINE ---
+        function renderDressCatalog(items) {
+            const container = document.getElementById('dress-grid-box');
+            container.innerHTML = '';
+            items.forEach(d => {
+                const card = document.createElement('div');
+                card.className = 'dress-card';
+                card.onclick = () => selectDressReference(d);
+                card.innerHTML = `
+                    <img src="${d.url}" alt="${d.title}" loading="lazy">
+                    <div class="dress-card-info">
+                        <h4>${d.title}</h4>
+                        <span>${d.tag}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            document.getElementById('customize-results-count').textContent = `Showing ${items.length} master reference styles.`;
+        }
+
+        function filterDressCatalog() {
+            const q = document.getElementById('dress-search-input').value.toLowerCase();
+            const filtered = dressCatalog.filter(d => d.title.toLowerCase().includes(q) || d.occasion.toLowerCase().includes(q) || d.tag.toLowerCase().includes(q));
+            renderDressCatalog(filtered);
+        }
+
+        function filterByOccasion(occ, btn) {
+            document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if(occ === 'all') {
+                renderDressCatalog(dressCatalog);
+            } else {
+                const filtered = dressCatalog.filter(d => d.occasion === occ);
+                renderDressCatalog(filtered);
+            }
+        }
+
+        function handleUserImageUpload(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const customDress = {
+                        url: e.target.result,
+                        title: "Custom Upload Reference",
+                        occasion: "Custom",
+                        tag: "User Uploaded"
+                    };
+                    dressCatalog.unshift(customDress);
+                    renderDressCatalog(dressCatalog);
+                    selectDressReference(customDress);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function selectDressReference(dress) {
+            document.getElementById('order-preview-img').src = dress.url;
+            document.getElementById('order-preview-title').textContent = dress.title;
+            document.getElementById('order-preview-tag').textContent = dress.occasion.toUpperCase() + " OCCASION";
+            
+            // Auto switch tab to Sizing as requested
+            document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-link')[1].classList.add('active');
+            document.getElementById('tab-sizing').classList.add('active');
+            alert(`Reference selected ("${dress.title}"). Information stored in "Your Order". Redirecting to Sizing tab.`);
+        }
+
+        // --- TAB 2: SIZING ---
+        function setMeasurementUnit(unit) {
+            userMeasurementUnit = unit;
+            document.getElementById('summary-unit-name').textContent = unit === 'in' ? 'Inches' : 'Centimeters';
+            if(unit === 'in') {
+                document.getElementById('btn-unit-in').classList.add('active');
+                document.getElementById('btn-unit-cm').classList.remove('active');
+                document.getElementById('input-height').placeholder = "e.g. 66";
+                document.getElementById('input-waist').placeholder = "e.g. 26";
+                document.getElementById('input-bust').placeholder = "e.g. 34";
+                document.getElementById('input-hips').placeholder = "e.g. 38";
+            } else {
+                document.getElementById('btn-unit-cm').classList.add('active');
+                document.getElementById('btn-unit-in').classList.remove('active');
+                document.getElementById('input-height').placeholder = "e.g. 168";
+                document.getElementById('input-waist').placeholder = "e.g. 66";
+                document.getElementById('input-bust').placeholder = "e.g. 86";
+                document.getElementById('input-hips').placeholder = "e.g. 96";
+            }
+        }
+
+        function runAiBodyScanner() {
+            const video = document.getElementById('webcam-live-feed');
+            const placeholder = document.getElementById('camera-placeholder-ui');
+            navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                video.style.display = 'block';
+                placeholder.style.display = 'none';
+                video.srcObject = stream;
+            }).catch(() => {
+                alert('Camera access simulated. Scanning body geometry...');
+            });
+
+            setTimeout(() => {
+                if(userMeasurementUnit === 'in') {
+                    document.getElementById('input-height').value = "67";
+                    document.getElementById('input-waist').value = "27";
+                    document.getElementById('input-bust').value = "35";
+                    document.getElementById('input-hips').value = "39";
+                } else {
+                    document.getElementById('input-height').value = "170";
+                    document.getElementById('input-waist').value = "68";
+                    document.getElementById('input-bust').value = "89";
+                    document.getElementById('input-hips').value = "99";
+                }
+                alert('AI Body Scan telemetry completed successfully!');
+            }, 1200);
+        }
+
+        function saveMeasurementsToOrder() {
+            const h = document.getElementById('input-height').value;
+            const w = document.getElementById('input-waist').value;
+            const b = document.getElementById('input-bust').value;
+            const hp = document.getElementById('input-hips').value;
+            const suffix = userMeasurementUnit === 'in' ? ' in' : ' cm';
+
+            document.getElementById('summary-h').textContent = h ? h + suffix : 'Not provided';
+            document.getElementById('summary-w').textContent = w ? w + suffix : 'Not provided';
+            document.getElementById('summary-b').textContent = b ? b + suffix : 'Not provided';
+            document.getElementById('summary-hp').textContent = hp ? hp + suffix : 'Not provided';
+
+            alert('Measurements successfully saved and synchronized with "Your Order".');
+        }
+
+        // --- TAB 4: EXPLORE DESIGNERS ---
+        function renderDesignerCatalog(items) {
+            const container = document.getElementById('designer-grid-box');
+            container.innerHTML = '';
+            items.forEach(ds => {
+                const card = document.createElement('div');
+                card.className = 'designer-grid-card';
+                card.onclick = () => openDesignerModal(ds);
+                card.innerHTML = `
+                    <img src="${ds.headshot}" alt="${ds.name}" loading="lazy">
+                    <div class="designer-grid-card-info">
+                        <h4 style="font-weight:400; margin-bottom:0.2rem;">${ds.name}</h4>
+                        <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase;">${ds.city} • ${ds.price}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterDesignerCatalog() {
+            const q = document.getElementById('designer-search-input').value.toLowerCase();
+            const filtered = designersCatalog.filter(ds => ds.name.toLowerCase().includes(q) || ds.city.toLowerCase().includes(q) || ds.price.toLowerCase().includes(q) || ds.address.toLowerCase().includes(q));
+            renderDesignerCatalog(filtered);
+        }
+
+        function filterDesignerCity(city, btn) {
+            btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if(city === 'all') {
+                renderDesignerCatalog(designersCatalog);
+            } else {
+                const filtered = designersCatalog.filter(ds => ds.city === city);
+                renderDesignerCatalog(filtered);
+            }
+        }
+
+        function openDesignerModal(ds) {
+            selectedActiveDesigner = ds;
+            document.getElementById('modal-ds-name').textContent = ds.name;
+            document.getElementById('modal-ds-address').textContent = ds.address;
+            document.getElementById('modal-ds-contact').textContent = ds.contact;
+            document.getElementById('modal-ds-price').textContent = ds.price;
+            document.getElementById('modal-ds-headshot').src = ds.headshot;
+            
+            const portfolio = document.getElementById('modal-ds-portfolio');
+            portfolio.innerHTML = '';
+            ds.works.forEach(w => {
+                const img = document.createElement('img');
+                img.src = w;
+                portfolio.appendChild(img);
+            });
+
+            document.getElementById('designer-modal').style.display = 'flex';
+        }
+
+        function closeDesignerModal(e) {
+            if(e.target.id === 'designer-modal') {
+                document.getElementById('designer-modal').style.display = 'none';
+            }
+        }
+
+        function selectDesignerAndRedirect() {
+            document.getElementById('designer-modal').style.display = 'none';
+            document.getElementById('selected-ds-title').textContent = "Consultation with " + selectedActiveDesigner.name;
+            document.getElementById('ft-designer-img').src = selectedActiveDesigner.headshot;
+            
+            // Redirect to Consultation tab
+            document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-link')[4].classList.add('active');
+            document.getElementById('tab-consultation').classList.add('active');
+        }
+
+        // --- TAB 5: CONSULTATION & CALENDAR & FACETIME ---
+        function buildCalendarDays() {
+            const container = document.getElementById('cal-days-container');
+            container.innerHTML = '';
+            for(let i=1; i<=31; i++) {
+                const day = document.createElement('div');
+                day.className = 'cal-day';
+                if(i === 22) day.classList.add('selected');
+                day.textContent = i;
+                day.onclick = () => {
+                    container.querySelectorAll('.cal-day').forEach(d => d.classList.remove('selected'));
+                    day.classList.add('selected');
+                }
+                container.appendChild(day);
+            }
+        }
+
+        function selectTimeSlot(el) {
+            el.parentElement.querySelectorAll('.time-chip').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function confirmConsultationSchedule() {
+            alert(`Meeting confirmed with ${selectedActiveDesigner.name} for August 22, 2026.`);
+        }
+
+        function initiatePhoneCall() {
+            alert(`Placing telephone call to ${selectedActiveDesigner.name} office (${selectedActiveDesigner.contact})...`);
+        }
+
+        function initiateTextChat() {
+            const box = document.getElementById('text-chat-box');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input-msg');
+            const msg = input.value.trim();
+            if(!msg) return;
+            const chatBox = document.getElementById('chat-messages');
+            chatBox.innerHTML += `<p style="margin-top:0.4rem;">You: ${msg}</p>`;
+            input.value = '';
+            setTimeout(() => {
+                chatBox.innerHTML += `<p style="margin-top:0.4rem; color:var(--accent);">Designer: Received your note regarding the custom fabric drape. I will adjust the atelier pattern.</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 800);
+        }
+
+        function launchFaceTimeCall() {
+            document.getElementById('facetime-modal').style.display = 'flex';
+            callSecondsCount = 0;
+            const userVideo = document.getElementById('ft-user-video');
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+                userVideo.srcObject = stream;
+            }).catch(() => {});
+
+            activeCallTimerInterval = setInterval(() => {
+                callSecondsCount++;
+                const mins = String(Math.floor(callSecondsCount / 60)).padStart(2, '0');
+                const secs = String(callSecondsCount % 60).padStart(2, '0');
+                document.getElementById('ft-timer').textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function endFaceTimeCall() {
+            clearInterval(activeCallTimerInterval);
+            document.getElementById('facetime-modal').style.display = 'none';
+        }
+
+        function toggleAudioMute() { alert('Microphone muted/unmuted.'); }
+        function toggleVideoCamera() { alert('Camera stream flipped.'); }
+
+        // --- TAB 6: CHECKOUT ---
+        function processCheckoutOrder() {
+            const name = document.getElementById('chk-name').value;
+            const contact = document.getElementById('chk-contact').value;
+            const address = document.getElementById('chk-address').value;
+            const payment = document.getElementById('chk-payment').value;
+
+            if(!name || !contact || !address || !payment) {
+                alert('Please complete all checkout and payment details.');
+                return;
+            }
+            alert('Order commission and payment processed successfully! Receipt generated.');
+        }
+
+        // --- TAB 7: TRACK PACKAGE ---
+        function lookupTrackingPackage() {
+            const code = document.getElementById('tracking-code-input').value;
+            if(!code) { alert('Please enter tracking code.'); return; }
+            document.getElementById('tracking-status-text').textContent = `Package code ${code}: In transit via Global Air Courier.`;
+            
+            // Animate map pin
+            const pin = document.getElementById('map-moving-pin');
+            pin.style.top = '70%';
+            pin.style.left = '65%';
+            alert('Live GPS telemetry synchronized.');
+        }
+    </script>
 </body>
 </html>
